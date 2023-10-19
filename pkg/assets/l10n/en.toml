@@ -1,0 +1,7 @@
+# en.toml
+HelloMessage = "Hello World!"
+
+[DaysLeft]
+description = "Show days left"
+one = "{{.Count}} day left"
+other = "{{.Count}} days left"

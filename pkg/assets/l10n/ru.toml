@@ -1,0 +1,8 @@
+# ru.toml
+HelloMessage = "Привет Мир!"
+
+[DaysLeft]
+description = "Показывает остаток дней."
+one = "Остался: {{.Count}} день"
+few = "Осталось: {{.Count}} дня"
+many = "Осталось: {{.Count}} дней"
