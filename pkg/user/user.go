@@ -18,6 +18,14 @@ func (u *UserConfig) GetDaysReset() int {
 	return u.country.daysReset
 }
 
+func (u *UserConfig) GetDaysCont() int {
+	return u.country.daysContinual
+}
+
+func (u *UserConfig) GetDaysLimit() int {
+	return u.country.daysLimit
+}
+
 type UserCountry struct {
 	code          string
 	daysContinual int

@@ -1,11 +1,9 @@
 package calendar
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
-	"cdtj.io/days-in-turkey-bot/user"
 	"golang.org/x/exp/slices"
 )
 
@@ -63,15 +61,4 @@ func strToChunks(str string) []string {
 	str = strings.ReplaceAll(str, "\n", " ")
 	result := strings.Split(str, " ")
 	return result
-}
-
-func daysSpent(u *user.UserConfig, dates []time.Time) {
-	var daysIn, daysOut int
-	resetDate := time.Now().Add(-1 * time.Hour * time.Duration(u.GetDaysReset()))
-	fmt.Println("resetDate:", resetDate)
-
-	for i := 0; i < len(dates); i++ {
-
-	}
-	time.Now().Sub(resetDate).Hours()
 }
