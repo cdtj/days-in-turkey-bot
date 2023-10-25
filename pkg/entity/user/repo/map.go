@@ -17,13 +17,13 @@ func NewUserRepo(db db.Database) *UserRepo {
 	}
 }
 
-func (r *UserRepo) Load(ctx context.Context, userID uint64) (*model.User, error) {
+func (r *UserRepo) Load(ctx context.Context, userID string) (*model.User, error) {
 	u, err := r.db.Load(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 	return u.(*model.User), err
 }
-func (r *UserRepo) Save(ctx context.Context, userID uint64, user *model.User) error {
+func (r *UserRepo) Save(ctx context.Context, userID string, user *model.User) error {
 	return r.db.Save(ctx, userID, user)
 }

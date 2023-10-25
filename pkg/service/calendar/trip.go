@@ -4,26 +4,12 @@ import (
 	"fmt"
 	"time"
 
+	"cdtj.io/days-in-turkey-bot/model"
 	"github.com/sirupsen/logrus"
 )
 
-type TripTree struct {
-	StartDate    time.Time
-	EndDate      time.Time
-	EndPredicted bool
-	TripDays     int
-	PeriodDays   int
-
-	Prev *TripTree
-	Next *TripTree
-}
-
-func Trip(daysLimit, daysCont, resetInterval int, dates []time.Time) *TripTree {
-	return calcTree(daysLimit, daysCont, resetInterval, dates)
-}
-
-func calcTree(daysLimit, daysCont, resetInterval int, dates []time.Time) *TripTree {
-	var prev, tree *TripTree
+func calcTree(daysLimit, daysCont, resetInterval int, dates []time.Time) *model.TripTree {
+	var prev, tree *model.TripTree
 	for i := 0; i < len(dates); i = i + 2 {
 		var endDate time.Time
 		startDate := dates[i]
@@ -35,7 +21,7 @@ func calcTree(daysLimit, daysCont, resetInterval int, dates []time.Time) *TripTr
 			endDate = predictDate(startDate, maxTripDate(startDate, daysCont), daysLimit, daysCont, resetInterval, tree)
 		}
 		daysPassed := tripDays(startDate, endDate, resetInterval, tree)
-		tree = &TripTree{
+		tree = &model.TripTree{
 			StartDate:    startDate,
 			EndDate:      endDate,
 			TripDays:     daysBetween(startDate, endDate),
@@ -52,7 +38,7 @@ func daysAllowed(daysPassed, daysLimit int) int {
 	return daysLimit - daysPassed
 }
 
-func predictDate(startDate, endDate time.Time, daysLimit, daysCont, resetInterval int, tree *TripTree) time.Time {
+func predictDate(startDate, endDate time.Time, daysLimit, daysCont, resetInterval int, tree *model.TripTree) time.Time {
 	checker := daysCont
 	for {
 		daysPassed := tripDays(startDate, maxTripDate(startDate, checker), resetInterval, tree)
@@ -69,7 +55,7 @@ func predictDate(startDate, endDate time.Time, daysLimit, daysCont, resetInterva
 	}
 }
 
-func tripDays(startDate, endDate time.Time, resetInterval int, tree *TripTree) int {
+func tripDays(startDate, endDate time.Time, resetInterval int, tree *model.TripTree) int {
 	resetDay := getResetDay(endDate, resetInterval)
 	daysPassed := 0
 	if startDate.Before(endDate) {

@@ -3,7 +3,8 @@ package user
 import "context"
 
 type Usecase interface {
-	Create(ctx context.Context, userID uint64) error
-	Get(ctx context.Context, userID uint64) error
-	Calc(ctx context.Context, userID uint64) error
+	Get(ctx context.Context, userID string) (string, error)
+	CalculateTrip(ctx context.Context, userID string, input string) (string, error)
+	UpdateLang(ctx context.Context, userID string, lang string) error
+	UpdateCountry(ctx context.Context, userID string, countryID string) error
 }

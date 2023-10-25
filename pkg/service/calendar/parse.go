@@ -31,7 +31,7 @@ func compileRegexp() error {
 	return nil
 }
 
-func ProcessInput(input string) ([]time.Time, error) {
+func processInput(input string) ([]time.Time, error) {
 	strDates := strToChunks(input)
 	dates := make([]time.Time, 0, len(strDates))
 	for _, strDate := range strDates {

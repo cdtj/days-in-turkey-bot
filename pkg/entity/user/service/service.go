@@ -2,23 +2,35 @@ package service
 
 import (
 	"context"
-	"fmt"
 
+	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/calendar"
+	"cdtj.io/days-in-turkey-bot/service/formatter"
+	"golang.org/x/text/language"
 )
 
 type UserService struct {
+	fmtr formatter.Formatter
 }
 
-func (uc *UserService) Calc(ctx context.Context, input string, daysLimit, daysCont, resetInterval int) (string, error) {
-	dates, err := calendar.ProcessInput(input)
+func NewUserService(fmtr formatter.Formatter) *UserService {
+	return &UserService{
+		fmtr: fmtr,
+	}
+}
+
+func (s *UserService) UserInfo(ctx context.Context, u *model.User) string {
+	return s.fmtr.User(u)
+}
+
+func (s *UserService) CalculateTrip(ctx context.Context, input string, daysLimit, daysCont, resetInterval int) (string, error) {
+	tree, err := calendar.MakeTree(input, daysLimit, daysCont, resetInterval)
 	if err != nil {
 		return "", err
 	}
-	tree := calendar.Trip(daysLimit, daysCont, resetInterval, dates)
-	result := ""
-	for i := tree; i != nil; i = i.Prev {
-		result += fmt.Sprintf("trip: %q - %q @ %d / %d\n", i.StartDate, i.EndDate, i.TripDays, i.PeriodDays)
-	}
-	return result, nil
+	return s.fmtr.TripTree(tree), nil
+}
+
+func (s *UserService) LangLookup(ctx context.Context, lang string) (language.Tag, error) {
+	return language.Parse(lang)
 }

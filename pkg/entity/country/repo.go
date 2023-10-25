@@ -7,6 +7,6 @@ import (
 )
 
 type Repo interface {
-	Load(ctx context.Context, countryID uint64) (*model.Country, error)
-	Save(ctx context.Context, countryID uint64, user *model.Country) error
+	Load(ctx context.Context, countryID string) (*model.Country, error)
+	Save(ctx context.Context, countryID string, country *model.Country) error
 }

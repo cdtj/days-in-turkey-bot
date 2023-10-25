@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"cdtj.io/days-in-turkey-bot/l10n"
+	"cdtj.io/days-in-turkey-bot/service/l10n"
 	"golang.org/x/text/language"
 )
 
