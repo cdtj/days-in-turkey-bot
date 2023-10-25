@@ -22,7 +22,7 @@ func main() {
 			continue
 		}
 		fmt.Println(l10n.Localaze(lang, "HelloMessage"))
-		for i := 0; i < 90; i++ {
+		for i := 0; i < 5; i++ {
 			fmt.Println(l10n.LocalazeWithCount(lang, "DaysLeft", i))
 		}
 	}

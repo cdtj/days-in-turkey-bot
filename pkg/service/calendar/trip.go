@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"cdtj.io/days-in-turkey-bot/user"
+	"github.com/sirupsen/logrus"
 )
 
 type TripTree struct {
@@ -18,14 +18,11 @@ type TripTree struct {
 	Next *TripTree
 }
 
-func Trip(u *user.UserConfig, dates []time.Time) {
-	tree := calcTree(u, dates)
-	for i := tree; i != nil; i = i.Prev {
-		fmt.Printf("trip: %q - %q @ %d / %d\n", i.StartDate, i.EndDate, i.TripDays, i.PeriodDays)
-	}
+func Trip(daysLimit, daysCont, resetInterval int, dates []time.Time) *TripTree {
+	return calcTree(daysLimit, daysCont, resetInterval, dates)
 }
 
-func calcTree(u *user.UserConfig, dates []time.Time) *TripTree {
+func calcTree(daysLimit, daysCont, resetInterval int, dates []time.Time) *TripTree {
 	var prev, tree *TripTree
 	for i := 0; i < len(dates); i = i + 2 {
 		var endDate time.Time
@@ -35,9 +32,9 @@ func calcTree(u *user.UserConfig, dates []time.Time) *TripTree {
 			endDate = dates[i+1]
 		} else {
 			predicted = true
-			endDate = predictDate(startDate, maxTripDate(startDate, u.GetDaysCont()), u.GetDaysLimit(), u.GetDaysCont(), u.GetDaysReset(), tree)
+			endDate = predictDate(startDate, maxTripDate(startDate, daysCont), daysLimit, daysCont, resetInterval, tree)
 		}
-		daysPassed := tripDays(startDate, endDate, u.GetDaysReset(), tree)
+		daysPassed := tripDays(startDate, endDate, resetInterval, tree)
 		tree = &TripTree{
 			StartDate:    startDate,
 			EndDate:      endDate,
@@ -55,12 +52,12 @@ func daysAllowed(daysPassed, daysLimit int) int {
 	return daysLimit - daysPassed
 }
 
-func predictDate(startDate, endDate time.Time, daysLimit, daysCont, daysReset int, tree *TripTree) time.Time {
+func predictDate(startDate, endDate time.Time, daysLimit, daysCont, resetInterval int, tree *TripTree) time.Time {
 	checker := daysCont
 	for {
-		daysPassed := tripDays(startDate, maxTripDate(startDate, checker), daysReset, tree)
+		daysPassed := tripDays(startDate, maxTripDate(startDate, checker), resetInterval, tree)
 		daysAllowed := daysAllowed(daysPassed, daysLimit)
-		// fmt.Printf("[%d], daysPassed: %d, daysAllowed: %d\n", checker, daysPassed, daysAllowed)
+		logrus.WithFields(logrus.Fields{"method": "predictDate", "daysPassed": daysPassed, "daysAllowed": daysAllowed}).Debug(checker)
 		if checker < 0 {
 			return startDate
 		}
@@ -80,18 +77,16 @@ func tripDays(startDate, endDate time.Time, resetInterval int, tree *TripTree) i
 	}
 	fmt.Printf("%d > %q - %q @ %q\n", daysPassed, startDate, endDate, resetDay)
 	for i := tree; i != nil; i = i.Prev {
+		logrus.WithFields(logrus.Fields{"method": "tripDays", "StartDate": i.StartDate, "EndDate": i.EndDate, "resetDay": resetDay}).Debug(daysPassed)
 		if i.EndDate.After(resetDay) {
 			branchStartDate := i.StartDate
 			if branchStartDate.Before(resetDay) {
 				branchStartDate = resetDay
 			}
 			daysPassed += daysBetween(branchStartDate, i.EndDate)
-			// fmt.Printf("%d > on Before(%q): %q - %q\n", daysPassed, resetDay, i.StartDate, i.EndDate)
 		} else if i.StartDate.After(resetDay) {
 			daysPassed += daysBetween(i.StartDate, i.EndDate)
-			// fmt.Printf("%d > on After(%q): %q - %q\n", daysPassed, resetDay, i.StartDate, i.EndDate)
 		} else {
-			// fmt.Printf("%d > on Break: %q - %q\n", daysPassed, i.StartDate, i.EndDate)
 			break
 		}
 	}
