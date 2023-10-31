@@ -12,10 +12,8 @@ type TelegramFormatter struct {
 	lang language.Tag
 }
 
-func NewTelegramFormatter(lang language.Tag) *TelegramFormatter {
-	return &TelegramFormatter{
-		lang: lang,
-	}
+func NewTelegramFormatter() *TelegramFormatter {
+	return &TelegramFormatter{}
 }
 
 func (f *TelegramFormatter) TripTree(tree *model.TripTree) string {
