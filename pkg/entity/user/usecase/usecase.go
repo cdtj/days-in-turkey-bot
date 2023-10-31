@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"cdtj.io/days-in-turkey-bot/entity/country"
 	"cdtj.io/days-in-turkey-bot/entity/user"
@@ -23,43 +24,62 @@ func NewUserUsecase(repo user.Repo, country country.Repo, service user.Service) 
 	}
 }
 
-func (uc *UserUsecase) Get(ctx context.Context, userID string) (string, error) {
+func (uc *UserUsecase) Get(ctx context.Context, userID string) (*model.User, error) {
+	return uc.get(ctx, userID)
+}
+
+func (uc *UserUsecase) Info(ctx context.Context, userID string) (string, error) {
 	u, err := uc.get(ctx, userID)
 	if err != nil {
+		slog.Error("get user failed", "userID", userID, "err", err)
+		return "", err
+	}
+	slog.Info("get user", "userid", userID, "data", u)
+	return uc.service.UserInfo(ctx, u), nil
+}
+
+func (uc *UserUsecase) UpdateLang(ctx context.Context, userID string, lang string) (string, error) {
+	u, err := uc.get(ctx, userID)
+	if err != nil {
+		slog.Error("updateLang failed", "userID", userID, "lang", lang, "err", err)
+		return "", err
+	}
+	langTag, err := uc.service.LangLookup(ctx, lang)
+	if err != nil {
+		slog.Error("updateLang failed", "userID", userID, "lang", lang, "err", err)
+		return "", err
+	}
+	slog.Info("update lang", "userid", userID, "lang", langTag)
+	u.Lang = langTag
+	if err := uc.repo.Save(ctx, userID, u); err != nil {
 		return "", err
 	}
 	return uc.service.UserInfo(ctx, u), nil
 }
 
-func (uc *UserUsecase) UpdateLang(ctx context.Context, userID string, lang string) error {
+func (uc *UserUsecase) UpdateCountry(ctx context.Context, userID string, countryID string) (string, error) {
 	u, err := uc.get(ctx, userID)
 	if err != nil {
-		return err
+		slog.Error("updateCountry failed", "userID", userID, "countryID", countryID, "err", err)
+		return "", err
 	}
-	langTag, err := uc.service.LangLookup(ctx, lang)
+	country, err := uc.country.Get(ctx, countryID)
 	if err != nil {
-		return err
+		slog.Error("updateCountry failed", "userID", userID, "countryID", countryID, "err", err)
+		return "", err
 	}
-	u.Lang = langTag
-	return uc.repo.Save(ctx, userID, u)
-}
-
-func (uc *UserUsecase) UpdateCountry(ctx context.Context, userID string, countryID string) error {
-	u, err := uc.get(ctx, userID)
-	if err != nil {
-		return err
-	}
-	country, err := uc.country.Load(ctx, countryID)
-	if err != nil {
-		return err
-	}
+	slog.Info("update country", "userid", userID, "country", country)
 	u.Country = country
-	return uc.repo.Save(ctx, userID, u)
+	if err := uc.repo.Save(ctx, userID, u); err != nil {
+		return "", err
+	}
+	return uc.service.UserInfo(ctx, u), nil
 }
 
-func (uc *UserUsecase) Calc(ctx context.Context, userID string, input string) (string, error) {
+func (uc *UserUsecase) CalculateTrip(ctx context.Context, userID string, input string) (string, error) {
 	u, err := uc.get(ctx, userID)
 	if err != nil {
+		slog.Error("calculate trip failed", "userID", userID, "input", input, "err", err)
 		return "", err
 	}
 	return uc.service.CalculateTrip(ctx, input, u.GetDaysLimit(), u.GetDaysCont(), u.GetResetInterval())
@@ -78,6 +98,7 @@ func (uc *UserUsecase) get(ctx context.Context, userID string) (*model.User, err
 			}
 			return uc.get(ctx, userID)
 		}
+		slog.Error("internal user get failed", "userID", userID, "err", err)
 		return nil, err
 	}
 	return u, nil

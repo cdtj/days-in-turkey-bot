@@ -7,6 +7,6 @@ import (
 )
 
 type Repo interface {
-	Load(ctx context.Context, countryID string) (*model.Country, error)
-	Save(ctx context.Context, countryID string, country *model.Country) error
+	Get(ctx context.Context, countryID string) (*model.Country, error)
+	Set(ctx context.Context, countryID string, country *model.Country) error
 }

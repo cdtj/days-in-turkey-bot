@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"cdtj.io/days-in-turkey-bot/entity/country"
+	"cdtj.io/days-in-turkey-bot/model"
 )
 
 type CountryUsecase struct {
@@ -16,10 +17,10 @@ func NewCountryUsecase(repo country.Repo) *CountryUsecase {
 	}
 }
 
-func (u *CountryUsecase) Create(ctx context.Context) error {
-	return nil
+func (u *CountryUsecase) Get(ctx context.Context, countryID string) (*model.Country, error) {
+	return u.repo.Get(ctx, countryID)
 }
 
-func (u *CountryUsecase) Update(ctx context.Context) error {
-	return nil
+func (u *CountryUsecase) Set(ctx context.Context, countryID string, country *model.Country) error {
+	return u.repo.Set(ctx, countryID, country)
 }

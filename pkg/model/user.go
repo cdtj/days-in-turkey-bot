@@ -1,6 +1,10 @@
 package model
 
-import "golang.org/x/text/language"
+import (
+	"fmt"
+
+	"golang.org/x/text/language"
+)
 
 type User struct {
 	Lang    language.Tag
@@ -28,4 +32,8 @@ func (u *User) GetDaysLimit() int {
 
 func DefaultUser() *User {
 	return NewUserConfig(language.Russian, DefaultCountry())
+}
+
+func (u *User) String() string {
+	return fmt.Sprintf("Language: %s\nCountry: %s", u.Lang, u.Country.String())
 }

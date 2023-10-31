@@ -17,7 +17,7 @@ func NewCountryRepo(db db.Database) *CountryRepo {
 	}
 }
 
-func (r *CountryRepo) Load(ctx context.Context, userID string) (*model.Country, error) {
+func (r *CountryRepo) Get(ctx context.Context, userID string) (*model.Country, error) {
 	u, err := r.db.Load(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -25,6 +25,6 @@ func (r *CountryRepo) Load(ctx context.Context, userID string) (*model.Country, 
 	return u.(*model.Country), err
 }
 
-func (r *CountryRepo) Save(ctx context.Context, userID string, user *model.Country) error {
+func (r *CountryRepo) Set(ctx context.Context, userID string, user *model.Country) error {
 	return r.db.Save(ctx, userID, user)
 }

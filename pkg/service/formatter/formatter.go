@@ -7,4 +7,5 @@ import (
 type Formatter interface {
 	TripTree(tree *model.TripTree) string
 	User(user *model.User) string
+	Country(country *model.Country) string
 }

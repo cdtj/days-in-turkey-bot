@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"cdtj.io/days-in-turkey-bot/assets"
 	"github.com/BurntSushi/toml"
@@ -78,4 +79,11 @@ func LocalazeWithCount(tag language.Tag, messageID string, count interface{}) st
 func ValidateLang(tag language.Tag) bool {
 	_, ok := localizers.Load(tag)
 	return ok
+}
+
+const dateLayout = "02/01/2006"
+
+// TODO: add regional formats
+func FormatDate(dt time.Time) string {
+	return dt.Format(dateLayout)
 }
