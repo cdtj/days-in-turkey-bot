@@ -5,11 +5,9 @@ import (
 
 	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/l10n"
-	"golang.org/x/text/language"
 )
 
 type TelegramFormatter struct {
-	lang language.Tag
 }
 
 func NewTelegramFormatter() *TelegramFormatter {
