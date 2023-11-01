@@ -35,6 +35,11 @@ func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	msg := update.Message
+	if msg == nil {
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, nil)
+		return
+	}
 
 	slog.Debug("incoming",
 		"UpdateID", update.UpdateID,
@@ -71,8 +76,8 @@ func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
 	}
 	h.usecase.Reply(r.Context(), msg.Chat.ID, resp)
 	slog.Info("result", "resp", resp, "err", err)
-
 	render.Status(r, http.StatusOK)
+	render.JSON(w, r, nil)
 }
 
 type ErrorBotResponse struct {

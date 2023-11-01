@@ -31,3 +31,10 @@ func getToday() time.Time {
 	now := time.Now()
 	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, getLocation())
 }
+
+func isPastToday(dt time.Time) time.Time {
+	if getToday().After(dt) {
+		return getToday()
+	}
+	return dt
+}

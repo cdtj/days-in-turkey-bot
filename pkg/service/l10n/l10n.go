@@ -13,18 +13,24 @@ import (
 	"golang.org/x/text/language"
 )
 
+// https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
 const l10nDir = "l10n"
 
 var localizers sync.Map
 
 var (
-	ErrNoFiles    = errors.New("no localization files in l10n folder")
-	ErrUknownLang = errors.New("unknown language")
-	ErrUknownMsg  = errors.New("unknown message")
+	ErrNoDefaultPkg = errors.New("no package for default locale, can't run the app")
+	ErrNoFiles      = errors.New("no localization files in l10n folder")
+	ErrUknownLang   = errors.New("unknown language")
+	ErrUknownMsg    = errors.New("unknown message")
+)
+
+var (
+	defaultLang = language.English
 )
 
 func Localization() error {
-	bundle := i18n.NewBundle(language.English)
+	bundle := i18n.NewBundle(defaultLang)
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 
 	fs, err := assets.L10n.ReadDir(l10nDir)
@@ -41,7 +47,15 @@ func Localization() error {
 		}
 		localizers.Store(msg.Tag, i18n.NewLocalizer(bundle, msg.Tag.String()))
 	}
+	// to avoid nil check on every method call, we make sure that we have default locale
+	if !ValidateLang(defaultLang) {
+		return ErrNoDefaultPkg
+	}
 	return nil
+}
+
+func DefaultLang() language.Tag {
+	return defaultLang
 }
 
 func localizer(tag language.Tag) *i18n.Localizer {
@@ -52,38 +66,67 @@ func localizer(tag language.Tag) *i18n.Localizer {
 	return (l).(*i18n.Localizer)
 }
 
-func Localaze(tag language.Tag, messageID string) string {
-	return LocalazeWithCount(tag, messageID, nil)
-}
-
-func LocalazeWithCount(tag language.Tag, messageID string, count interface{}) string {
-	l := localizer(tag)
-	if l != nil {
-		msg, err := l.Localize(&i18n.LocalizeConfig{
-			MessageID: messageID,
-			TemplateData: map[string]interface{}{
-				"Count": count,
-			},
-			PluralCount: count,
-		})
-		if err != nil {
-			fmt.Println("localize failed:", err)
-			return ErrUknownMsg.Error()
-		}
-		return msg
-	}
-	fmt.Println("unknown lang:", tag)
-	return ErrUknownLang.Error()
-}
-
 func ValidateLang(tag language.Tag) bool {
 	_, ok := localizers.Load(tag)
 	return ok
 }
 
+type Locale struct {
+	tag       language.Tag
+	localizer *i18n.Localizer
+}
+
+func NewLocale(tag language.Tag) *Locale {
+	// oh my gd what im doing here?!
+	for _, t := range []language.Tag{tag, defaultLang} {
+		l := localizer(t)
+		if l != nil {
+			return &Locale{
+				tag:       tag,
+				localizer: l,
+			}
+		}
+	}
+	return nil
+}
+
+func (l *Locale) Lang() string {
+	return l.tag.String()
+}
+
+func (l *Locale) Message(messageID string) string {
+	msg, err := l.localizer.Localize(&i18n.LocalizeConfig{
+		MessageID: messageID,
+	})
+	if err != nil {
+		return errors.Join(ErrUknownMsg, err).Error()
+	}
+	return msg
+}
+
+func (l *Locale) Error(messageID string, err error) string {
+	return l.MessageWithTemplate(messageID, map[string]interface{}{"Error": err}, nil)
+}
+
+func (l *Locale) MessageWithCount(messageID string, count interface{}) string {
+	return l.MessageWithTemplate(messageID, map[string]interface{}{"Count": count}, count)
+}
+
+func (l *Locale) MessageWithTemplate(messageID string, tpl map[string]interface{}, plural interface{}) string {
+	msg, err := l.localizer.Localize(&i18n.LocalizeConfig{
+		MessageID:    messageID,
+		TemplateData: tpl,
+		PluralCount:  plural,
+	})
+	if err != nil {
+		return errors.Join(ErrUknownMsg, err).Error()
+	}
+	return msg
+}
+
 const dateLayout = "02/01/2006"
 
 // TODO: add regional formats
-func FormatDate(dt time.Time) string {
+func (l *Locale) FormatDate(dt time.Time) string {
 	return dt.Format(dateLayout)
 }

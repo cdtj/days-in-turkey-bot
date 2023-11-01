@@ -21,8 +21,13 @@ func NewTelegramBot(token, webhook string) *TelegramBot {
 	return &TelegramBot{
 		token:   token,
 		webhook: webhook,
-		debug:   true,
+		debug:   false,
 	}
+}
+
+// SetDebug sets bot into the debug mode, must be called before Serve()
+func (t *TelegramBot) SetDebug(debug bool) {
+	t.debug = debug
 }
 
 func (t *TelegramBot) Serve(ctx context.Context) error {

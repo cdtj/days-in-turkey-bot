@@ -1,39 +1,46 @@
 package model
 
 import (
-	"fmt"
-
+	"cdtj.io/days-in-turkey-bot/service/l10n"
 	"golang.org/x/text/language"
 )
 
 type User struct {
-	Lang    language.Tag
 	Country *Country
+	locale  *l10n.Locale
 }
 
 func NewUserConfig(lang language.Tag, country *Country) *User {
 	return &User{
-		Lang:    lang,
+		locale:  l10n.NewLocale(lang),
 		Country: country,
 	}
 }
 
+func DefaultUser() *User {
+	return NewUserConfig(l10n.DefaultLang(), DefaultCountry())
+}
+
+func (u *User) SetLocale(lang language.Tag) {
+	u.locale = l10n.NewLocale(lang)
+}
+
+func (u *User) GetLocale() *l10n.Locale {
+	return u.locale
+}
+
 func (u *User) GetResetInterval() int {
-	return u.Country.ResetInterval
+	return u.Country.GetResetInterval()
 }
 
 func (u *User) GetDaysCont() int {
-	return u.Country.DaysContinual
+	return u.Country.GetDaysCont()
 }
 
 func (u *User) GetDaysLimit() int {
-	return u.Country.DaysLimit
+	return u.Country.GetDaysLimit()
 }
 
-func DefaultUser() *User {
-	return NewUserConfig(language.Russian, DefaultCountry())
-}
-
-func (u *User) String() string {
-	return fmt.Sprintf("Language: %s\nCountry: %s", u.Lang, u.Country.String())
+func (u *User) GetLang() string {
+	return u.locale.Lang()
 }

@@ -19,14 +19,14 @@ func NewCountryHttpHandler(usecase country.Usecase) *CountryHttpHandler {
 
 func (h *CountryHttpHandler) getCountry(w http.ResponseWriter, r *http.Request) {
 	countryID := r.URL.Query().Get("countryID")
-	resp, err := h.usecase.Get(r.Context(), countryID)
+	resp, err := h.usecase.Info(r.Context(), countryID)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &ErrorCountryResponse{err.Error()})
 		return
 	}
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &CountryResponse{resp.String()})
+	render.JSON(w, r, &CountryResponse{resp})
 }
 
 type ErrorCountryResponse struct {

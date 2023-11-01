@@ -16,6 +16,7 @@ import (
 
 	cep "cdtj.io/days-in-turkey-bot/entity/country/endpoint/http"
 	cr "cdtj.io/days-in-turkey-bot/entity/country/repo"
+	cs "cdtj.io/days-in-turkey-bot/entity/country/service"
 	cuc "cdtj.io/days-in-turkey-bot/entity/country/usecase"
 
 	uep "cdtj.io/days-in-turkey-bot/entity/user/endpoint/http"
@@ -31,13 +32,15 @@ func init() {
 }
 
 func main() {
+	tgFmt := formatter.NewTelegramFormatter()
 	countryDB := db.NewMapDB()
 	countryRepo := cr.NewCountryRepo(countryDB)
-	countryUC := cuc.NewCountryUsecase(countryRepo)
+	countrySvc := cs.NewCountryService(tgFmt)
+	countryUC := cuc.NewCountryUsecase(countryRepo, countrySvc)
 
 	userDB := db.NewMapDB()
 	userRepo := ur.NewUserRepo(userDB)
-	userSvc := us.NewUserService(formatter.NewTelegramFormatter())
+	userSvc := us.NewUserService(tgFmt)
 	userUC := uuc.NewUserUsecase(userRepo, countryRepo, userSvc)
 
 	router := httpserver.NewChiRouter()

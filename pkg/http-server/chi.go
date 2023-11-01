@@ -7,6 +7,8 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
+var _ HttpServerRouter = NewChiRouter()
+
 func NewChiRouter() *chi.Mux {
 	r := chi.NewRouter()
 

@@ -10,6 +10,8 @@ import (
 	"cdtj.io/days-in-turkey-bot/model"
 )
 
+var _ user.Usecase = NewUserUsecase(nil, nil, nil)
+
 type UserUsecase struct {
 	repo    user.Repo
 	country country.Repo
@@ -35,7 +37,7 @@ func (uc *UserUsecase) Info(ctx context.Context, userID string) (string, error) 
 		return "", err
 	}
 	slog.Info("get user", "userid", userID, "data", u)
-	return uc.service.UserInfo(ctx, u), nil
+	return uc.service.UserInfo(ctx, u.GetLocale(), u), nil
 }
 
 func (uc *UserUsecase) UpdateLang(ctx context.Context, userID string, lang string) (string, error) {
@@ -49,12 +51,12 @@ func (uc *UserUsecase) UpdateLang(ctx context.Context, userID string, lang strin
 		slog.Error("updateLang failed", "userID", userID, "lang", lang, "err", err)
 		return "", err
 	}
+	u.SetLocale(langTag)
 	slog.Info("update lang", "userid", userID, "lang", langTag)
-	u.Lang = langTag
 	if err := uc.repo.Save(ctx, userID, u); err != nil {
 		return "", err
 	}
-	return uc.service.UserInfo(ctx, u), nil
+	return uc.service.UserInfo(ctx, u.GetLocale(), u), nil
 }
 
 func (uc *UserUsecase) UpdateCountry(ctx context.Context, userID string, countryID string) (string, error) {
@@ -73,7 +75,7 @@ func (uc *UserUsecase) UpdateCountry(ctx context.Context, userID string, country
 	if err := uc.repo.Save(ctx, userID, u); err != nil {
 		return "", err
 	}
-	return uc.service.UserInfo(ctx, u), nil
+	return uc.service.UserInfo(ctx, u.GetLocale(), u), nil
 }
 
 func (uc *UserUsecase) CalculateTrip(ctx context.Context, userID string, input string) (string, error) {
@@ -82,7 +84,7 @@ func (uc *UserUsecase) CalculateTrip(ctx context.Context, userID string, input s
 		slog.Error("calculate trip failed", "userID", userID, "input", input, "err", err)
 		return "", err
 	}
-	return uc.service.CalculateTrip(ctx, input, u.GetDaysLimit(), u.GetDaysCont(), u.GetResetInterval())
+	return uc.service.CalculateTrip(ctx, u.GetLocale(), input, u.GetDaysLimit(), u.GetDaysCont(), u.GetResetInterval())
 }
 
 func (uc *UserUsecase) сreate(ctx context.Context, userID string) error {

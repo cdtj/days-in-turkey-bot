@@ -1,7 +1,5 @@
 package model
 
-import "fmt"
-
 type Country struct {
 	Code          string
 	Flag          string
@@ -30,6 +28,32 @@ func DefaultCountry() *Country {
 	}
 }
 
-func (c *Country) String() string {
-	return fmt.Sprintf("[%s %s]\nDays(Continual: %d, Limit: %d, Reset: %d)", c.Code, c.Flag, c.DaysContinual, c.DaysLimit, c.ResetInterval)
+func CustomCountry(cont, limit, reset int) *Country {
+	return &Country{
+		Code:          "",
+		Flag:          "❔",
+		DaysContinual: cont,
+		DaysLimit:     limit,
+		ResetInterval: reset,
+	}
+}
+
+func (c *Country) GetResetInterval() int {
+	return c.ResetInterval
+}
+
+func (c *Country) GetDaysCont() int {
+	return c.DaysContinual
+}
+
+func (c *Country) GetDaysLimit() int {
+	return c.DaysLimit
+}
+
+func (c *Country) GetCode() string {
+	return c.Code
+}
+
+func (c *Country) GetFlag() string {
+	return c.Flag
 }
