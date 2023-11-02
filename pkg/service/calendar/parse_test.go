@@ -1,7 +1,6 @@
 package calendar
 
 import (
-	"fmt"
 	"log/slog"
 	"os"
 	"testing"
@@ -13,7 +12,7 @@ import (
 func TestCalendarCalc(t *testing.T) {
 	l10n.Localization()
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
+		Level: slog.LevelInfo,
 	})))
 
 	testCases := []struct {
@@ -30,7 +29,7 @@ func TestCalendarCalc(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			fmt.Println(formatter.NewTelegramFormatter().TripTree(l10n.NewLocale(l10n.DefaultLang()), tree))
+			formatter.NewTelegramFormatter().TripTree(l10n.NewLocale(l10n.DefaultLang()), tree)
 		})
 	}
 }
@@ -38,7 +37,7 @@ func TestCalendarCalc(t *testing.T) {
 func BenchmarkCalendarCalc(b *testing.B) {
 	l10n.Localization()
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
+		Level: slog.LevelInfo,
 	})))
 
 	testCases := []struct {
@@ -58,7 +57,7 @@ func BenchmarkCalendarCalc(b *testing.B) {
 				if err != nil {
 					b.Error(err)
 				}
-				fmt.Println(formatter.NewTelegramFormatter().TripTree(l10n.NewLocale(l10n.DefaultLang()), tree))
+				formatter.NewTelegramFormatter().TripTree(l10n.NewLocale(l10n.DefaultLang()), tree)
 			}
 		})
 	}
