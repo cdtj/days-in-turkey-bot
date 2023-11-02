@@ -12,7 +12,7 @@ type User struct {
 
 func NewUserConfig(lang language.Tag, country *Country) *User {
 	return &User{
-		locale:  l10n.NewLocale(lang),
+		locale:  l10n.GetLocale(lang),
 		Country: country,
 	}
 }
@@ -22,7 +22,7 @@ func DefaultUser() *User {
 }
 
 func (u *User) SetLocale(lang language.Tag) {
-	u.locale = l10n.NewLocale(lang)
+	u.locale = l10n.GetLocale(lang)
 }
 
 func (u *User) GetLocale() *l10n.Locale {

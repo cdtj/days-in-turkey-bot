@@ -61,8 +61,8 @@ func (f *TelegramFormatter) User(locale *l10n.Locale, user *model.User) string {
 
 func (f *TelegramFormatter) Country(locale *l10n.Locale, country *model.Country) string {
 	return locale.MessageWithTemplate("CountryInfo", map[string]interface{}{
-		"Code": country.GetCode(),
 		"Flag": country.GetFlag(),
+		"Code": country.GetCode(),
 	}, nil) + "\n" + locale.MessageWithTemplate("CountryDays", map[string]interface{}{
 		"Continual":     country.GetDaysCont(),
 		"Limit":         country.GetDaysLimit(),

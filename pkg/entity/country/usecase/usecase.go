@@ -30,11 +30,15 @@ func (u *CountryUsecase) Set(ctx context.Context, countryID string, country *mod
 	return u.repo.Set(ctx, countryID, country)
 }
 
+func (u *CountryUsecase) Keys(ctx context.Context) ([]string, error) {
+	return u.repo.Keys(ctx)
+}
+
 func (u *CountryUsecase) Info(ctx context.Context, countryID string) (string, error) {
 	c, err := u.Get(ctx, countryID)
 	if err != nil {
 		return "", err
 	}
 	// default locale is enough for debugging
-	return u.service.Info(ctx, l10n.NewLocale(l10n.DefaultLang()), c), nil
+	return u.service.Info(ctx, l10n.GetLocale(l10n.DefaultLang()), c), nil
 }

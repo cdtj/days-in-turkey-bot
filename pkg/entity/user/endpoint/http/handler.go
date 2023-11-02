@@ -66,14 +66,14 @@ func (h *UserHttpHandler) updateLang(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
 		return
 	}
-	resp, err := h.usecase.UpdateLang(r.Context(), userID, input.Lang)
+	err := h.usecase.UpdateLang(r.Context(), userID, input.Lang)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
 		return
 	}
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &UserResponse{resp})
+	render.JSON(w, r, nil)
 }
 
 type UpdateCountryInput struct {
@@ -89,14 +89,14 @@ func (h *UserHttpHandler) updateCountry(w http.ResponseWriter, r *http.Request) 
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
 		return
 	}
-	resp, err := h.usecase.UpdateCountry(r.Context(), userID, input.Country)
+	err := h.usecase.UpdateCountry(r.Context(), userID, input.Country)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
 		return
 	}
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &UserResponse{resp})
+	render.JSON(w, r, nil)
 }
 
 type ErrorUserResponse struct {

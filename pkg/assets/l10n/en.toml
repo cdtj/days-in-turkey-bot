@@ -1,14 +1,19 @@
 # en.toml
-HelloMessage = "Hello World!"
-Trip = "Trip: {{.StartDate}} - {{.EndDate}}, Continous: {{.TripDays}}, Total: "
-TripPredicted = "Entrance Date: {{.StartDate}}, Latest Departure Date is: {{.EndDate}}, with Continous: {{.TripDays}}, and Total: "
-TripPast = "Past Trips:"
+Name="🇺🇸 English"
+
+Trip = "🛬 {{.StartDate}} > 🛫 {{.EndDate}}, Duration: {{.TripDays}}, with Total: "
+TripPredicted = "🛬 {{.StartDate}} > Leave until 🛫 {{.EndDate}}, Duration: {{.TripDays}}, with Total:"
+TripPast = "Previous Trips:"
 TripEligibleHdr = "You're eligible for the following trips:"
-TripEligible = "Entrance Date: {{.StartDate}}, Latest Departure Date is: {{.EndDate}}, with Continous: {{.TripDays}}, and Total: "
+TripEligible = "🛬 {{.StartDate}} > 🛫 {{.EndDate}}, Duration: {{.TripDays}}, with Total: "
+TripExplanation = "Depending on your country you're allowed to stay in Turkey for a while, basically, there are 3 metrics that you need to look at:\nContinual Days - days that you're allowed to stay without crossing the Turkey border,\nDays Limit - days that you spent in Turkey during some interval,\nInterval Reset - days you spent above the reset interval are not counted, in case you're not breaking other limits."
+
 UserInfo = "Language: {{.Language}}"
-CountryInfo = "Country: {{.Code}} {{.Flag}}"
+UserLanguageChaned = "Language Changed"
+UserCountryChaned = "Country Changed"
+
+CountryInfo = "Country: {{.Flag}} {{.Code}}"
 CountryDays = "Days Allowed - Continual: {{.Continual}} / Limit: {{.Limit}} / Reset Interval: {{.ResetInterval}}"
-DaysExplanation = "Depending on your country you're allowed to stay in Turkey for a while, basically, there are 3 metrics that you need to look at:\nContinual Days - days that you're allowed to stay without crossing the Turkey border,\nDays Limit - days that you spent in Turkey during some interval,\nInterval Reset - days you spent above the reset interval are not counted, in case you're not breaking other limits."
 
 [DayCounter]
 description = "Display day/days on condition"

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"sync"
-	"time"
 
 	"cdtj.io/days-in-turkey-bot/assets"
 	"github.com/BurntSushi/toml"
@@ -46,6 +45,7 @@ func Localization() error {
 			return fmt.Errorf("unable to read %s: %w", f.Name(), err)
 		}
 		localizers.Store(msg.Tag, i18n.NewLocalizer(bundle, msg.Tag.String()))
+		GetLocale(msg.Tag)
 	}
 	// to avoid nil check on every method call, we make sure that we have default locale
 	if !ValidateLang(defaultLang) {
@@ -69,64 +69,4 @@ func localizer(tag language.Tag) *i18n.Localizer {
 func ValidateLang(tag language.Tag) bool {
 	_, ok := localizers.Load(tag)
 	return ok
-}
-
-type Locale struct {
-	tag       language.Tag
-	localizer *i18n.Localizer
-}
-
-func NewLocale(tag language.Tag) *Locale {
-	// oh my gd what im doing here?!
-	for _, t := range []language.Tag{tag, defaultLang} {
-		l := localizer(t)
-		if l != nil {
-			return &Locale{
-				tag:       tag,
-				localizer: l,
-			}
-		}
-	}
-	return nil
-}
-
-func (l *Locale) Lang() string {
-	return l.tag.String()
-}
-
-func (l *Locale) Message(messageID string) string {
-	msg, err := l.localizer.Localize(&i18n.LocalizeConfig{
-		MessageID: messageID,
-	})
-	if err != nil {
-		return errors.Join(ErrUknownMsg, err).Error()
-	}
-	return msg
-}
-
-func (l *Locale) Error(messageID string, err error) string {
-	return l.MessageWithTemplate(messageID, map[string]interface{}{"Error": err}, nil)
-}
-
-func (l *Locale) MessageWithCount(messageID string, count interface{}) string {
-	return l.MessageWithTemplate(messageID, map[string]interface{}{"Count": count}, count)
-}
-
-func (l *Locale) MessageWithTemplate(messageID string, tpl map[string]interface{}, plural interface{}) string {
-	msg, err := l.localizer.Localize(&i18n.LocalizeConfig{
-		MessageID:    messageID,
-		TemplateData: tpl,
-		PluralCount:  plural,
-	})
-	if err != nil {
-		return errors.Join(ErrUknownMsg, err).Error()
-	}
-	return msg
-}
-
-const dateLayout = "02/01/2006"
-
-// TODO: add regional formats
-func (l *Locale) FormatDate(dt time.Time) string {
-	return dt.Format(dateLayout)
 }

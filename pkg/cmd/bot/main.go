@@ -16,6 +16,8 @@ import (
 	telegrambot "cdtj.io/days-in-turkey-bot/telegram-bot"
 
 	cr "cdtj.io/days-in-turkey-bot/entity/country/repo"
+	cs "cdtj.io/days-in-turkey-bot/entity/country/service"
+	cuc "cdtj.io/days-in-turkey-bot/entity/country/usecase"
 
 	bwh "cdtj.io/days-in-turkey-bot/entity/bot/endpoint/web-hook"
 	ur "cdtj.io/days-in-turkey-bot/entity/user/repo"
@@ -36,6 +38,8 @@ func main() {
 	// country service
 	countryDB := db.NewMapDB()
 	countryRepo := cr.NewCountryRepo(countryDB)
+	countrySvc := cs.NewCountryService(formatter.NewTelegramFormatter())
+	countryUC := cuc.NewCountryUsecase(countryRepo, countrySvc)
 
 	// user service
 	userDB := db.NewMapDB()
@@ -46,7 +50,7 @@ func main() {
 	// telegram bot
 	bot := telegrambot.NewTelegramBot(os.Getenv("BOT_TOKEN"), os.Getenv("BOT_WEBHOOK"))
 	botSvc := bs.NewBotService(bot)
-	botUC := buc.NewBotUsecase(userUC, botSvc)
+	botUC := buc.NewBotUsecase(userUC, botSvc, countryUC)
 
 	router := httpserver.NewChiRouter()
 	bwh.RegisterWebhookEndpoints(router, botUC)

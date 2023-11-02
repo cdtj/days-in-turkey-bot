@@ -2,12 +2,10 @@ package bot
 
 import (
 	"context"
+
+	"cdtj.io/days-in-turkey-bot/model"
 )
 
 type Service interface {
-	Reply(ctx context.Context, chatID int64, text string) error
-}
-
-type ServiceSender interface {
-	Send(ctx context.Context, chatID int64, text string) error
+	Send(ctx context.Context, chatID int64, text string, replyMarkup []*model.TelegramBotCommandRow) error
 }

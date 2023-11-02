@@ -26,7 +26,7 @@ func TestHelloMessage(t *testing.T) {
 				t.Error("invalid tag", err)
 				return
 			}
-			msg := NewLocale(tag).Message("HelloMessage")
+			msg := GetLocale(tag).Message("HelloMessage")
 			if msg != tc.Result {
 				t.Errorf("Expected %q but got %q for %q\n", tc.Result, msg, tc.Lang)
 			}

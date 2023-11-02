@@ -29,7 +29,7 @@ func TestCalendarCalc(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			formatter.NewTelegramFormatter().TripTree(l10n.NewLocale(l10n.DefaultLang()), tree)
+			formatter.NewTelegramFormatter().TripTree(l10n.GetLocale(l10n.DefaultLang()), tree)
 		})
 	}
 }
@@ -57,7 +57,7 @@ func BenchmarkCalendarCalc(b *testing.B) {
 				if err != nil {
 					b.Error(err)
 				}
-				formatter.NewTelegramFormatter().TripTree(l10n.NewLocale(l10n.DefaultLang()), tree)
+				formatter.NewTelegramFormatter().TripTree(l10n.GetLocale(l10n.DefaultLang()), tree)
 			}
 		})
 	}

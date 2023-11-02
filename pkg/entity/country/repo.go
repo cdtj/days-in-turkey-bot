@@ -7,6 +7,7 @@ import (
 )
 
 type Repo interface {
+	Keys(ctx context.Context) ([]string, error)
 	Get(ctx context.Context, countryID string) (*model.Country, error)
 	Set(ctx context.Context, countryID string, country *model.Country) error
 }

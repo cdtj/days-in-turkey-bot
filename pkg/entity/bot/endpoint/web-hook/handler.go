@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"cdtj.io/days-in-turkey-bot/entity/bot"
 	"github.com/go-chi/render"
@@ -35,47 +36,74 @@ func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	msg := update.Message
-	if msg == nil {
+	cb := update.CallbackQuery
+	if msg == nil && cb == nil {
 		render.Status(r, http.StatusOK)
 		render.JSON(w, r, nil)
 		return
 	}
 
-	slog.Debug("incoming",
-		"UpdateID", update.UpdateID,
-		slog.Group("Message",
-			"From", msg.From,
-			"Text", msg.Text,
-			"Entities", msg.Entities,
-		),
-		slog.Group("Command",
-			"IsCommand", msg.IsCommand(),
-			"Command", msg.Command(),
-			"CommandArguments", msg.CommandArguments(),
-			"CommandWithAt", msg.CommandWithAt(),
-		),
-	)
+	switch {
+	case msg != nil:
 
-	var resp string
-	userID := strconv.Itoa(msg.From.ID)
-	if msg.IsCommand() {
-		switch msg.Command() {
-		case BotWebhookCountry:
-			resp, err = h.usecase.UpdateCountry(r.Context(), userID, msg.CommandArguments())
-		case BotWebhookLanguage:
-			resp, err = h.usecase.UpdateLang(r.Context(), userID, msg.CommandArguments())
-		case BotWebhookStart:
-			resp = "hi"
+		slog.Info("incoming message",
+			"UpdateID", update.UpdateID,
+			slog.Group("Message",
+				"From", msg.From,
+				"Text", msg.Text,
+				"Entities", msg.Entities,
+			),
+			slog.Group("User",
+				"Name", msg.From.String(),
+				"Lang", msg.From.LanguageCode,
+			),
+			slog.Group("Command",
+				"IsCommand", msg.IsCommand(),
+				"Command", msg.Command(),
+				"CommandArguments", msg.CommandArguments(),
+				"CommandWithAt", msg.CommandWithAt(),
+			),
+		)
+		userID := strconv.Itoa(msg.From.ID)
+		if msg.IsCommand() {
+			switch msg.Command() {
+			case BotWebhookCountry:
+				err = h.usecase.UpdateCountry(r.Context(), msg.Chat.ID, userID, msg.CommandArguments())
+			case BotWebhookLanguage:
+				err = h.usecase.UpdateLang(r.Context(), msg.Chat.ID, userID, msg.CommandArguments())
+			case BotWebhookStart:
+				err = h.usecase.Welcome(r.Context(), msg.Chat.ID, userID, msg.From.LanguageCode)
+			}
+		} else {
+			err = h.usecase.CalculateTrip(r.Context(), msg.Chat.ID, userID, msg.Text)
 		}
-	} else {
-		resp, err = h.usecase.CalculateTrip(r.Context(), userID, msg.Text)
+	case cb != nil:
+		slog.Info("incoming callback",
+			"UpdateID", update.UpdateID,
+			slog.Group("Message",
+				"From", cb.From,
+				"Data", cb.Data,
+			),
+		)
+		userID := strconv.Itoa(cb.From.ID)
+		inputArr := strings.Split(cb.Data, " ")
+		if len(inputArr) == 2 {
+			switch inputArr[0] {
+			case BotWebhookCountry:
+				err = h.usecase.UpdateCountry(r.Context(), cb.Message.Chat.ID, userID, inputArr[1])
+			case BotWebhookLanguage:
+				err = h.usecase.UpdateLang(r.Context(), cb.Message.Chat.ID, userID, inputArr[1])
+			}
+		}
 	}
+
 	if err != nil {
-		h.usecase.Reply(r.Context(), msg.Chat.ID, err.Error())
+		slog.Info("result", "err", err)
+		h.usecase.Send(r.Context(), msg.Chat.ID, err.Error(), nil)
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, nil)
 		return
 	}
-	h.usecase.Reply(r.Context(), msg.Chat.ID, resp)
-	slog.Info("result", "resp", resp, "err", err)
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, nil)
 }

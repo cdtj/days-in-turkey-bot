@@ -26,8 +26,11 @@ func NewUserUsecase(repo user.Repo, country country.Repo, service user.Service) 
 	}
 }
 
-func (uc *UserUsecase) Get(ctx context.Context, userID string) (*model.User, error) {
-	return uc.get(ctx, userID)
+func (uc *UserUsecase) Create(ctx context.Context, userID, lang string) error {
+	if _, err := uc.get(ctx, userID); err == nil {
+		return nil
+	}
+	return uc.сreate(ctx, userID, lang)
 }
 
 func (uc *UserUsecase) Info(ctx context.Context, userID string) (string, error) {
@@ -40,42 +43,42 @@ func (uc *UserUsecase) Info(ctx context.Context, userID string) (string, error) 
 	return uc.service.UserInfo(ctx, u.GetLocale(), u), nil
 }
 
-func (uc *UserUsecase) UpdateLang(ctx context.Context, userID string, lang string) (string, error) {
+func (uc *UserUsecase) UpdateLang(ctx context.Context, userID string, lang string) error {
 	u, err := uc.get(ctx, userID)
 	if err != nil {
 		slog.Error("updateLang failed", "userID", userID, "lang", lang, "err", err)
-		return "", err
+		return err
 	}
 	langTag, err := uc.service.LangLookup(ctx, lang)
 	if err != nil {
 		slog.Error("updateLang failed", "userID", userID, "lang", lang, "err", err)
-		return "", err
+		return err
 	}
 	u.SetLocale(langTag)
 	slog.Info("update lang", "userid", userID, "lang", langTag)
 	if err := uc.repo.Save(ctx, userID, u); err != nil {
-		return "", err
+		return err
 	}
-	return uc.service.UserInfo(ctx, u.GetLocale(), u), nil
+	return nil
 }
 
-func (uc *UserUsecase) UpdateCountry(ctx context.Context, userID string, countryID string) (string, error) {
+func (uc *UserUsecase) UpdateCountry(ctx context.Context, userID string, countryID string) error {
 	u, err := uc.get(ctx, userID)
 	if err != nil {
 		slog.Error("updateCountry failed", "userID", userID, "countryID", countryID, "err", err)
-		return "", err
+		return err
 	}
 	country, err := uc.country.Get(ctx, countryID)
 	if err != nil {
 		slog.Error("updateCountry failed", "userID", userID, "countryID", countryID, "err", err)
-		return "", err
+		return err
 	}
 	slog.Info("update country", "userid", userID, "country", country)
 	u.Country = country
 	if err := uc.repo.Save(ctx, userID, u); err != nil {
-		return "", err
+		return err
 	}
-	return uc.service.UserInfo(ctx, u.GetLocale(), u), nil
+	return nil
 }
 
 func (uc *UserUsecase) CalculateTrip(ctx context.Context, userID string, input string) (string, error) {
@@ -87,15 +90,24 @@ func (uc *UserUsecase) CalculateTrip(ctx context.Context, userID string, input s
 	return uc.service.CalculateTrip(ctx, u.GetLocale(), input, u.GetDaysLimit(), u.GetDaysCont(), u.GetResetInterval())
 }
 
-func (uc *UserUsecase) сreate(ctx context.Context, userID string) error {
-	return uc.repo.Save(ctx, userID, model.DefaultUser())
+func (uc *UserUsecase) сreate(ctx context.Context, userID, lang string) error {
+	u := model.DefaultUser()
+	if lang != "" {
+		tag, err := uc.service.LangLookup(ctx, lang)
+		if err != nil {
+			slog.Error("falied to init user with custom lang", "userID", userID, "lang", lang, "err", err)
+		} else {
+			u.SetLocale(tag)
+		}
+	}
+	return uc.repo.Save(ctx, userID, u)
 }
 
 func (uc *UserUsecase) get(ctx context.Context, userID string) (*model.User, error) {
 	u, err := uc.repo.Load(ctx, userID)
 	if err != nil {
 		if errors.Is(err, user.ErrRepoUserNotFound) {
-			if err := uc.сreate(ctx, userID); err != nil {
+			if err := uc.сreate(ctx, userID, ""); err != nil {
 				return nil, err
 			}
 			return uc.get(ctx, userID)

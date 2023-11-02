@@ -6,7 +6,8 @@ import (
 	"log/slog"
 	"time"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"cdtj.io/days-in-turkey-bot/model"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type TelegramBot struct {
@@ -40,7 +41,11 @@ func (t *TelegramBot) Serve(ctx context.Context) error {
 	t.sender = t.bot.Send
 	slog.Info("authorized", "account", t.bot.Self.UserName)
 
-	resp, err := bot.SetWebhook(tgbotapi.NewWebhook(t.webhook))
+	wh, err := tgbotapi.NewWebhook(t.webhook)
+	if err != nil {
+		return err
+	}
+	resp, err := bot.Request(wh)
 	if err != nil {
 		return err
 	}
@@ -62,25 +67,38 @@ func (t *TelegramBot) Shutdown(ctx context.Context) {
 		}
 	}()
 
-	resp, err := t.bot.RemoveWebhook()
-	if err != nil {
-		slog.Error("unable to remove webhook", "error", err)
-		return
-	}
+	t.bot.StopReceivingUpdates()
 	t.bot = nil
-	slog.Info("webhook removed", "result", resp.Result)
+	slog.Info("bot stopped")
 }
 
 var (
 	ErrBotNotReady = errors.New("not not started or already stopped")
 )
 
-func (t *TelegramBot) Send(ctx context.Context, chatID int64, text string) error {
+func (t *TelegramBot) Send(ctx context.Context, chatID int64, text string, commands []*model.TelegramBotCommandRow) error {
 	if t.bot != nil {
 		msg := tgbotapi.NewMessage(chatID, text)
+		msg.ParseMode = tgbotapi.ModeMarkdown
+		if commands != nil {
+			msg.ReplyMarkup = replyMarkup(ctx, commands)
+		}
 		if _, err := t.bot.Send(msg); err != nil {
 			return err
 		}
 	}
 	return ErrBotNotReady
+}
+
+func replyMarkup(ctx context.Context, rows []*model.TelegramBotCommandRow) tgbotapi.InlineKeyboardMarkup {
+	ikbs := make([]tgbotapi.InlineKeyboardButton, 0)
+	for _, row := range rows {
+		ikrs := make([]tgbotapi.InlineKeyboardButton, 0)
+		for _, command := range row.Commands {
+			ikrs = append(ikrs, tgbotapi.NewInlineKeyboardButtonData(command.Caption, command.Command))
+		}
+		ikbs = append(ikbs, ikrs...)
+	}
+	inlineKeyboard := tgbotapi.NewInlineKeyboardMarkup(ikbs)
+	return inlineKeyboard
 }

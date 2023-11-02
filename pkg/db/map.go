@@ -37,3 +37,15 @@ func (db *MapDB) Save(ctx context.Context, id string, intfc interface{}) error {
 	db.data[id] = intfc
 	return nil
 }
+
+func (db *MapDB) Keys(ctx context.Context) ([]string, error) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	keys := make([]string, 0, len(db.data))
+	for k := range db.data {
+		keys = append(keys, k)
+	}
+
+	return keys, nil
+}

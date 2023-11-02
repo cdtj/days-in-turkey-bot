@@ -19,6 +19,7 @@ require (
 require (
 	github.com/go-chi/render v1.0.3
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
+	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/gorilla/mux v1.8.0
 	golang.org/x/sys v0.13.0 // indirect
 )

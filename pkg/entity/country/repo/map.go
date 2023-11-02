@@ -17,14 +17,18 @@ func NewCountryRepo(db db.Database) *CountryRepo {
 	}
 }
 
-func (r *CountryRepo) Get(ctx context.Context, userID string) (*model.Country, error) {
-	u, err := r.db.Load(ctx, userID)
+func (r *CountryRepo) Get(ctx context.Context, countryID string) (*model.Country, error) {
+	u, err := r.db.Load(ctx, countryID)
 	if err != nil {
 		return nil, err
 	}
 	return u.(*model.Country), err
 }
 
-func (r *CountryRepo) Set(ctx context.Context, userID string, user *model.Country) error {
-	return r.db.Save(ctx, userID, user)
+func (r *CountryRepo) Set(ctx context.Context, countryID string, country *model.Country) error {
+	return r.db.Save(ctx, countryID, country)
+}
+
+func (r *CountryRepo) Keys(ctx context.Context) ([]string, error) {
+	return r.db.Keys(ctx)
 }
