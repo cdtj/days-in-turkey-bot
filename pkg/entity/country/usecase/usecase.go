@@ -95,7 +95,7 @@ func (u *CountryUsecase) InitData(ctx context.Context, dir string) error {
 		if err := toml.Unmarshal(content, &country); err != nil {
 			return fmt.Errorf("unable to unmarshal %s: %w", f.Name(), err)
 		}
-		slog.Info("init for repo", "repo", u.repo)
+		slog.Debug("init for repo", "repo", u.repo)
 		if err := u.repo.Set(ctx, country.Code, &country); err != nil {
 			return err
 		}
