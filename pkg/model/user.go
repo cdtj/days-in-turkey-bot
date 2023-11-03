@@ -6,27 +6,21 @@ import (
 )
 
 type User struct {
-	Country *Country
-	locale  *l10n.Locale
+	Lang        string
+	CountryCode string
+	Country     Country
+	langTag     language.Tag
 }
 
-func NewUserConfig(lang language.Tag, country *Country) *User {
+func NewUserConfig(lang, countryCode string) *User {
 	return &User{
-		locale:  l10n.GetLocale(lang),
-		Country: country,
+		Lang:        lang,
+		CountryCode: countryCode,
 	}
 }
 
 func DefaultUser() *User {
-	return NewUserConfig(l10n.DefaultLang(), DefaultCountry())
-}
-
-func (u *User) SetLocale(lang language.Tag) {
-	u.locale = l10n.GetLocale(lang)
-}
-
-func (u *User) GetLocale() *l10n.Locale {
-	return u.locale
+	return NewUserConfig(l10n.DefaultLang().String(), DefaultCountryCode())
 }
 
 func (u *User) GetResetInterval() int {
@@ -42,5 +36,13 @@ func (u *User) GetDaysLimit() int {
 }
 
 func (u *User) GetLang() string {
-	return u.locale.Lang()
+	return u.Lang
+}
+
+func (u *User) GetLangTag() language.Tag {
+	return u.langTag
+}
+
+func (u *User) SetLangTag(tag language.Tag) {
+	u.langTag = tag
 }

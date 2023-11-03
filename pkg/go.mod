@@ -17,9 +17,11 @@ require (
 )
 
 require (
+	github.com/boltdb/bolt v1.3.1
 	github.com/go-chi/render v1.0.3
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/gorilla/mux v1.8.0
+	github.com/pelletier/go-toml v1.9.5
 	golang.org/x/sys v0.13.0 // indirect
 )

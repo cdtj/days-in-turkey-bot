@@ -42,7 +42,7 @@ func main() {
 	countryUC := cuc.NewCountryUsecase(countryRepo, countrySvc)
 
 	// user service
-	userDB := db.NewMapDB()
+	userDB := db.NewBoltDB("users", "users")
 	userRepo := ur.NewUserRepo(userDB)
 	userSvc := us.NewUserService(formatter.NewTelegramFormatter())
 	userUC := uuc.NewUserUsecase(userRepo, countryRepo, userSvc)
@@ -55,42 +55,45 @@ func main() {
 	router := httpserver.NewChiRouter()
 	bwh.RegisterWebhookEndpoints(router, botUC)
 
+	srv := httpserver.NewHttpServer(&http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	})
+	Serve(srv, bot, userDB)
+}
+
+type Serveable interface {
+	Serve(ctx context.Context) error
+	Shutdown(ctx context.Context)
+}
+
+func Serve(serveables ...Serveable) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	errch := make(chan error)
 
-	srv := httpserver.NewHttpServer(&http.Server{
-		Addr:    ":8080",
-		Handler: router,
-	})
-	go func() {
-		err := srv.Serve(ctx)
-		if err != nil {
-			errch <- fmt.Errorf("server stopped: %w", err)
-		}
-	}()
-
-	go func() {
-		err := bot.Serve(ctx)
-		if err != nil {
-			errch <- fmt.Errorf("bot stopped: %w", err)
-		}
-	}()
+	for k, s := range serveables {
+		slog.Info("starting", "key", k, "s", s)
+		go func(s Serveable) {
+			if err := s.Serve(ctx); err != nil {
+				errch <- fmt.Errorf("%T stopped with error: %w", s, err)
+			}
+		}(s)
+	}
 
 	go func() {
 		rcvd := <-sig
-		slog.Info("stopping daemon", "signal", rcvd)
-		srv.Shutdown(ctx)
-		bot.Shutdown(ctx)
+		slog.Info("stopping serveables", "signal", rcvd)
+		for _, s := range serveables {
+			s.Shutdown(ctx)
+		}
 		cancel()
 	}()
 	go func() {
 		panic(<-errch)
 	}()
-
 	<-ctx.Done()
 }

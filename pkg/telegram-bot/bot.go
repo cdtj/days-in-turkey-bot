@@ -66,7 +66,10 @@ func (t *TelegramBot) Shutdown(ctx context.Context) {
 			return
 		}
 	}()
-
+	if t.bot == nil {
+		slog.Error("not yet started", "wh", t.webhook)
+		return
+	}
 	t.bot.StopReceivingUpdates()
 	t.bot = nil
 	slog.Info("bot stopped")

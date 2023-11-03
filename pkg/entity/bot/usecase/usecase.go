@@ -77,13 +77,13 @@ func (uc *BotUsecase) Send(ctx context.Context, chatID int64, text string, reply
 }
 
 func (uc *BotUsecase) CountryMarkup(ctx context.Context, userID string) []*model.TelegramBotCommandRow {
-	countries, err := uc.country.Keys(ctx)
+	countries, err := uc.country.List(ctx)
 	if err != nil {
 		return nil
 	}
 	commands := make([]*model.TelegramBotCommand, 0, len(countries))
 	for _, country := range countries {
-		commands = append(commands, model.NewTelegramBotCommand(country, "country "+country))
+		commands = append(commands, model.NewTelegramBotCommand(country.GetFlag()+" "+country.GetName(), "country "+country.GetCode()))
 	}
 	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands)}
 }

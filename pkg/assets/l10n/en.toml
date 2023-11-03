@@ -12,7 +12,7 @@ UserInfo = "Language: {{.Language}}"
 UserLanguageChaned = "Language Changed"
 UserCountryChaned = "Country Changed"
 
-CountryInfo = "Country: {{.Flag}} {{.Code}}"
+CountryInfo = "Country: {{.Flag}} {{.Name}}"
 CountryDays = "Days Allowed - Continual: {{.Continual}} / Limit: {{.Limit}} / Reset Interval: {{.ResetInterval}}"
 
 [DayCounter]

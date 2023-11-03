@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"errors"
 	"sync"
 )
 
@@ -18,17 +17,13 @@ func NewMapDB() *MapDB {
 	}
 }
 
-var (
-	ErrMapDBNotFound = errors.New("entry not found")
-)
-
 func (db *MapDB) Load(ctx context.Context, id string) (interface{}, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 	if data, ok := db.data[id]; ok {
 		return data, nil
 	}
-	return nil, ErrMapDBNotFound
+	return nil, ErrDBEntryNotFound
 }
 
 func (db *MapDB) Save(ctx context.Context, id string, intfc interface{}) error {

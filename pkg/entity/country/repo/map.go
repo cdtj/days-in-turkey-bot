@@ -3,15 +3,20 @@ package repo
 import (
 	"context"
 
-	"cdtj.io/days-in-turkey-bot/db"
 	"cdtj.io/days-in-turkey-bot/model"
 )
 
-type CountryRepo struct {
-	db db.Database
+type CountryDatabase interface {
+	Keys(ctx context.Context) ([]string, error)
+	Load(ctx context.Context, id string) (interface{}, error)
+	Save(ctx context.Context, id string, intfc interface{}) error
 }
 
-func NewCountryRepo(db db.Database) *CountryRepo {
+type CountryRepo struct {
+	db CountryDatabase
+}
+
+func NewCountryRepo(db CountryDatabase) *CountryRepo {
 	return &CountryRepo{
 		db: db,
 	}

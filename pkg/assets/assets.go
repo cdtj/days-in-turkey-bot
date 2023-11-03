@@ -8,3 +8,6 @@ Since we cannot embed ../. dir, I'm using this hack to embed my assets
 
 //go:embed l10n/*.toml
 var L10n embed.FS
+
+//go:embed country/*.toml
+var Countries embed.FS

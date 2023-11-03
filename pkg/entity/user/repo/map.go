@@ -9,11 +9,16 @@ import (
 	"cdtj.io/days-in-turkey-bot/model"
 )
 
-type UserRepo struct {
-	db db.Database
+type UseryDatabase interface {
+	Load(ctx context.Context, id string) (interface{}, error)
+	Save(ctx context.Context, id string, intfc interface{}) error
 }
 
-func NewUserRepo(db db.Database) *UserRepo {
+type UserRepo struct {
+	db UseryDatabase
+}
+
+func NewUserRepo(db UseryDatabase) *UserRepo {
 	return &UserRepo{
 		db: db,
 	}
@@ -22,7 +27,7 @@ func NewUserRepo(db db.Database) *UserRepo {
 func (r *UserRepo) Load(ctx context.Context, userID string) (*model.User, error) {
 	u, err := r.db.Load(ctx, userID)
 	if err != nil {
-		if errors.Is(err, db.ErrMapDBNotFound) {
+		if errors.Is(err, db.ErrDBEntryNotFound) {
 			return nil, user.ErrRepoUserNotFound
 		}
 		return nil, err

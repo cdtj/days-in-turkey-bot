@@ -2,6 +2,7 @@ package model
 
 type Country struct {
 	Code          string
+	Name          string
 	Flag          string
 	DaysContinual int
 	DaysLimit     int
@@ -16,6 +17,14 @@ func NewCountry(code, flag string, daysContinual, daysLimit, resetInterval int) 
 		DaysLimit:     daysLimit,
 		ResetInterval: resetInterval,
 	}
+}
+
+var (
+	defaultCountryCode = "RU"
+)
+
+func DefaultCountryCode() string {
+	return defaultCountryCode
 }
 
 func DefaultCountry() *Country {
@@ -56,4 +65,8 @@ func (c *Country) GetCode() string {
 
 func (c *Country) GetFlag() string {
 	return c.Flag
+}
+
+func (c *Country) GetName() string {
+	return c.Name
 }

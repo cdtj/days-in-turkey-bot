@@ -1,9 +1,12 @@
 package db
 
-import "context"
+import "errors"
 
-type Database interface {
-	Keys(ctx context.Context) ([]string, error)
-	Load(ctx context.Context, id string) (interface{}, error)
-	Save(ctx context.Context, id string, intfc interface{}) error
-}
+// some of database methods are only used by few entities,
+// so db abstractions are defined directly on entity repo level
+// to avoid dummy methods declaration
+
+var (
+	ErrDBEntryNotFound  = errors.New("entry not found")
+	ErrDBBucketNotFound = errors.New("bucket not found")
+)

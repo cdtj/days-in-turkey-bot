@@ -56,13 +56,13 @@ func (f *TelegramFormatter) TripTree(locale *l10n.Locale, tree *model.TripTree) 
 func (f *TelegramFormatter) User(locale *l10n.Locale, user *model.User) string {
 	return locale.MessageWithTemplate("UserInfo", map[string]interface{}{
 		"Language": user.GetLang(),
-	}, nil) + "\n" + f.Country(locale, user.Country)
+	}, nil) + "\n" + f.Country(locale, &user.Country)
 }
 
 func (f *TelegramFormatter) Country(locale *l10n.Locale, country *model.Country) string {
 	return locale.MessageWithTemplate("CountryInfo", map[string]interface{}{
 		"Flag": country.GetFlag(),
-		"Code": country.GetCode(),
+		"Name": country.GetName(),
 	}, nil) + "\n" + locale.MessageWithTemplate("CountryDays", map[string]interface{}{
 		"Continual":     country.GetDaysCont(),
 		"Limit":         country.GetDaysLimit(),

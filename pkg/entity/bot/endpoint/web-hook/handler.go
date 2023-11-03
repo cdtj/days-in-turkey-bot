@@ -42,10 +42,10 @@ func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, nil)
 		return
 	}
+	var chatID int64
 
 	switch {
 	case msg != nil:
-
 		slog.Info("incoming message",
 			"UpdateID", update.UpdateID,
 			slog.Group("Message",
@@ -64,18 +64,19 @@ func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
 				"CommandWithAt", msg.CommandWithAt(),
 			),
 		)
+		chatID = msg.Chat.ID
 		userID := strconv.Itoa(msg.From.ID)
 		if msg.IsCommand() {
 			switch msg.Command() {
 			case BotWebhookCountry:
-				err = h.usecase.UpdateCountry(r.Context(), msg.Chat.ID, userID, msg.CommandArguments())
+				err = h.usecase.UpdateCountry(r.Context(), chatID, userID, msg.CommandArguments())
 			case BotWebhookLanguage:
-				err = h.usecase.UpdateLang(r.Context(), msg.Chat.ID, userID, msg.CommandArguments())
+				err = h.usecase.UpdateLang(r.Context(), chatID, userID, msg.CommandArguments())
 			case BotWebhookStart:
-				err = h.usecase.Welcome(r.Context(), msg.Chat.ID, userID, msg.From.LanguageCode)
+				err = h.usecase.Welcome(r.Context(), chatID, userID, msg.From.LanguageCode)
 			}
 		} else {
-			err = h.usecase.CalculateTrip(r.Context(), msg.Chat.ID, userID, msg.Text)
+			err = h.usecase.CalculateTrip(r.Context(), chatID, userID, msg.Text)
 		}
 	case cb != nil:
 		slog.Info("incoming callback",
@@ -85,24 +86,29 @@ func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
 				"Data", cb.Data,
 			),
 		)
+		chatID = cb.Message.Chat.ID
 		userID := strconv.Itoa(cb.From.ID)
 		inputArr := strings.Split(cb.Data, " ")
 		if len(inputArr) == 2 {
 			switch inputArr[0] {
 			case BotWebhookCountry:
-				err = h.usecase.UpdateCountry(r.Context(), cb.Message.Chat.ID, userID, inputArr[1])
+				err = h.usecase.UpdateCountry(r.Context(), chatID, userID, inputArr[1])
 			case BotWebhookLanguage:
-				err = h.usecase.UpdateLang(r.Context(), cb.Message.Chat.ID, userID, inputArr[1])
+				err = h.usecase.UpdateLang(r.Context(), chatID, userID, inputArr[1])
 			}
 		}
 	}
 
 	if err != nil {
 		slog.Info("result", "err", err)
-		h.usecase.Send(r.Context(), msg.Chat.ID, err.Error(), nil)
-		render.Status(r, http.StatusBadRequest)
-		render.JSON(w, r, nil)
-		return
+		if chatID > 0 {
+			h.usecase.Send(r.Context(), chatID, err.Error(), nil)
+		}
+		/*
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, nil)
+			return
+		*/
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, nil)
