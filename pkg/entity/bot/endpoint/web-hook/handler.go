@@ -8,7 +8,7 @@ import (
 
 	"cdtj.io/days-in-turkey-bot/entity/bot"
 	"github.com/go-chi/render"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type BotWebhookHandler struct {
@@ -65,7 +65,7 @@ func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
 			),
 		)
 		chatID = msg.Chat.ID
-		userID := strconv.Itoa(msg.From.ID)
+		userID := strconv.FormatInt(msg.From.ID, 10)
 		if msg.IsCommand() {
 			switch msg.Command() {
 			case BotWebhookCountry:
@@ -87,7 +87,7 @@ func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
 			),
 		)
 		chatID = cb.Message.Chat.ID
-		userID := strconv.Itoa(cb.From.ID)
+		userID := strconv.FormatInt(cb.From.ID, 10)
 		inputArr := strings.Split(cb.Data, " ")
 		if len(inputArr) == 2 {
 			switch inputArr[0] {
