@@ -9,16 +9,16 @@ import (
 	"cdtj.io/days-in-turkey-bot/model"
 )
 
-type UseryDatabase interface {
+type UserDatabase interface {
 	Load(ctx context.Context, id string) (interface{}, error)
 	Save(ctx context.Context, id string, intfc interface{}) error
 }
 
 type UserRepo struct {
-	db UseryDatabase
+	db UserDatabase
 }
 
-func NewUserRepo(db UseryDatabase) *UserRepo {
+func NewUserRepo(db UserDatabase) *UserRepo {
 	return &UserRepo{
 		db: db,
 	}

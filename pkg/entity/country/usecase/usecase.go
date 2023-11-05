@@ -11,7 +11,7 @@ import (
 	"cdtj.io/days-in-turkey-bot/assets"
 	"cdtj.io/days-in-turkey-bot/entity/country"
 	"cdtj.io/days-in-turkey-bot/model"
-	"cdtj.io/days-in-turkey-bot/service/l10n"
+	"cdtj.io/days-in-turkey-bot/service/i18n"
 	"github.com/BurntSushi/toml"
 )
 
@@ -75,7 +75,7 @@ func (u *CountryUsecase) Info(ctx context.Context, countryID string) (string, er
 		return "", err
 	}
 	// default locale is enough for debugging
-	return u.service.Info(ctx, l10n.GetLocale(l10n.DefaultLang()), c), nil
+	return u.service.Info(ctx, i18n.GetLocale(i18n.DefaultLang()), c), nil
 }
 
 func (u *CountryUsecase) InitData(ctx context.Context, dir string) error {
@@ -101,4 +101,8 @@ func (u *CountryUsecase) InitData(ctx context.Context, dir string) error {
 		}
 	}
 	return nil
+}
+
+func (u *CountryUsecase) Cache(ctx context.Context) []*model.Country {
+	return u.repo.Cache(ctx)
 }

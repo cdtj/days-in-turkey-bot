@@ -6,11 +6,11 @@ import (
 	"testing"
 
 	"cdtj.io/days-in-turkey-bot/service/formatter"
-	"cdtj.io/days-in-turkey-bot/service/l10n"
+	"cdtj.io/days-in-turkey-bot/service/i18n"
 )
 
 func TestCalendarCalc(t *testing.T) {
-	l10n.Localization()
+	i18n.I18n()
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})))
@@ -30,13 +30,13 @@ func TestCalendarCalc(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			t.Log(formatter.NewTelegramFormatter().TripTree(l10n.GetLocale(l10n.DefaultLang()), tree))
+			t.Log(formatter.NewTelegramFormatter().TripTree(i18n.GetLocale(i18n.DefaultLang()), tree))
 		})
 	}
 }
 
 func BenchmarkCalendarCalc(b *testing.B) {
-	l10n.Localization()
+	i18n.I18n()
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})))
@@ -58,7 +58,7 @@ func BenchmarkCalendarCalc(b *testing.B) {
 				if err != nil {
 					b.Error(err)
 				}
-				formatter.NewTelegramFormatter().TripTree(l10n.GetLocale(l10n.DefaultLang()), tree)
+				formatter.NewTelegramFormatter().TripTree(i18n.GetLocale(i18n.DefaultLang()), tree)
 			}
 		})
 	}

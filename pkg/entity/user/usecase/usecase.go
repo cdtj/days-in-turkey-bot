@@ -8,7 +8,7 @@ import (
 	"cdtj.io/days-in-turkey-bot/entity/country"
 	"cdtj.io/days-in-turkey-bot/entity/user"
 	"cdtj.io/days-in-turkey-bot/model"
-	"cdtj.io/days-in-turkey-bot/service/l10n"
+	"cdtj.io/days-in-turkey-bot/service/i18n"
 	"golang.org/x/text/language"
 )
 
@@ -50,7 +50,7 @@ func (uc *UserUsecase) Info(ctx context.Context, userID string) (string, error) 
 		return "", err
 	}
 	slog.Info("get user", "userid", userID, "data", u)
-	return uc.service.UserInfo(ctx, l10n.GetLocale(u.GetLangTag()), u), nil
+	return uc.service.UserInfo(ctx, i18n.GetLocale(u.GetLangTag()), u), nil
 }
 
 func (uc *UserUsecase) UpdateLang(ctx context.Context, userID string, lang string) error {
@@ -97,7 +97,7 @@ func (uc *UserUsecase) CalculateTrip(ctx context.Context, userID string, input s
 		slog.Error("calculate trip failed", "userID", userID, "input", input, "err", err)
 		return "", err
 	}
-	return uc.service.CalculateTrip(ctx, l10n.GetLocale(u.GetLangTag()), input, u.GetDaysLimit(), u.GetDaysCont(), u.GetResetInterval())
+	return uc.service.CalculateTrip(ctx, i18n.GetLocale(u.GetLangTag()), input, u.GetDaysLimit(), u.GetDaysCont(), u.GetResetInterval())
 }
 
 func (uc *UserUsecase) сreate(ctx context.Context, userID, lang string) error {
@@ -131,7 +131,7 @@ func (uc *UserUsecase) get(ctx context.Context, userID string) (*model.User, err
 
 	tag, err := uc.service.LangLookup(ctx, u.Lang)
 	if err != nil {
-		tag = l10n.DefaultLang()
+		tag = i18n.DefaultLang()
 	}
 	u.SetLangTag(tag)
 

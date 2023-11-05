@@ -6,7 +6,7 @@ import (
 	"cdtj.io/days-in-turkey-bot/entity/country"
 	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/formatter"
-	"cdtj.io/days-in-turkey-bot/service/l10n"
+	"cdtj.io/days-in-turkey-bot/service/i18n"
 )
 
 var _ country.Service = NewCountryService(nil)
@@ -21,6 +21,6 @@ func NewCountryService(fmtr formatter.Formatter) *CountryService {
 	}
 }
 
-func (s *CountryService) Info(ctx context.Context, l *l10n.Locale, c *model.Country) string {
+func (s *CountryService) Info(ctx context.Context, l *i18n.Locale, c *model.Country) string {
 	return s.fmtr.Country(l, c)
 }

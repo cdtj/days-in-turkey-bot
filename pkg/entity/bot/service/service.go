@@ -5,7 +5,7 @@ import (
 
 	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/formatter"
-	"cdtj.io/days-in-turkey-bot/service/l10n"
+	"cdtj.io/days-in-turkey-bot/service/i18n"
 )
 
 type BotSender interface {
@@ -14,13 +14,15 @@ type BotSender interface {
 
 type BotService struct {
 	sender BotSender
-	fmtr   formatter.Formatter
+	frmtr  formatter.Formatter
+	i18n   i18n.Localizer
 }
 
-func NewBotService(sender BotSender, fmtr formatter.Formatter) *BotService {
+func NewBotService(service BotSender, frmtr formatter.Formatter, i18n i18n.Localizer) *BotService {
 	return &BotService{
-		sender: sender,
-		fmtr:   fmtr,
+		sender: service,
+		frmtr:  frmtr,
+		i18n:   i18n,
 	}
 }
 
@@ -28,6 +30,19 @@ func (s *BotService) Send(ctx context.Context, chatID int64, text string, replyM
 	return s.sender.Send(ctx, chatID, text, replyMarkup)
 }
 
-func (s *BotService) FormatMessage(ctx context.Context, l *l10n.Locale, messageID string) string {
-	return s.fmtr.FormatMessage(l, messageID)
+func (s *BotService) CountryMarkup(ctx context.Context, countries []*model.Country) []*model.TelegramBotCommandRow {
+	commands := make([]*model.TelegramBotCommand, 0, len(countries))
+	for _, country := range countries {
+		commands = append(commands, model.NewTelegramBotCommand(country.GetFlag()+" "+country.GetName(), "country "+country.GetCode()))
+	}
+	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands)}
+}
+
+func (s *BotService) LangMarkup(ctx context.Context) []*model.TelegramBotCommandRow {
+	locales := s.i18n.Locales()
+	commands := make([]*model.TelegramBotCommand, 0, len(locales))
+	for _, cmd := range locales {
+		commands = append(commands, model.NewTelegramBotCommand(cmd.Name, "language "+cmd.Tag.String()))
+	}
+	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands)}
 }

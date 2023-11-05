@@ -1,7 +1,7 @@
 package model
 
 import (
-	"cdtj.io/days-in-turkey-bot/service/l10n"
+	"cdtj.io/days-in-turkey-bot/service/i18n"
 	"golang.org/x/text/language"
 )
 
@@ -20,7 +20,7 @@ func NewUserConfig(lang, countryCode string) *User {
 }
 
 func DefaultUser() *User {
-	return NewUserConfig(l10n.DefaultLang().String(), DefaultCountryCode())
+	return NewUserConfig(i18n.DefaultLang().String(), DefaultCountryCode())
 }
 
 func (u *User) GetResetInterval() int {

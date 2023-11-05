@@ -12,7 +12,7 @@ import (
 	"cdtj.io/days-in-turkey-bot/db"
 	httpserver "cdtj.io/days-in-turkey-bot/http-server"
 	"cdtj.io/days-in-turkey-bot/service/formatter"
-	"cdtj.io/days-in-turkey-bot/service/l10n"
+	"cdtj.io/days-in-turkey-bot/service/i18n"
 	telegrambot "cdtj.io/days-in-turkey-bot/telegram-bot"
 
 	cr "cdtj.io/days-in-turkey-bot/entity/country/repo"
@@ -29,7 +29,7 @@ import (
 )
 
 func init() {
-	if err := l10n.Localization(); err != nil {
+	if err := i18n.I18n(); err != nil {
 		panic(err)
 	}
 }

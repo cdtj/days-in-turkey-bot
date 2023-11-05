@@ -7,7 +7,7 @@ import (
 	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/calendar"
 	"cdtj.io/days-in-turkey-bot/service/formatter"
-	"cdtj.io/days-in-turkey-bot/service/l10n"
+	"cdtj.io/days-in-turkey-bot/service/i18n"
 	"golang.org/x/text/language"
 )
 
@@ -23,11 +23,11 @@ func NewUserService(fmtr formatter.Formatter) *UserService {
 	}
 }
 
-func (s *UserService) UserInfo(ctx context.Context, l *l10n.Locale, u *model.User) string {
+func (s *UserService) UserInfo(ctx context.Context, l *i18n.Locale, u *model.User) string {
 	return s.fmtr.User(l, u)
 }
 
-func (s *UserService) CalculateTrip(ctx context.Context, l *l10n.Locale, input string, daysLimit, daysCont, resetInterval int) (string, error) {
+func (s *UserService) CalculateTrip(ctx context.Context, l *i18n.Locale, input string, daysLimit, daysCont, resetInterval int) (string, error) {
 	tree, err := calendar.MakeTree(input, daysLimit, daysCont, resetInterval)
 	if err != nil {
 		return "", err

@@ -8,35 +8,35 @@ import (
 	"cdtj.io/days-in-turkey-bot/entity/country"
 	"cdtj.io/days-in-turkey-bot/entity/user"
 	"cdtj.io/days-in-turkey-bot/model"
-	"cdtj.io/days-in-turkey-bot/service/l10n"
+	"cdtj.io/days-in-turkey-bot/service/i18n"
 )
 
 var _ bot.Usecase = NewBotUsecase(nil, nil, nil)
 
 type BotUsecase struct {
-	usecase user.Usecase
-	service bot.Service
-	country country.Usecase
+	service   bot.Service
+	userUC    user.Usecase
+	countryUC country.Usecase
 }
 
-func NewBotUsecase(usecase user.Usecase, service bot.Service, country country.Usecase) *BotUsecase {
+func NewBotUsecase(service bot.Service, userUC user.Usecase, countryUC country.Usecase) *BotUsecase {
 	return &BotUsecase{
-		usecase: usecase,
-		service: service,
-		country: country,
+		service:   service,
+		userUC:    userUC,
+		countryUC: countryUC,
 	}
 }
 
 func (uc *BotUsecase) Welcome(ctx context.Context, chatID int64, userID, lang string) error {
-	if err := uc.usecase.Create(ctx, userID, lang); err != nil {
+	if err := uc.userUC.Create(ctx, userID, lang); err != nil {
 		return err
 	}
-	userInfo, err := uc.usecase.Info(ctx, userID)
+	userInfo, err := uc.userUC.Info(ctx, userID)
 	if err != nil {
 		return err
 	}
-	storedLang := uc.usecase.GetLang(ctx, userID)
-	locale := l10n.GetLocale(storedLang)
+	storedLang := uc.userUC.GetLang(ctx, userID)
+	locale := i18n.GetLocale(storedLang)
 	slog.Info("user's lang", "lang", storedLang, "userID", userID, "locale", locale.Name)
 
 	msg := uc.service.FormatMessage(ctx, locale, "Welcome") + " " +
@@ -62,7 +62,7 @@ const (
 )
 
 func (uc *BotUsecase) Prompt(ctx context.Context, chatID int64, userID, prompt string) error {
-	locale := l10n.GetLocale(uc.usecase.GetLang(ctx, userID))
+	locale := i18n.GetLocale(uc.userUC.GetLang(ctx, userID))
 	switch prompt {
 	case BotCommandCountry:
 		return uc.Send(ctx, chatID, locale.Message("UserCountryPrompt"), uc.CountryMarkup(ctx, userID))
@@ -83,10 +83,10 @@ func (uc *BotUsecase) Prompt(ctx context.Context, chatID int64, userID, prompt s
 }
 
 func (uc *BotUsecase) UpdateLang(ctx context.Context, chatID int64, userID, lang string) error {
-	if err := uc.usecase.UpdateLang(ctx, userID, lang); err != nil {
+	if err := uc.userUC.UpdateLang(ctx, userID, lang); err != nil {
 		return err
 	}
-	userInfo, err := uc.usecase.Info(ctx, userID)
+	userInfo, err := uc.userUC.Info(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -95,10 +95,10 @@ func (uc *BotUsecase) UpdateLang(ctx context.Context, chatID int64, userID, lang
 }
 
 func (uc *BotUsecase) UpdateCountry(ctx context.Context, chatID int64, userID, countryID string) error {
-	if err := uc.usecase.UpdateCountry(ctx, userID, countryID); err != nil {
+	if err := uc.userUC.UpdateCountry(ctx, userID, countryID); err != nil {
 		return err
 	}
-	userInfo, err := uc.usecase.Info(ctx, userID)
+	userInfo, err := uc.userUC.Info(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func (uc *BotUsecase) UpdateCountry(ctx context.Context, chatID int64, userID, c
 }
 
 func (uc *BotUsecase) CalculateTrip(ctx context.Context, chatID int64, userID, input string) error {
-	trip, err := uc.usecase.CalculateTrip(ctx, userID, input)
+	trip, err := uc.userUC.CalculateTrip(ctx, userID, input)
 	if err != nil {
 		return err
 	}
@@ -116,25 +116,4 @@ func (uc *BotUsecase) CalculateTrip(ctx context.Context, chatID int64, userID, i
 
 func (uc *BotUsecase) Send(ctx context.Context, chatID int64, text string, replyMarkup []*model.TelegramBotCommandRow) error {
 	return uc.service.Send(ctx, chatID, text, replyMarkup)
-}
-
-func (uc *BotUsecase) CountryMarkup(ctx context.Context, userID string) []*model.TelegramBotCommandRow {
-	countries, err := uc.country.List(ctx)
-	if err != nil {
-		return nil
-	}
-	commands := make([]*model.TelegramBotCommand, 0, len(countries))
-	for _, country := range countries {
-		commands = append(commands, model.NewTelegramBotCommand(country.GetFlag()+" "+country.GetName(), "country "+country.GetCode()))
-	}
-	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands)}
-}
-
-func (uc *BotUsecase) LangMarkup(ctx context.Context, userID string) []*model.TelegramBotCommandRow {
-	locales := l10n.Locales()
-	commands := make([]*model.TelegramBotCommand, 0, len(locales))
-	for _, cmd := range locales {
-		commands = append(commands, model.NewTelegramBotCommand(cmd.Name, "language "+cmd.Tag.String()))
-	}
-	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands)}
 }
