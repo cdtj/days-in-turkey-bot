@@ -7,13 +7,17 @@ import (
 
 	"cdtj.io/days-in-turkey-bot/service/formatter"
 	"cdtj.io/days-in-turkey-bot/service/i18n"
+	"golang.org/x/text/language"
 )
 
 func TestCalendarCalc(t *testing.T) {
-	i18n.I18n()
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})))
+	i18n, err := i18n.NewI18n("i18n", language.English.String())
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	testCases := []struct {
 		Name  string
@@ -29,17 +33,21 @@ func TestCalendarCalc(t *testing.T) {
 			tree, err := MakeTree(tc.Input, 90, 60, 180)
 			if err != nil {
 				t.Error(err)
+				return
 			}
-			t.Log(formatter.NewTelegramFormatter().TripTree(i18n.GetLocale(i18n.DefaultLang()), tree))
+			t.Log(formatter.NewTelegramFormatter(i18n).TripTree(i18n.DefaultLang(), tree))
 		})
 	}
 }
 
 func BenchmarkCalendarCalc(b *testing.B) {
-	i18n.I18n()
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})))
+	i18n, err := i18n.NewI18n("i18n", language.English.String())
+	if err != nil {
+		b.Fatal(err)
+	}
 
 	testCases := []struct {
 		Name  string
@@ -57,8 +65,9 @@ func BenchmarkCalendarCalc(b *testing.B) {
 				tree, err := MakeTree(tc.Input, 90, 60, 180)
 				if err != nil {
 					b.Error(err)
+					continue
 				}
-				formatter.NewTelegramFormatter().TripTree(i18n.GetLocale(i18n.DefaultLang()), tree)
+				formatter.NewTelegramFormatter(i18n).TripTree(i18n.DefaultLang(), tree)
 			}
 		})
 	}

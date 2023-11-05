@@ -15,99 +15,73 @@ import (
 var _ user.Usecase = NewUserUsecase(nil, nil, nil)
 
 type UserUsecase struct {
-	repo    user.Repo
-	country country.Repo
-	service user.Service
+	repo      user.Repo
+	service   user.Service
+	countryUC country.Usecase
 }
 
-func NewUserUsecase(repo user.Repo, country country.Repo, service user.Service) *UserUsecase {
+func NewUserUsecase(repo user.Repo, service user.Service, countryUC country.Usecase) *UserUsecase {
 	return &UserUsecase{
-		repo:    repo,
-		country: country,
-		service: service,
+		repo:      repo,
+		service:   service,
+		countryUC: countryUC,
 	}
 }
 
-func (uc *UserUsecase) GetLang(ctx context.Context, userID string) language.Tag {
-	u, err := uc.get(ctx, userID)
-	if err != nil {
-		return l10n.DefaultLang()
-	}
-	return u.GetLangTag()
-}
-
-func (uc *UserUsecase) Create(ctx context.Context, userID, lang string) error {
+func (uc *UserUsecase) Create(ctx context.Context, userID int64, lang string) error {
 	if _, err := uc.get(ctx, userID); err == nil {
 		return nil
 	}
 	return uc.сreate(ctx, userID, lang)
 }
 
-func (uc *UserUsecase) Info(ctx context.Context, userID string) (string, error) {
-	u, err := uc.get(ctx, userID)
-	if err != nil {
-		slog.Error("get user failed", "userID", userID, "err", err)
-		return "", err
-	}
-	slog.Info("get user", "userid", userID, "data", u)
-	return uc.service.UserInfo(ctx, i18n.GetLocale(u.GetLangTag()), u), nil
+func (uc *UserUsecase) Get(ctx context.Context, userID int64) (*model.User, error) {
+	return uc.get(ctx, userID)
 }
 
-func (uc *UserUsecase) UpdateLang(ctx context.Context, userID string, lang string) error {
-	u, err := uc.get(ctx, userID)
+func (uc *UserUsecase) GetInfo(ctx context.Context, user *model.User) (string, error) {
+	return uc.service.UserInfo(ctx, user.GetLanguage(), user), nil
+}
+
+func (uc *UserUsecase) GetTrip(ctx context.Context, user *model.User, datesInput string) (string, error) {
+	return uc.service.CalculateTrip(ctx, user.GetLanguage(), datesInput, user.GetDaysCont(), user.GetDaysLimit(), user.GetResetInterval())
+}
+
+func (uc *UserUsecase) GetLanguage(ctx context.Context, user *model.User) language.Tag {
+	return user.GetLanguage()
+}
+
+func (uc *UserUsecase) UpdateLanguage(ctx context.Context, user *model.User, languageCode string) error {
+	language, err := i18n.LanguageLookup(languageCode)
 	if err != nil {
-		slog.Error("updateLang failed", "userID", userID, "lang", lang, "err", err)
+		slog.Error("updateLang failed", "userID", user.GetID(), "languageCode", languageCode, "err", err)
 		return err
 	}
-	langTag, err := uc.service.LangLookup(ctx, lang)
-	if err != nil {
-		slog.Error("updateLang failed", "userID", userID, "lang", lang, "err", err)
-		return err
-	}
-	u.Lang = langTag.String()
-	slog.Info("update lang", "userid", userID, "lang", langTag)
-	if err := uc.repo.Save(ctx, userID, u); err != nil {
+	user.SetLanguage(language)
+	slog.Debug("updateLang ok", "userID", user.GetID(), "language", language)
+	if err := uc.repo.Save(ctx, user.GetID(), user); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (uc *UserUsecase) UpdateCountry(ctx context.Context, userID string, countryID string) error {
-	u, err := uc.get(ctx, userID)
-	if err != nil {
-		slog.Error("updateCountry failed", "userID", userID, "countryID", countryID, "err", err)
-		return err
-	}
-	country, err := uc.country.Get(ctx, countryID)
-	if err != nil {
-		slog.Error("updateCountry failed", "userID", userID, "countryID", countryID, "err", err)
-		return err
-	}
-	slog.Info("update country", "userid", userID, "country", country)
-	u.Country = *country
-	if err := uc.repo.Save(ctx, userID, u); err != nil {
+func (uc *UserUsecase) UpdateCountry(ctx context.Context, user *model.User, country *model.Country) error {
+	slog.Info("updateCountry ok", "userID", user.GetID(), "country", country)
+	user.SetCountry(*country)
+	if err := uc.repo.Save(ctx, user.GetID(), user); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (uc *UserUsecase) CalculateTrip(ctx context.Context, userID string, input string) (string, error) {
-	u, err := uc.get(ctx, userID)
-	if err != nil {
-		slog.Error("calculate trip failed", "userID", userID, "input", input, "err", err)
-		return "", err
-	}
-	return uc.service.CalculateTrip(ctx, i18n.GetLocale(u.GetLangTag()), input, u.GetDaysLimit(), u.GetDaysCont(), u.GetResetInterval())
-}
-
-func (uc *UserUsecase) сreate(ctx context.Context, userID, lang string) error {
-	u := model.DefaultUser()
-	if lang != "" {
-		tag, err := uc.service.LangLookup(ctx, lang)
+func (uc *UserUsecase) сreate(ctx context.Context, userID int64, languageCode string) error {
+	u := uc.service.DefaultUser(ctx, userID)
+	if languageCode != "" {
+		tag, err := i18n.LanguageLookup(languageCode)
 		if err != nil {
-			slog.Error("falied to init user with custom lang", "userID", userID, "lang", lang, "err", err)
+			slog.Error("falied to init user with custom lang", "userID", userID, "languageCode", languageCode, "err", err)
 		} else {
-			u.Lang = tag.String()
+			u.SetLanguage(tag)
 		}
 	}
 	return uc.repo.Save(ctx, userID, u)
@@ -116,7 +90,7 @@ func (uc *UserUsecase) сreate(ctx context.Context, userID, lang string) error {
 // get is a most expensive method because it contains user constructor performing
 // CountryLookup and LanguageLookup, it might be cheaper just to store them instead of
 // looking up every time
-func (uc *UserUsecase) get(ctx context.Context, userID string) (*model.User, error) {
+func (uc *UserUsecase) get(ctx context.Context, userID int64) (*model.User, error) {
 	u, err := uc.repo.Load(ctx, userID)
 	if err != nil {
 		if errors.Is(err, user.ErrRepoUserNotFound) {
@@ -129,23 +103,17 @@ func (uc *UserUsecase) get(ctx context.Context, userID string) (*model.User, err
 		return nil, err
 	}
 
-	tag, err := uc.service.LangLookup(ctx, u.Lang)
-	if err != nil {
-		tag = i18n.DefaultLang()
-	}
-	u.SetLangTag(tag)
-
 	switch u.Country.Code {
 	case "CUSTOM":
 		break
 	case "":
-		u.Country = *model.DefaultCountry()
+		u.SetCountry(*uc.countryUC.DefaultCountry(ctx))
 	default:
-		country, err := uc.country.Get(ctx, u.Country.Code)
+		country, err := uc.countryUC.Get(ctx, u.Country.Code)
 		if err != nil {
 			return nil, err
 		}
-		u.Country = *country
+		u.SetCountry(*country)
 	}
 
 	return u, nil

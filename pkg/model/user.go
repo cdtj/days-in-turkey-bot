@@ -1,26 +1,25 @@
 package model
 
 import (
-	"cdtj.io/days-in-turkey-bot/service/i18n"
 	"golang.org/x/text/language"
 )
 
 type User struct {
-	Lang        string
-	CountryCode string
-	Country     Country
-	langTag     language.Tag
+	ID       int64
+	Country  Country
+	Language language.Tag
 }
 
-func NewUserConfig(lang, countryCode string) *User {
+func NewUser(id int64, language language.Tag, country Country) *User {
 	return &User{
-		Lang:        lang,
-		CountryCode: countryCode,
+		ID:       id,
+		Country:  country,
+		Language: language,
 	}
 }
 
-func DefaultUser() *User {
-	return NewUserConfig(i18n.DefaultLang().String(), DefaultCountryCode())
+func (u *User) GetID() int64 {
+	return u.ID
 }
 
 func (u *User) GetResetInterval() int {
@@ -35,14 +34,14 @@ func (u *User) GetDaysLimit() int {
 	return u.Country.GetDaysLimit()
 }
 
-func (u *User) GetLang() string {
-	return u.Lang
+func (u *User) GetLanguage() language.Tag {
+	return u.Language
 }
 
-func (u *User) GetLangTag() language.Tag {
-	return u.langTag
+func (u *User) SetLanguage(language language.Tag) {
+	u.Language = language
 }
 
-func (u *User) SetLangTag(tag language.Tag) {
-	u.langTag = tag
+func (u *User) SetCountry(country Country) {
+	u.Country = country
 }

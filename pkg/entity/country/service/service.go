@@ -6,21 +6,37 @@ import (
 	"cdtj.io/days-in-turkey-bot/entity/country"
 	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/formatter"
-	"cdtj.io/days-in-turkey-bot/service/i18n"
+	"golang.org/x/text/language"
 )
 
-var _ country.Service = NewCountryService(nil)
+var _ country.Service = NewCountryService(nil, nil)
 
 type CountryService struct {
-	fmtr formatter.Formatter
+	defaultCountry *model.Country
+	fmtr           formatter.Formatter
 }
 
-func NewCountryService(fmtr formatter.Formatter) *CountryService {
+func NewCountryService(fmtr formatter.Formatter, defaultCountry *model.Country) *CountryService {
 	return &CountryService{
-		fmtr: fmtr,
+		fmtr:           fmtr,
+		defaultCountry: defaultCountry,
 	}
 }
 
-func (s *CountryService) Info(ctx context.Context, l *i18n.Locale, c *model.Country) string {
-	return s.fmtr.Country(l, c)
+func (s *CountryService) CountryInfo(ctx context.Context, language language.Tag, country *model.Country) string {
+	return s.fmtr.Country(language, country)
+}
+
+func (s *CountryService) DefaultCountry(context.Context) *model.Country {
+	return s.defaultCountry
+}
+
+func (s *CountryService) CustomCountry(ctx context.Context, daysCont, daysLimit, resetInterval int) *model.Country {
+	return &model.Country{
+		Code:          "CUSTOM",
+		Flag:          "❔",
+		DaysContinual: daysCont,
+		DaysLimit:     daysLimit,
+		ResetInterval: resetInterval,
+	}
 }

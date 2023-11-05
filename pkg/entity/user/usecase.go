@@ -3,14 +3,18 @@ package user
 import (
 	"context"
 
+	"cdtj.io/days-in-turkey-bot/model"
 	"golang.org/x/text/language"
 )
 
 type Usecase interface {
-	Create(ctx context.Context, userID, lang string) error
-	Info(ctx context.Context, userID string) (string, error)
-	CalculateTrip(ctx context.Context, userID string, input string) (string, error)
-	UpdateLang(ctx context.Context, userID string, lang string) error
-	UpdateCountry(ctx context.Context, userID string, countryID string) error
-	GetLang(ctx context.Context, userID string) language.Tag
+	Create(ctx context.Context, userID int64, lang string) error
+	Get(ctx context.Context, userID int64) (*model.User, error)
+
+	GetInfo(ctx context.Context, user *model.User) (string, error)
+	GetTrip(ctx context.Context, user *model.User, datesInput string) (string, error)
+	GetLanguage(ctx context.Context, user *model.User) language.Tag
+
+	UpdateLanguage(ctx context.Context, user *model.User, lang string) error
+	UpdateCountry(ctx context.Context, user *model.User, country *model.Country) error
 }

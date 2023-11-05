@@ -81,3 +81,24 @@ func (f *TelegramFormatter) FormatMessage(language language.Tag, messageID strin
 	locale := f.i18n.GetLocale(language)
 	return locale.Message(messageID)
 }
+
+func (f *TelegramFormatter) Welcome(language language.Tag) string {
+	locale := f.i18n.GetLocale(language)
+	return locale.Message("Welcome") + " " +
+		locale.Message("Welcome1") + "\n\n" +
+		locale.Message("WelcomeCountry") + "\n" +
+		locale.Message("WelcomeLanguage") + "\n" +
+		locale.Message("WelcomeTrip") + "\n" +
+		locale.Message("WelcomeContribute") + "\n\n" +
+		locale.Message("WelcomePrompt") + "\n\n" +
+		locale.Message("WelcomePromptPredictEnd") + "\n" +
+		locale.Message("WelcomePromptPredictRemain")
+}
+
+func (f *TelegramFormatter) TripExplanation(language language.Tag) string {
+	locale := f.i18n.GetLocale(language)
+	return locale.Message("TripExplanation") + "\n\n" +
+		locale.Message("TripExplanationContinual") + "\n" +
+		locale.Message("TripExplanationLimit") + "\n" +
+		locale.Message("TripExplanationResetInterval")
+}

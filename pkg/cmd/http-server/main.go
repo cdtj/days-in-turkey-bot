@@ -11,6 +11,7 @@ import (
 
 	"cdtj.io/days-in-turkey-bot/db"
 	httpserver "cdtj.io/days-in-turkey-bot/http-server"
+	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/formatter"
 	"cdtj.io/days-in-turkey-bot/service/i18n"
 
@@ -25,23 +26,26 @@ import (
 	uuc "cdtj.io/days-in-turkey-bot/entity/user/usecase"
 )
 
-func init() {
-	if err := i18n.I18n(); err != nil {
-		panic(err)
-	}
-}
+var (
+	defaultLang    = "en"
+	defaultCountry = model.NewCountry("RU", "RU", 60, 90, 180)
+)
 
 func main() {
-	tgFmt := formatter.NewTelegramFormatter()
+	i18n, err := i18n.NewI18n("i18n", defaultLang)
+	if err != nil {
+		panic(err)
+	}
+	tgFmt := formatter.NewTelegramFormatter(i18n)
 	countryDB := db.NewMapDB()
-	countryRepo := cr.NewCountryRepo(countryDB)
-	countrySvc := cs.NewCountryService(tgFmt)
+	countryRepo := cr.NewCountryMapRepo(countryDB)
+	countrySvc := cs.NewCountryService(tgFmt, defaultCountry)
 	countryUC := cuc.NewCountryUsecase(countryRepo, countrySvc)
 
 	userDB := db.NewMapDB()
 	userRepo := ur.NewUserRepo(userDB)
-	userSvc := us.NewUserService(tgFmt)
-	userUC := uuc.NewUserUsecase(userRepo, countryRepo, userSvc)
+	userSvc := us.NewUserService(tgFmt, i18n, countrySvc)
+	userUC := uuc.NewUserUsecase(userRepo, userSvc, countryUC)
 
 	router := httpserver.NewChiRouter()
 	uep.RegisterHTTPEndpoints(router, userUC)

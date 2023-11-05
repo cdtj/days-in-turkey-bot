@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"cdtj.io/days-in-turkey-bot/entity/country"
 	"cdtj.io/days-in-turkey-bot/entity/user"
 	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/calendar"
@@ -11,30 +12,34 @@ import (
 	"golang.org/x/text/language"
 )
 
-var _ user.Service = NewUserService(nil)
+var _ user.Service = NewUserService(nil, nil, nil)
 
 type UserService struct {
-	fmtr formatter.Formatter
+	fmtr    formatter.Formatter
+	i18n    i18n.I18ner
+	country country.Service
 }
 
-func NewUserService(fmtr formatter.Formatter) *UserService {
+func NewUserService(fmtr formatter.Formatter, i18n i18n.I18ner, country country.Service) *UserService {
 	return &UserService{
-		fmtr: fmtr,
+		fmtr:    fmtr,
+		i18n:    i18n,
+		country: country,
 	}
 }
 
-func (s *UserService) UserInfo(ctx context.Context, l *i18n.Locale, u *model.User) string {
-	return s.fmtr.User(l, u)
+func (s *UserService) UserInfo(ctx context.Context, language language.Tag, user *model.User) string {
+	return s.fmtr.User(language, user)
 }
 
-func (s *UserService) CalculateTrip(ctx context.Context, l *i18n.Locale, input string, daysLimit, daysCont, resetInterval int) (string, error) {
+func (s *UserService) CalculateTrip(ctx context.Context, language language.Tag, input string, daysCont, daysLimit, resetInterval int) (string, error) {
 	tree, err := calendar.MakeTree(input, daysLimit, daysCont, resetInterval)
 	if err != nil {
 		return "", err
 	}
-	return s.fmtr.TripTree(l, tree), nil
+	return s.fmtr.TripTree(language, tree), nil
 }
 
-func (s *UserService) LangLookup(ctx context.Context, lang string) (language.Tag, error) {
-	return language.Parse(lang)
+func (s *UserService) DefaultUser(ctx context.Context, userID int64) *model.User {
+	return model.NewUser(userID, s.i18n.DefaultLang(), *s.country.DefaultCountry(ctx))
 }

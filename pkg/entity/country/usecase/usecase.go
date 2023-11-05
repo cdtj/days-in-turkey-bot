@@ -11,8 +11,8 @@ import (
 	"cdtj.io/days-in-turkey-bot/assets"
 	"cdtj.io/days-in-turkey-bot/entity/country"
 	"cdtj.io/days-in-turkey-bot/model"
-	"cdtj.io/days-in-turkey-bot/service/i18n"
 	"github.com/BurntSushi/toml"
+	"golang.org/x/text/language"
 )
 
 var _ country.Usecase = NewCountryUsecase(nil, nil)
@@ -29,29 +29,43 @@ func NewCountryUsecase(repo country.Repo, service country.Service) *CountryUseca
 		repo:    repo,
 		service: service,
 	}
-	if repo != nil {
-		if err := uc.InitData(context.Background(), countryFiles); err != nil {
-			slog.Error("failed to init CountryUsecase", "err", err)
-			return nil
-		}
+	if err := uc.constructor(); err != nil {
+		slog.Error("failed to init CountryUsecase", "err", err)
+		return nil
 	}
 	return uc
 }
 
-func (u *CountryUsecase) Get(ctx context.Context, countryID string) (*model.Country, error) {
-	return u.repo.Get(ctx, countryID)
+func (uc *CountryUsecase) constructor() error {
+	if uc.repo != nil {
+		if err := uc.loadFromFiles(context.Background(), countryFiles); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (u *CountryUsecase) Set(ctx context.Context, countryID string, country *model.Country) error {
-	return u.repo.Set(ctx, countryID, country)
+func (uc *CountryUsecase) Get(ctx context.Context, countryID string) (*model.Country, error) {
+	return uc.repo.Get(ctx, countryID)
 }
 
-func (u *CountryUsecase) Keys(ctx context.Context) ([]string, error) {
-	return u.repo.Keys(ctx)
+func (uc *CountryUsecase) Lookup(ctx context.Context, countryID string, daysCont, daysLimit, resetInterval int) (*model.Country, error) {
+	if countryID != "" {
+		country, err := uc.repo.Get(ctx, countryID)
+		if err != nil {
+			return nil, err
+		}
+		return country, nil
+	}
+	return uc.service.CustomCountry(ctx, daysCont, daysLimit, resetInterval), nil
 }
 
-func (u *CountryUsecase) List(ctx context.Context) ([]*model.Country, error) {
-	keys, err := u.repo.Keys(ctx)
+func (uc *CountryUsecase) Set(ctx context.Context, countryID string, country *model.Country) error {
+	return uc.repo.Set(ctx, countryID, country)
+}
+
+func (uc *CountryUsecase) ListFromRepo(ctx context.Context) ([]*model.Country, error) {
+	keys, err := uc.repo.Keys(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +74,7 @@ func (u *CountryUsecase) List(ctx context.Context) ([]*model.Country, error) {
 	})
 	countries := make([]*model.Country, 0, len(keys))
 	for _, key := range keys {
-		country, err := u.Get(ctx, key)
+		country, err := uc.Get(ctx, key)
 		if err != nil {
 			return nil, err
 		}
@@ -69,16 +83,19 @@ func (u *CountryUsecase) List(ctx context.Context) ([]*model.Country, error) {
 	return countries, nil
 }
 
-func (u *CountryUsecase) Info(ctx context.Context, countryID string) (string, error) {
-	c, err := u.Get(ctx, countryID)
-	if err != nil {
-		return "", err
-	}
-	// default locale is enough for debugging
-	return u.service.Info(ctx, i18n.GetLocale(i18n.DefaultLang()), c), nil
+func (uc *CountryUsecase) ListFromCache(ctx context.Context) []*model.Country {
+	return uc.repo.Cache(ctx)
 }
 
-func (u *CountryUsecase) InitData(ctx context.Context, dir string) error {
+func (uc *CountryUsecase) GetInfo(ctx context.Context, language language.Tag, country *model.Country) (string, error) {
+	return uc.service.CountryInfo(ctx, language, country), nil
+}
+
+func (uc *CountryUsecase) DefaultCountry(ctx context.Context) *model.Country {
+	return uc.service.DefaultCountry(ctx)
+}
+
+func (uc *CountryUsecase) loadFromFiles(ctx context.Context, dir string) error {
 	entries, err := assets.Countries.ReadDir(dir)
 	if err != nil {
 		return fmt.Errorf("unable to read %s dir: %w", dir, err)
@@ -95,14 +112,10 @@ func (u *CountryUsecase) InitData(ctx context.Context, dir string) error {
 		if err := toml.Unmarshal(content, &country); err != nil {
 			return fmt.Errorf("unable to unmarshal %s: %w", f.Name(), err)
 		}
-		slog.Debug("init for repo", "repo", u.repo)
-		if err := u.repo.Set(ctx, country.Code, &country); err != nil {
+		slog.Debug("init for repo", "repo", uc.repo)
+		if err := uc.repo.Set(ctx, country.Code, &country); err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-func (u *CountryUsecase) Cache(ctx context.Context) []*model.Country {
-	return u.repo.Cache(ctx)
 }

@@ -15,6 +15,8 @@ import (
 
 type I18ner interface {
 	GetLocale(tag language.Tag) Localizer
+	Locales() []*Locale
+	DefaultLang() language.Tag
 }
 
 type I18n struct {
@@ -116,4 +118,8 @@ func (i *I18n) localizer(tag language.Tag) *i18nlib.Localizer {
 		return nil
 	}
 	return (l).(*i18nlib.Localizer)
+}
+
+func LanguageLookup(languageCode string) (language.Tag, error) {
+	return language.Parse(languageCode)
 }

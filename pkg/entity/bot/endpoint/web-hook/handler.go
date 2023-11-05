@@ -3,7 +3,6 @@ package webhook
 import (
 	"log/slog"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"cdtj.io/days-in-turkey-bot/entity/bot"
@@ -44,7 +43,7 @@ func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, nil)
 		return
 	}
-	var chatID int64
+	var chatID, userID int64
 
 	switch {
 	case msg != nil:
@@ -67,7 +66,7 @@ func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
 			),
 		)
 		chatID = msg.Chat.ID
-		userID := strconv.FormatInt(msg.From.ID, 10)
+		userID = msg.From.ID
 		if msg.IsCommand() {
 			switch msg.Command() {
 			case BotWebhookCountry, BotWebhookLanguage, BotWebhookContribute, BotWebhookTrip:
@@ -87,14 +86,14 @@ func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
 			),
 		)
 		chatID = cb.Message.Chat.ID
-		userID := strconv.FormatInt(cb.From.ID, 10)
+		userID = cb.From.ID
 		inputArr := strings.Split(cb.Data, " ")
 		if len(inputArr) == 2 {
 			switch inputArr[0] {
 			case BotWebhookCountry:
-				err = h.usecase.UpdateCountry(r.Context(), chatID, userID, inputArr[1])
+				err = h.usecase.UpdateCountry(r.Context(), chatID, userID, inputArr[1], -1, -1, -1)
 			case BotWebhookLanguage:
-				err = h.usecase.UpdateLang(r.Context(), chatID, userID, inputArr[1])
+				err = h.usecase.UpdateLanguage(r.Context(), chatID, userID, inputArr[1])
 			}
 		}
 	}

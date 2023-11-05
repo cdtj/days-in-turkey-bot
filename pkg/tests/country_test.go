@@ -7,8 +7,10 @@ import (
 	"testing"
 
 	"cdtj.io/days-in-turkey-bot/db"
+	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/formatter"
 	"cdtj.io/days-in-turkey-bot/service/i18n"
+	"golang.org/x/text/language"
 
 	cr "cdtj.io/days-in-turkey-bot/entity/country/repo"
 	cs "cdtj.io/days-in-turkey-bot/entity/country/service"
@@ -21,10 +23,13 @@ const (
 )
 
 func BenchmarkCountry(b *testing.B) {
-	i18n.I18n()
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})))
+	i18n, err := i18n.NewI18n("i18n", language.English.String())
+	if err != nil {
+		b.Fatal(err)
+	}
 
 	testCases := []struct {
 		Name  string
@@ -37,16 +42,16 @@ func BenchmarkCountry(b *testing.B) {
 	for _, tc := range testCases {
 		b.Run(tc.Name, func(b *testing.B) {
 			countryDB := db.NewMapDB()
-			countryRepo := cr.NewCountryRepo(countryDB)
-			countrySvc := cs.NewCountryService(formatter.NewTelegramFormatter())
+			countryRepo := cr.NewCountryMapRepo(countryDB)
+			countrySvc := cs.NewCountryService(formatter.NewTelegramFormatter(i18n), model.NewCountry("RU", "RU", 90, 60, 180))
 			countryUC := cuc.NewCountryUsecase(countryRepo, countrySvc)
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
 				switch tc.Input {
 				case FromCache:
-					countryUC.Cache(context.Background())
+					countryUC.ListFromCache(context.Background())
 				case FromSyncMap:
-					_, err := countryUC.List(context.Background())
+					_, err := countryUC.ListFromRepo(context.Background())
 					if err != nil {
 						b.Error(err)
 					}

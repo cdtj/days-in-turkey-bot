@@ -37,7 +37,7 @@ func init() {
 func main() {
 	// country service
 	countryDB := db.NewMapDB()
-	countryRepo := cr.NewCountryRepo(countryDB)
+	countryRepo := cr.NewCountryMapRepo(countryDB)
 	countrySvc := cs.NewCountryService(formatter.NewTelegramFormatter())
 	countryUC := cuc.NewCountryUsecase(countryRepo, countrySvc)
 

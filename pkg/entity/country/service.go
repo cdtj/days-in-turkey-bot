@@ -4,9 +4,11 @@ import (
 	"context"
 
 	"cdtj.io/days-in-turkey-bot/model"
-	"cdtj.io/days-in-turkey-bot/service/i18n"
+	"golang.org/x/text/language"
 )
 
 type Service interface {
-	Info(ctx context.Context, l *i18n.Locale, c *model.Country) string
+	CountryInfo(ctx context.Context, language language.Tag, c *model.Country) string
+	DefaultCountry(ctx context.Context) *model.Country
+	CustomCountry(ctx context.Context, daysCont, daysLimit, resetInterval int) *model.Country
 }

@@ -2,8 +2,10 @@ package http
 
 import (
 	"net/http"
+	"strconv"
 
 	"cdtj.io/days-in-turkey-bot/entity/user"
+	"cdtj.io/days-in-turkey-bot/model"
 	"github.com/go-chi/render"
 )
 
@@ -18,8 +20,18 @@ func NewUserHttpHandler(usecase user.Usecase) *UserHttpHandler {
 }
 
 func (h *UserHttpHandler) info(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("userID")
-	resp, err := h.usecase.Info(r.Context(), userID)
+	userID, err := strconv.ParseInt(r.URL.Query().Get("userID"), 10, 64)
+	if err != nil {
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, &ErrorUserResponse{err.Error()})
+	}
+	user, err := h.usecase.Get(r.Context(), userID)
+	if err != nil {
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, &ErrorUserResponse{err.Error()})
+		return
+	}
+	resp, err := h.usecase.GetInfo(r.Context(), user)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
@@ -34,7 +46,11 @@ type CalculateTripInput struct {
 }
 
 func (h *UserHttpHandler) calculateTrip(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("userID")
+	userID, err := strconv.ParseInt(r.URL.Query().Get("userID"), 10, 64)
+	if err != nil {
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, &ErrorUserResponse{err.Error()})
+	}
 	input := new(CalculateTripInput)
 
 	if err := render.DecodeJSON(r.Body, input); err != nil {
@@ -43,7 +59,13 @@ func (h *UserHttpHandler) calculateTrip(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	resp, err := h.usecase.CalculateTrip(r.Context(), userID, input.Dates)
+	user, err := h.usecase.Get(r.Context(), userID)
+	if err != nil {
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, &ErrorUserResponse{err.Error()})
+		return
+	}
+	resp, err := h.usecase.GetTrip(r.Context(), user, input.Dates)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
@@ -58,7 +80,11 @@ type UpdateLangInput struct {
 }
 
 func (h *UserHttpHandler) updateLang(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("userID")
+	userID, err := strconv.ParseInt(r.URL.Query().Get("userID"), 10, 64)
+	if err != nil {
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, &ErrorUserResponse{err.Error()})
+	}
 	input := new(UpdateLangInput)
 
 	if err := render.DecodeJSON(r.Body, input); err != nil {
@@ -66,7 +92,13 @@ func (h *UserHttpHandler) updateLang(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
 		return
 	}
-	err := h.usecase.UpdateLang(r.Context(), userID, input.Lang)
+	user, err := h.usecase.Get(r.Context(), userID)
+	if err != nil {
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, &ErrorUserResponse{err.Error()})
+		return
+	}
+	err = h.usecase.UpdateLanguage(r.Context(), user, input.Lang)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
@@ -77,11 +109,19 @@ func (h *UserHttpHandler) updateLang(w http.ResponseWriter, r *http.Request) {
 }
 
 type UpdateCountryInput struct {
-	Country string `json:"country"`
+	Code          string `json:"code"`
+	Flag          string `json:"flag"`
+	DaysContinual int    `json:"daysContinual"`
+	DaysLimit     int    `json:"daysLimit"`
+	ResetInterval int    `json:"resetInterval"`
 }
 
 func (h *UserHttpHandler) updateCountry(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("userID")
+	userID, err := strconv.ParseInt(r.URL.Query().Get("userID"), 10, 64)
+	if err != nil {
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, &ErrorUserResponse{err.Error()})
+	}
 	input := new(UpdateCountryInput)
 
 	if err := render.DecodeJSON(r.Body, input); err != nil {
@@ -89,7 +129,15 @@ func (h *UserHttpHandler) updateCountry(w http.ResponseWriter, r *http.Request) 
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
 		return
 	}
-	err := h.usecase.UpdateCountry(r.Context(), userID, input.Country)
+	user, err := h.usecase.Get(r.Context(), userID)
+	if err != nil {
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, &ErrorUserResponse{err.Error()})
+		return
+	}
+	// this is test handler for internal use so we don't make any data validation
+	// use at your own risk
+	err = h.usecase.UpdateCountry(r.Context(), user, model.NewCountry(input.Code, input.Flag, input.DaysContinual, input.DaysLimit, input.ResetInterval))
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})

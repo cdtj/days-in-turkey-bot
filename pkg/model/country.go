@@ -19,34 +19,6 @@ func NewCountry(code, flag string, daysContinual, daysLimit, resetInterval int) 
 	}
 }
 
-var (
-	defaultCountryCode = "RU"
-)
-
-func DefaultCountryCode() string {
-	return defaultCountryCode
-}
-
-func DefaultCountry() *Country {
-	return &Country{
-		Code:          "RU",
-		Flag:          "🇷🇺",
-		DaysContinual: 60,
-		DaysLimit:     90,
-		ResetInterval: 180,
-	}
-}
-
-func CustomCountry(cont, limit, reset int) *Country {
-	return &Country{
-		Code:          "",
-		Flag:          "❔",
-		DaysContinual: cont,
-		DaysLimit:     limit,
-		ResetInterval: reset,
-	}
-}
-
 func (c *Country) GetResetInterval() int {
 	return c.ResetInterval
 }

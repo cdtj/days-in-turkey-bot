@@ -1,12 +1,22 @@
 package i18n
 
 import (
+	"log/slog"
+	"os"
 	"testing"
 
 	"golang.org/x/text/language"
 )
 
 func TestHelloMessage(t *testing.T) {
+	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+	})))
+	i18n, err := NewI18n("i18n", language.English.String())
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	testCases := []struct {
 		Lang   string
 		Result string
@@ -14,11 +24,6 @@ func TestHelloMessage(t *testing.T) {
 		{"en", "This bot is an open-source project. You can contribute to Localization, Data Accuracy, and Source Code aswell. Details: https://cdtj.io/l/turkey-bot"},
 		{"ru", "Этот бот является open-source проектом. Вы можете внести свой вклад в локализацию, точность даных, а так же в исходный код проекта. Больше информации: https://cdtj.io/l/turkey-bot"},
 		{"es", "This bot is an open-source project. You can contribute to Localization, Data Accuracy, and Source Code aswell. Details: https://cdtj.io/l/turkey-bot"}, // default language for unlocalized tag
-	}
-
-	i18n, err := NewI18n("i18n", language.English.String())
-	if err != nil {
-		t.Fatal(err)
 	}
 
 	for _, tc := range testCases {

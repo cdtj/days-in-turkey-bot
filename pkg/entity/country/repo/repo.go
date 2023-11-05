@@ -9,9 +9,9 @@ import (
 )
 
 type CountryDatabase interface {
-	Keys(ctx context.Context) ([]string, error)
-	Load(ctx context.Context, id string) (interface{}, error)
-	Save(ctx context.Context, id string, intfc interface{}) error
+	Keys(ctx context.Context) ([]interface{}, error)
+	Load(ctx context.Context, id interface{}) (interface{}, error)
+	Save(ctx context.Context, id interface{}, intfc interface{}) error
 }
 
 type CountryRepo struct {
@@ -19,7 +19,7 @@ type CountryRepo struct {
 	cache []*model.Country
 }
 
-func NewCountryRepo(db CountryDatabase) *CountryRepo {
+func NewCountryMapRepo(db CountryDatabase) *CountryRepo {
 	repo := &CountryRepo{
 		db:    db,
 		cache: make([]*model.Country, 0),
@@ -64,7 +64,15 @@ func (r *CountryRepo) Set(ctx context.Context, countryID string, country *model.
 }
 
 func (r *CountryRepo) Keys(ctx context.Context) ([]string, error) {
-	return r.db.Keys(ctx)
+	keys, err := r.db.Keys(ctx)
+	if err != nil {
+		return nil, err
+	}
+	strKeys := make([]string, 0, len(keys))
+	for _, key := range keys {
+		strKeys = append(strKeys, key.(string))
+	}
+	return strKeys, nil
 }
 
 func (r *CountryRepo) Cache(ctx context.Context) []*model.Country {

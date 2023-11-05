@@ -4,14 +4,21 @@ import (
 	"context"
 
 	"cdtj.io/days-in-turkey-bot/model"
+	"golang.org/x/text/language"
 )
 
 type Usecase interface {
-	Keys(ctx context.Context) ([]string, error)
-	List(ctx context.Context) ([]*model.Country, error)
-	Cache(ctx context.Context) []*model.Country
 	Get(ctx context.Context, countryID string) (*model.Country, error)
-	Set(ctx context.Context, countryID string, country *model.Country) error
-	Info(ctx context.Context, userID string) (string, error)
-	InitData(ctx context.Context, path string) error
+	// Set is commented out because we don't want to affect the list through API,
+	// to modify Country/Countries make relevant changes to assets/country,
+	// and re-init the CountryMapRepo
+	// Set(ctx context.Context, countryID string, country *model.Country) error
+	Lookup(ctx context.Context, countryID string, daysCont, daysLimit, resetInterval int) (*model.Country, error)
+
+	// ListFromRepo deprecated
+	ListFromRepo(ctx context.Context) ([]*model.Country, error)
+	ListFromCache(ctx context.Context) []*model.Country
+	GetInfo(ctx context.Context, language language.Tag, country *model.Country) (string, error)
+
+	DefaultCountry(ctx context.Context) *model.Country
 }

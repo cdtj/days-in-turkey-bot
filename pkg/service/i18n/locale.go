@@ -9,6 +9,9 @@ import (
 )
 
 type Localizer interface {
+	GetName() string
+	GetLanguage() string
+
 	Message(messageID string) string
 	MessageWithCount(messageID string, count interface{}) string
 	MessageWithTemplate(messageID string, tpl map[string]interface{}, plural interface{}) string
@@ -22,8 +25,12 @@ type Locale struct {
 	localizer *i18n.Localizer
 }
 
-func (l *Locale) Lang() string {
+func (l *Locale) GetName() string {
 	return l.Name
+}
+
+func (l *Locale) GetLanguage() string {
+	return l.Tag.String()
 }
 
 func (l *Locale) Message(messageID string) string {
