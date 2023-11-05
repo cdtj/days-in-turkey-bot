@@ -11,6 +11,7 @@ import (
 
 	"cdtj.io/days-in-turkey-bot/db"
 	httpserver "cdtj.io/days-in-turkey-bot/http-server"
+	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/formatter"
 	"cdtj.io/days-in-turkey-bot/service/i18n"
 	telegrambot "cdtj.io/days-in-turkey-bot/telegram-bot"
@@ -28,29 +29,35 @@ import (
 	buc "cdtj.io/days-in-turkey-bot/entity/bot/usecase"
 )
 
-func init() {
-	if err := i18n.I18n(); err != nil {
-		panic(err)
-	}
-}
+var (
+	defaultLang    = "en"
+	defaultCountry = model.NewCountry("RU", "RU", 60, 90, 180)
+)
 
 func main() {
+	i18n, err := i18n.NewI18n("i18n", defaultLang)
+	if err != nil {
+		panic(err)
+	}
+
+	telegramFrmtr := formatter.NewTelegramFormatter(i18n)
+
 	// country service
 	countryDB := db.NewMapDB()
-	countryRepo := cr.NewCountryMapRepo(countryDB)
-	countrySvc := cs.NewCountryService(formatter.NewTelegramFormatter())
+	countryRepo := cr.NewCountryRepo(countryDB)
+	countrySvc := cs.NewCountryService(telegramFrmtr, defaultCountry)
 	countryUC := cuc.NewCountryUsecase(countryRepo, countrySvc)
 
 	// user service
 	userDB := db.NewBoltDB("users", "users")
 	userRepo := ur.NewUserRepo(userDB)
-	userSvc := us.NewUserService(formatter.NewTelegramFormatter())
-	userUC := uuc.NewUserUsecase(userRepo, countryRepo, userSvc)
+	userSvc := us.NewUserService(telegramFrmtr, i18n, countrySvc)
+	userUC := uuc.NewUserUsecase(userRepo, userSvc, countryUC)
 
 	// telegram bot
 	bot := telegrambot.NewTelegramBot(os.Getenv("BOT_TOKEN"), os.Getenv("BOT_WEBHOOK"))
-	botSvc := bs.NewBotService(bot, formatter.NewTelegramFormatter())
-	botUC := buc.NewBotUsecase(userUC, botSvc, countryUC)
+	botSvc := bs.NewBotService(bot, telegramFrmtr, i18n)
+	botUC := buc.NewBotUsecase(botSvc, userUC, countryUC)
 
 	router := httpserver.NewChiRouter()
 	bwh.RegisterWebhookEndpoints(router, botUC)

@@ -19,7 +19,7 @@ type CountryRepo struct {
 	cache []*model.Country
 }
 
-func NewCountryMapRepo(db CountryDatabase) *CountryRepo {
+func NewCountryRepo(db CountryDatabase) *CountryRepo {
 	repo := &CountryRepo{
 		db:    db,
 		cache: make([]*model.Country, 0),

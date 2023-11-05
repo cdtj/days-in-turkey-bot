@@ -54,7 +54,7 @@ func (db *BoltDB) Shutdown(ctx context.Context) {
 	}
 }
 
-func (db *BoltDB) Load(ctx context.Context, id int64) (interface{}, error) {
+func (db *BoltDB) Load(ctx context.Context, id interface{}) (interface{}, error) {
 	var result interface{}
 	switch db.bucket {
 	case "users":
@@ -66,7 +66,7 @@ func (db *BoltDB) Load(ctx context.Context, id int64) (interface{}, error) {
 		if bucket == nil {
 			return ErrDBBucketNotFound
 		}
-		data := bucket.Get(int64toByte(id))
+		data := bucket.Get(keyToByte(id))
 		if data == nil {
 			return ErrDBEntryNotFound
 		}
@@ -75,7 +75,7 @@ func (db *BoltDB) Load(ctx context.Context, id int64) (interface{}, error) {
 	return result, err
 }
 
-func (db *BoltDB) Save(ctx context.Context, id int64, data interface{}) error {
+func (db *BoltDB) Save(ctx context.Context, id interface{}, data interface{}) error {
 	switch db.bucket {
 	case "users":
 		data = data.(*model.User)
@@ -92,12 +92,16 @@ func (db *BoltDB) Save(ctx context.Context, id int64, data interface{}) error {
 			return err
 		}
 
-		return bucket.Put((int64toByte(id)), buf.Bytes())
+		return bucket.Put((keyToByte(id)), buf.Bytes())
 	})
 }
 
-func int64toByte(id int64) []byte {
-	b := make([]byte, 8)
-	binary.LittleEndian.PutUint64(b, uint64(id))
-	return b
+func keyToByte(id interface{}) []byte {
+	switch v := id.(type) {
+	case int64:
+		b := make([]byte, 8)
+		binary.LittleEndian.PutUint64(b, uint64(v))
+		return b
+	}
+	return nil
 }

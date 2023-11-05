@@ -38,7 +38,7 @@ func main() {
 	}
 	tgFmt := formatter.NewTelegramFormatter(i18n)
 	countryDB := db.NewMapDB()
-	countryRepo := cr.NewCountryMapRepo(countryDB)
+	countryRepo := cr.NewCountryRepo(countryDB)
 	countrySvc := cs.NewCountryService(tgFmt, defaultCountry)
 	countryUC := cuc.NewCountryUsecase(countryRepo, countrySvc)
 

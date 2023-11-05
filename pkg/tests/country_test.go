@@ -42,7 +42,7 @@ func BenchmarkCountry(b *testing.B) {
 	for _, tc := range testCases {
 		b.Run(tc.Name, func(b *testing.B) {
 			countryDB := db.NewMapDB()
-			countryRepo := cr.NewCountryMapRepo(countryDB)
+			countryRepo := cr.NewCountryRepo(countryDB)
 			countrySvc := cs.NewCountryService(formatter.NewTelegramFormatter(i18n), model.NewCountry("RU", "RU", 90, 60, 180))
 			countryUC := cuc.NewCountryUsecase(countryRepo, countrySvc)
 			b.ResetTimer()
