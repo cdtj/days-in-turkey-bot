@@ -7,7 +7,6 @@ import (
 	"cdtj.io/days-in-turkey-bot/entity/country"
 	"cdtj.io/days-in-turkey-bot/entity/user"
 	"cdtj.io/days-in-turkey-bot/model"
-	"cdtj.io/days-in-turkey-bot/service/l10n"
 )
 
 var _ bot.Usecase = NewBotUsecase(nil, nil, nil)
@@ -35,8 +34,8 @@ func (uc *BotUsecase) Welcome(ctx context.Context, chatID int64, userID, lang st
 		return err
 	}
 	uc.Send(ctx, chatID, userInfo, nil)
-	uc.Send(ctx, chatID, "Select Country:", uc.CountryMarkup(ctx, userID))
-	uc.Send(ctx, chatID, "Select Language:", uc.LangMarkup(ctx, userID))
+	uc.Send(ctx, chatID, "Select Country:", uc.service.CountryMarkup(ctx, uc.country.Cache(ctx)))
+	uc.Send(ctx, chatID, "Select Language:", uc.service.LangMarkup(ctx))
 	return nil
 }
 
@@ -74,25 +73,4 @@ func (uc *BotUsecase) CalculateTrip(ctx context.Context, chatID int64, userID, i
 
 func (uc *BotUsecase) Send(ctx context.Context, chatID int64, text string, replyMarkup []*model.TelegramBotCommandRow) error {
 	return uc.service.Send(ctx, chatID, text, replyMarkup)
-}
-
-func (uc *BotUsecase) CountryMarkup(ctx context.Context, userID string) []*model.TelegramBotCommandRow {
-	countries, err := uc.country.List(ctx)
-	if err != nil {
-		return nil
-	}
-	commands := make([]*model.TelegramBotCommand, 0, len(countries))
-	for _, country := range countries {
-		commands = append(commands, model.NewTelegramBotCommand(country.GetFlag()+" "+country.GetName(), "country "+country.GetCode()))
-	}
-	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands)}
-}
-
-func (uc *BotUsecase) LangMarkup(ctx context.Context, userID string) []*model.TelegramBotCommandRow {
-	locales := l10n.Locales()
-	commands := make([]*model.TelegramBotCommand, 0, len(locales))
-	for _, cmd := range locales {
-		commands = append(commands, model.NewTelegramBotCommand(cmd.Name, "language "+cmd.Tag.String()))
-	}
-	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands)}
 }

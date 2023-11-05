@@ -2,7 +2,7 @@ package formatter
 
 import (
 	"cdtj.io/days-in-turkey-bot/model"
-	"cdtj.io/days-in-turkey-bot/service/l10n"
+	"cdtj.io/days-in-turkey-bot/service/i18n"
 )
 
 type TelegramFormatter struct {
@@ -14,7 +14,7 @@ func NewTelegramFormatter() *TelegramFormatter {
 
 var _ Formatter = NewTelegramFormatter()
 
-func (f *TelegramFormatter) TripTree(locale *l10n.Locale, tree *model.TripTree) string {
+func (f *TelegramFormatter) TripTree(locale *i18n.Locale, tree *model.TripTree) string {
 	result := ""
 	firstLine := true
 	firstEligible := true
@@ -53,13 +53,13 @@ func (f *TelegramFormatter) TripTree(locale *l10n.Locale, tree *model.TripTree) 
 	return result
 }
 
-func (f *TelegramFormatter) User(locale *l10n.Locale, user *model.User) string {
+func (f *TelegramFormatter) User(locale *i18n.Locale, user *model.User) string {
 	return locale.MessageWithTemplate("UserInfo", map[string]interface{}{
 		"Language": user.GetLang(),
 	}, nil) + "\n" + f.Country(locale, &user.Country)
 }
 
-func (f *TelegramFormatter) Country(locale *l10n.Locale, country *model.Country) string {
+func (f *TelegramFormatter) Country(locale *i18n.Locale, country *model.Country) string {
 	return locale.MessageWithTemplate("CountryInfo", map[string]interface{}{
 		"Flag": country.GetFlag(),
 		"Name": country.GetName(),

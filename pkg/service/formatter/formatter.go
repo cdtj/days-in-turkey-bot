@@ -2,11 +2,11 @@ package formatter
 
 import (
 	"cdtj.io/days-in-turkey-bot/model"
-	"cdtj.io/days-in-turkey-bot/service/l10n"
+	"cdtj.io/days-in-turkey-bot/service/i18n"
 )
 
 type Formatter interface {
-	TripTree(locale *l10n.Locale, tree *model.TripTree) string
-	User(locale *l10n.Locale, user *model.User) string
-	Country(locale *l10n.Locale, country *model.Country) string
+	TripTree(locale *i18n.Locale, tree *model.TripTree) string
+	User(locale *i18n.Locale, user *model.User) string
+	Country(locale *i18n.Locale, country *model.Country) string
 }

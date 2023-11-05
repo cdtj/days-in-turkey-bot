@@ -1,4 +1,4 @@
-package l10n
+package i18n
 
 import (
 	"errors"
@@ -11,6 +11,15 @@ import (
 )
 
 var locales sync.Map
+
+type Localizer interface {
+	Locales() []*Locale
+	Message(messageID string) string
+	MessageWithCount(messageID string, count interface{}) string
+	MessageWithTemplate(messageID string, tpl map[string]interface{}, plural interface{}) string
+	Error(messageID string, err error) string
+	FormatDate(dt time.Time) string
+}
 
 type Locale struct {
 	Name      string

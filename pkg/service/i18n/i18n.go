@@ -1,4 +1,4 @@
-package l10n
+package i18n
 
 import (
 	"errors"
