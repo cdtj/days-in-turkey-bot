@@ -1,6 +1,7 @@
 package calendar
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -12,6 +13,10 @@ import (
 
 var (
 	nonNumberRegexp *regexp.Regexp
+)
+
+var (
+	ErrInvalidDate = errors.New("invalid date")
 )
 
 func init() {
@@ -72,7 +77,7 @@ func parseDate(dt string) (time.Time, error) {
 		}
 		return time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC), nil
 	}
-	return nullTime, nil
+	return nullTime, ErrInvalidDate
 }
 
 func getSeparator(str string) string {

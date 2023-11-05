@@ -1,4 +1,4 @@
-NGROK_URL=https://3a22-188-169-160-237.ngrok.io
+NGROK_URL=https://f7de-188-169-160-237.ngrok.io
 
 export BOT_TOKEN=$(shell cat .token)
 export BOT_WEBHOOK=${NGROK_URL}/telegram-webhook

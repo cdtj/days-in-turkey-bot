@@ -8,6 +8,7 @@ import (
 
 type Usecase interface {
 	Welcome(ctx context.Context, chatID int64, userID, lang string) error
+	Prompt(ctx context.Context, chatID int64, userID, prompt string) error
 	UpdateLang(ctx context.Context, chatID int64, userID, lang string) error
 	UpdateCountry(ctx context.Context, chatID int64, userID, countryID string) error
 	CalculateTrip(ctx context.Context, chatID int64, userID, input string) error

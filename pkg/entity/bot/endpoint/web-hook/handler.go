@@ -22,9 +22,11 @@ func NewBotWebhookHandler(usecase bot.Usecase) *BotWebhookHandler {
 }
 
 const (
-	BotWebhookCountry  = "country"
-	BotWebhookLanguage = "language"
-	BotWebhookStart    = "start"
+	BotWebhookCountry    = "country"
+	BotWebhookLanguage   = "language"
+	BotWebhookContribute = "contribute"
+	BotWebhookTrip       = "trip"
+	BotWebhookStart      = "start"
 )
 
 func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
@@ -68,10 +70,8 @@ func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
 		userID := strconv.FormatInt(msg.From.ID, 10)
 		if msg.IsCommand() {
 			switch msg.Command() {
-			case BotWebhookCountry:
-				err = h.usecase.UpdateCountry(r.Context(), chatID, userID, msg.CommandArguments())
-			case BotWebhookLanguage:
-				err = h.usecase.UpdateLang(r.Context(), chatID, userID, msg.CommandArguments())
+			case BotWebhookCountry, BotWebhookLanguage, BotWebhookContribute, BotWebhookTrip:
+				err = h.usecase.Prompt(r.Context(), chatID, userID, msg.Command())
 			case BotWebhookStart:
 				err = h.usecase.Welcome(r.Context(), chatID, userID, msg.From.LanguageCode)
 			}

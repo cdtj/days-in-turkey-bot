@@ -89,6 +89,7 @@ func (t *TelegramBot) Send(ctx context.Context, chatID int64, text string, comma
 		if _, err := t.bot.Send(msg); err != nil {
 			return err
 		}
+		return nil
 	}
 	return ErrBotNotReady
 }

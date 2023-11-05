@@ -27,16 +27,16 @@ func (f *TelegramFormatter) TripTree(locale *l10n.Locale, tree *model.TripTree) 
 			result += locale.MessageWithTemplate("TripPredicted", map[string]interface{}{
 				"StartDate":  locale.FormatDate(i.StartDate),
 				"EndDate":    locale.FormatDate(i.EndDate),
-				"TripDays":   i.TripDays,
-				"PeriodDays": i.PeriodDays,
-			}, nil) + locale.MessageWithCount("DayCounter", i.PeriodDays) + "\n"
+				"TripDays":   locale.MessageWithCount("DayCounter", i.TripDays),
+				"PeriodDays": locale.MessageWithCount("DayCounter", i.PeriodDays),
+			}, nil) + "\n"
 		} else if i.EndPredicted {
 			result += locale.MessageWithTemplate("TripPredicted", map[string]interface{}{
 				"StartDate":  locale.FormatDate(i.StartDate),
 				"EndDate":    locale.FormatDate(i.EndDate),
-				"TripDays":   i.TripDays,
-				"PeriodDays": i.PeriodDays,
-			}, nil) + locale.MessageWithCount("DayCounter", i.PeriodDays) + "\n"
+				"TripDays":   locale.MessageWithCount("DayCounter", i.TripDays),
+				"PeriodDays": locale.MessageWithCount("DayCounter", i.PeriodDays),
+			}, nil) + "\n"
 		} else {
 			if firstLine {
 				result += "\n" + locale.Message("TripPast") + "\n"
@@ -45,9 +45,9 @@ func (f *TelegramFormatter) TripTree(locale *l10n.Locale, tree *model.TripTree) 
 			result += locale.MessageWithTemplate("Trip", map[string]interface{}{
 				"StartDate":  locale.FormatDate(i.StartDate),
 				"EndDate":    locale.FormatDate(i.EndDate),
-				"TripDays":   i.TripDays,
-				"PeriodDays": i.PeriodDays,
-			}, nil) + locale.MessageWithCount("DayCounter", i.PeriodDays) + "\n"
+				"TripDays":   locale.MessageWithCount("DayCounter", i.TripDays),
+				"PeriodDays": locale.MessageWithCount("DayCounter", i.PeriodDays),
+			}, nil) + "\n"
 		}
 	}
 	return result
@@ -55,7 +55,7 @@ func (f *TelegramFormatter) TripTree(locale *l10n.Locale, tree *model.TripTree) 
 
 func (f *TelegramFormatter) User(locale *l10n.Locale, user *model.User) string {
 	return locale.MessageWithTemplate("UserInfo", map[string]interface{}{
-		"Language": user.GetLang(),
+		"Language": locale.Message("LanguageName"),
 	}, nil) + "\n" + f.Country(locale, &user.Country)
 }
 
@@ -68,4 +68,8 @@ func (f *TelegramFormatter) Country(locale *l10n.Locale, country *model.Country)
 		"Limit":         country.GetDaysLimit(),
 		"ResetInterval": country.GetResetInterval(),
 	}, nil)
+}
+
+func (f *TelegramFormatter) FormatMessage(locale *l10n.Locale, messageID string) string {
+	return locale.Message(messageID)
 }

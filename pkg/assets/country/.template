@@ -1,0 +1,6 @@
+Code="RU" # Country Code, lookup: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
+Name="Россия" # Visible Name
+Flag="🇷🇺" # Country Flag, used cuz of search: https://emojipedia.org/
+DaysContinual=60 # Days allowed to stay without leaving the country
+DaysLimit=90 # Days allowed to stay withing Reset Interval
+ResetInterval=180 # Days above this interval are not counted

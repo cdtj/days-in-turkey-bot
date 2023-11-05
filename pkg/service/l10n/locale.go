@@ -30,13 +30,21 @@ func GetLocale(tag language.Tag) *Locale {
 				Tag:       t,
 				localizer: l,
 			}
-			locale.Name = locale.Message("Name")
+			locale.Name = locale.Message("LanguageName")
 			locales.Store(tag, locale)
 			return locale
 		}
 	}
 	slog.Error("empty locale", "tag", tag)
 	return nil
+}
+
+func GetLocaleByString(lang string) *Locale {
+	tag, err := language.Parse(lang)
+	if err != nil {
+		return GetLocale(defaultLang)
+	}
+	return GetLocale(tag)
 }
 
 func Locales() []*Locale {

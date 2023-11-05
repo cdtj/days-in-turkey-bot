@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log/slog"
 
 	"cdtj.io/days-in-turkey-bot/entity/bot"
 	"cdtj.io/days-in-turkey-bot/entity/country"
@@ -34,10 +35,51 @@ func (uc *BotUsecase) Welcome(ctx context.Context, chatID int64, userID, lang st
 	if err != nil {
 		return err
 	}
+	storedLang := uc.usecase.GetLang(ctx, userID)
+	locale := l10n.GetLocale(storedLang)
+	slog.Info("user's lang", "lang", storedLang, "userID", userID, "locale", locale.Name)
+
+	msg := uc.service.FormatMessage(ctx, locale, "Welcome") + " " +
+		uc.service.FormatMessage(ctx, locale, "Welcome1") + "\n\n" +
+		uc.service.FormatMessage(ctx, locale, "WelcomeCountry") + "\n" +
+		uc.service.FormatMessage(ctx, locale, "WelcomeLanguage") + "\n" +
+		uc.service.FormatMessage(ctx, locale, "WelcomeTrip") + "\n" +
+		uc.service.FormatMessage(ctx, locale, "WelcomeContribute") + "\n\n" +
+		uc.service.FormatMessage(ctx, locale, "WelcomePrompt") + "\n\n" +
+		uc.service.FormatMessage(ctx, locale, "WelcomePromptPredictEnd") + "\n" +
+		uc.service.FormatMessage(ctx, locale, "WelcomePromptPredictRemain")
+
+	uc.Send(ctx, chatID, msg, nil)
 	uc.Send(ctx, chatID, userInfo, nil)
-	uc.Send(ctx, chatID, "Select Country:", uc.CountryMarkup(ctx, userID))
-	uc.Send(ctx, chatID, "Select Language:", uc.LangMarkup(ctx, userID))
 	return nil
+}
+
+const (
+	BotCommandCountry    = "country"
+	BotCommandLanguage   = "language"
+	BotCommandContribute = "contribute"
+	BotCommandTrip       = "trip"
+)
+
+func (uc *BotUsecase) Prompt(ctx context.Context, chatID int64, userID, prompt string) error {
+	locale := l10n.GetLocale(uc.usecase.GetLang(ctx, userID))
+	switch prompt {
+	case BotCommandCountry:
+		return uc.Send(ctx, chatID, locale.Message("UserCountryPrompt"), uc.CountryMarkup(ctx, userID))
+	case BotCommandLanguage:
+		return uc.Send(ctx, chatID, locale.Message("UserLanguagePrompt"), uc.LangMarkup(ctx, userID))
+	case BotCommandContribute:
+		return uc.Send(ctx, chatID, locale.Message("Contribute"), nil)
+	case BotCommandTrip:
+		return uc.Send(ctx, chatID,
+			uc.service.FormatMessage(ctx, locale, "TripExplanation")+"\n\n"+
+				uc.service.FormatMessage(ctx, locale, "TripExplanationContinual")+"\n"+
+				uc.service.FormatMessage(ctx, locale, "TripExplanationLimit")+"\n"+
+				uc.service.FormatMessage(ctx, locale, "TripExplanationResetInterval"),
+			nil)
+	default:
+		return bot.ErrBotCommandNotFound
+	}
 }
 
 func (uc *BotUsecase) UpdateLang(ctx context.Context, chatID int64, userID, lang string) error {

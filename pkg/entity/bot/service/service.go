@@ -3,20 +3,31 @@ package service
 import (
 	"context"
 
-	"cdtj.io/days-in-turkey-bot/entity/bot"
 	"cdtj.io/days-in-turkey-bot/model"
+	"cdtj.io/days-in-turkey-bot/service/formatter"
+	"cdtj.io/days-in-turkey-bot/service/l10n"
 )
 
-type BotService struct {
-	service bot.Service
+type BotSender interface {
+	Send(ctx context.Context, chatID int64, text string, replyMarkup []*model.TelegramBotCommandRow) error
 }
 
-func NewBotService(service bot.Service) *BotService {
+type BotService struct {
+	sender BotSender
+	fmtr   formatter.Formatter
+}
+
+func NewBotService(sender BotSender, fmtr formatter.Formatter) *BotService {
 	return &BotService{
-		service: service,
+		sender: sender,
+		fmtr:   fmtr,
 	}
 }
 
 func (s *BotService) Send(ctx context.Context, chatID int64, text string, replyMarkup []*model.TelegramBotCommandRow) error {
-	return s.service.Send(ctx, chatID, text, replyMarkup)
+	return s.sender.Send(ctx, chatID, text, replyMarkup)
+}
+
+func (s *BotService) FormatMessage(ctx context.Context, l *l10n.Locale, messageID string) string {
+	return s.fmtr.FormatMessage(l, messageID)
 }

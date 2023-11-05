@@ -1,15 +1,32 @@
 # en.toml
-Name="🇺🇸 English"
+LanguageName = "🇺🇸 English"
+Contribute = "This bot is an open-source project. You can contribute to Localization, Data Accuracy, and Source Code aswell. Details: https://cdtj.io/l/turkey-bot"
 
-Trip = "🛬 {{.StartDate}} > 🛫 {{.EndDate}}, Duration: {{.TripDays}}, with Total: "
-TripPredicted = "🛬 {{.StartDate}} > Leave until 🛫 {{.EndDate}}, Duration: {{.TripDays}}, with Total:"
+Welcome = "Welcome! Here you can plan your trip duration withing allowed period to avoid overstays."
+Welcome1 = "Days eligible to stay without visa or residence permit are depending on your citizenship."
+WelcomeCountry = "/country - to change your country"
+WelcomeLanguage = "/language - to change your language"
+WelcomeTrip = "/trip - to get more info how everything works"
+WelcomeContribute = "/contribute - to contribute to open-source world (looking for translations and data providers)"
+WelcomePrompt = "If you're already bored reading everything, just send me dates space or linebreak separated to calculate your days."
+WelcomePromptPredictEnd = "_sample 1:_ sending an open date like `31/12/2022` will result a date before that you need to leave (or will show how much you overstayed already);"
+WelcomePromptPredictRemain = "_sample 2:_ sending a complete trip `31/12/2022 15/01/2023 01/02/2023 15/02/2023` will show you how many days are remaining and when you're able to enter for a full stay;"
+
+Trip = "🛬 `{{.StartDate}}` > 🛫 `{{.EndDate}}`, Duration: {{.TripDays}}, with Total: {{.PeriodDays}}"
+TripPredicted = "🛬 `{{.StartDate}}` > Leave until 🛫 `{{.EndDate}}`, Duration: {{.TripDays}}, with Total: {{.PeriodDays}}"
 TripPast = "Previous Trips:"
 TripEligibleHdr = "You're eligible for the following trips:"
-TripEligible = "🛬 {{.StartDate}} > 🛫 {{.EndDate}}, Duration: {{.TripDays}}, with Total: "
-TripExplanation = "Depending on your country you're allowed to stay in Turkey for a while, basically, there are 3 metrics that you need to look at:\nContinual Days - days that you're allowed to stay without crossing the Turkey border,\nDays Limit - days that you spent in Turkey during some interval,\nInterval Reset - days you spent above the reset interval are not counted, in case you're not breaking other limits."
+TripEligible = "🛬 `{{.StartDate}}` > 🛫 `{{.EndDate}}`, Duration: {{.TripDays}}, with Total: {{.PeriodDays}}"
+
+TripExplanation = "Depending on your country you're allowed to stay in Turkey for a while, basically, there are 3 metrics that you need to look at:"
+TripExplanationContinual = "*Continual Days* - days that you're allowed to stay without crossing the Turkey border;"
+TripExplanationLimit = "*Days Limit* - days that you spent in Turkey during some interval;"
+TripExplanationResetInterval = "*Interval Reset* - days you spent above the reset interval are not counted, in case you're not breaking other limits."
 
 UserInfo = "Language: {{.Language}}"
+UserLanguagePrompt = "Choose Language"
 UserLanguageChaned = "Language Changed"
+UserCountryPrompt = "Choose Country"
 UserCountryChaned = "Country Changed"
 
 CountryInfo = "Country: {{.Flag}} {{.Name}}"

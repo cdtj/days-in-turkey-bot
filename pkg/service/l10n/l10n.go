@@ -12,7 +12,6 @@ import (
 	"golang.org/x/text/language"
 )
 
-// https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
 const l10nDir = "l10n"
 
 var localizers sync.Map

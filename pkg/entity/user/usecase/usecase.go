@@ -9,6 +9,7 @@ import (
 	"cdtj.io/days-in-turkey-bot/entity/user"
 	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/l10n"
+	"golang.org/x/text/language"
 )
 
 var _ user.Usecase = NewUserUsecase(nil, nil, nil)
@@ -25,6 +26,14 @@ func NewUserUsecase(repo user.Repo, country country.Repo, service user.Service) 
 		country: country,
 		service: service,
 	}
+}
+
+func (uc *UserUsecase) GetLang(ctx context.Context, userID string) language.Tag {
+	u, err := uc.get(ctx, userID)
+	if err != nil {
+		return l10n.DefaultLang()
+	}
+	return u.GetLangTag()
 }
 
 func (uc *UserUsecase) Create(ctx context.Context, userID, lang string) error {

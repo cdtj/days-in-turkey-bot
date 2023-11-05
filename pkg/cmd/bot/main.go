@@ -49,7 +49,7 @@ func main() {
 
 	// telegram bot
 	bot := telegrambot.NewTelegramBot(os.Getenv("BOT_TOKEN"), os.Getenv("BOT_WEBHOOK"))
-	botSvc := bs.NewBotService(bot)
+	botSvc := bs.NewBotService(bot, formatter.NewTelegramFormatter())
 	botUC := buc.NewBotUsecase(userUC, botSvc, countryUC)
 
 	router := httpserver.NewChiRouter()
