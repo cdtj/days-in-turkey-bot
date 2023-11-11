@@ -6,6 +6,7 @@ import (
 
 	"cdtj.io/days-in-turkey-bot/entity/user"
 	"cdtj.io/days-in-turkey-bot/model"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
 
@@ -20,7 +21,7 @@ func NewUserHttpHandler(usecase user.Usecase) *UserHttpHandler {
 }
 
 func (h *UserHttpHandler) info(w http.ResponseWriter, r *http.Request) {
-	userID, err := strconv.ParseInt(r.URL.Query().Get("userID"), 10, 64)
+	userID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
@@ -46,7 +47,7 @@ type CalculateTripInput struct {
 }
 
 func (h *UserHttpHandler) calculateTrip(w http.ResponseWriter, r *http.Request) {
-	userID, err := strconv.ParseInt(r.URL.Query().Get("userID"), 10, 64)
+	userID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
@@ -80,7 +81,7 @@ type UpdateLangInput struct {
 }
 
 func (h *UserHttpHandler) updateLang(w http.ResponseWriter, r *http.Request) {
-	userID, err := strconv.ParseInt(r.URL.Query().Get("userID"), 10, 64)
+	userID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
@@ -117,7 +118,7 @@ type UpdateCountryInput struct {
 }
 
 func (h *UserHttpHandler) updateCountry(w http.ResponseWriter, r *http.Request) {
-	userID, err := strconv.ParseInt(r.URL.Query().Get("userID"), 10, 64)
+	userID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})

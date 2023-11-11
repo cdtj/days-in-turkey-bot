@@ -5,6 +5,7 @@ import (
 
 	"cdtj.io/days-in-turkey-bot/entity/country"
 	"cdtj.io/days-in-turkey-bot/service/i18n"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
 
@@ -23,7 +24,7 @@ type GetCountryInput struct {
 }
 
 func (h *CountryHttpHandler) getCountry(w http.ResponseWriter, r *http.Request) {
-	countryID := r.URL.Query().Get("countryID")
+	countryID := chi.URLParam(r, "countryID")
 	input := new(GetCountryInput)
 
 	if err := render.DecodeJSON(r.Body, input); err != nil {

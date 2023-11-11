@@ -7,8 +7,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-var _ HttpServerRouter = NewChiRouter()
-
+// my decision to drop the support of unified router replacing it with the instance of this one
 func NewChiRouter() *chi.Mux {
 	r := chi.NewRouter()
 

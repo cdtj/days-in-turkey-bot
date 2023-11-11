@@ -1,4 +1,4 @@
-package country
+package tests
 
 import (
 	"context"
