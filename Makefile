@@ -6,13 +6,13 @@ export BOT_WEBHOOK=${NGROK_URL}/telegram-webhook
 .PHONY: build run debug
 
 build:
-	cd ./src && \
-	go build ${LDFLAGS} -o . 
+	cd ./pkg && \
+	go build -o httpsrvr cmd/http-server/main.go
 
 run:
-	rm -f ./src/termsite
-	$(MAKE) -f Golang.mk build && \
-	cd src && ./termsite
+	rm -f ./pkg/httpsrvr
+	$(MAKE) build
+	cd ./pkg && ./httpsrvr
 
 debug:
 	cd ./pkg && \
