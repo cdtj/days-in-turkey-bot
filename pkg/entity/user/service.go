@@ -11,4 +11,5 @@ type Service interface {
 	UserInfo(ctx context.Context, language language.Tag, user *model.User) string
 	CalculateTrip(ctx context.Context, language language.Tag, input string, daysCont, daysLimit, resetInterval int) (string, error)
 	DefaultUser(ctx context.Context, userID int64) *model.User
+	ParseLanguage(ctx context.Context, languageCode string) language.Tag
 }

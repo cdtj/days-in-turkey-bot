@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"log/slog"
 	"sort"
 	"sync"
 
@@ -9,9 +10,9 @@ import (
 )
 
 type CountryDatabase interface {
-	Keys(ctx context.Context) ([]interface{}, error)
-	Load(ctx context.Context, id interface{}) (interface{}, error)
-	Save(ctx context.Context, id interface{}, intfc interface{}) error
+	Keys(ctx context.Context) ([]any, error)
+	Load(ctx context.Context, id any) (any, error)
+	Save(ctx context.Context, id any, intfc any) error
 }
 
 type CountryRepo struct {
@@ -24,29 +25,28 @@ func NewCountryRepo(db CountryDatabase) *CountryRepo {
 		db:    db,
 		cache: make([]*model.Country, 0),
 	}
-	if err := constructor(context.Background(), repo); err != nil {
-		return nil
-	}
 	return repo
 }
 
-func constructor(ctx context.Context, repo *CountryRepo) error {
+func (r *CountryRepo) BuildCache(ctx context.Context) error {
 	mu := new(sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
-	keys, err := repo.Keys(ctx)
+	keys, err := r.Keys(ctx)
 	if err != nil {
 		return nil
 	}
+	slog.Debug("constructing countries", "keys", keys)
 	sort.Slice(keys, func(i, j int) bool {
 		return keys[i] > keys[j]
 	})
 	for _, key := range keys {
-		country, err := repo.Get(ctx, key)
+		country, err := r.Get(ctx, key)
 		if err != nil {
 			return nil
 		}
-		repo.cache = append(repo.cache, country)
+		slog.Debug("caching country", "key", key, "country", country)
+		r.cache = append(r.cache, country)
 	}
 	return nil
 }

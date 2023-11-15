@@ -30,15 +30,15 @@ func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree
 				firstEligible = false
 			}
 			result += locale.MessageWithTemplate("TripPredicted", map[string]interface{}{
-				"StartDate":  locale.FormatDate(i.StartDate),
-				"EndDate":    locale.FormatDate(i.EndDate),
+				"StartDate":  wrapCode(locale.FormatDate(i.StartDate)),
+				"EndDate":    wrapCode(locale.FormatDate(i.EndDate)),
 				"TripDays":   locale.MessageWithCount("DayCounter", i.TripDays),
 				"PeriodDays": locale.MessageWithCount("DayCounter", i.PeriodDays),
 			}, nil) + "\n"
 		} else if i.EndPredicted {
 			result += locale.MessageWithTemplate("TripPredicted", map[string]interface{}{
-				"StartDate":  locale.FormatDate(i.StartDate),
-				"EndDate":    locale.FormatDate(i.EndDate),
+				"StartDate":  wrapCode(locale.FormatDate(i.StartDate)),
+				"EndDate":    wrapCode(locale.FormatDate(i.EndDate)),
 				"TripDays":   locale.MessageWithCount("DayCounter", i.TripDays),
 				"PeriodDays": locale.MessageWithCount("DayCounter", i.PeriodDays),
 			}, nil) + "\n"
@@ -48,8 +48,8 @@ func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree
 				firstLine = false
 			}
 			result += locale.MessageWithTemplate("Trip", map[string]interface{}{
-				"StartDate":  locale.FormatDate(i.StartDate),
-				"EndDate":    locale.FormatDate(i.EndDate),
+				"StartDate":  wrapCode(locale.FormatDate(i.StartDate)),
+				"EndDate":    wrapCode(locale.FormatDate(i.EndDate)),
 				"TripDays":   locale.MessageWithCount("DayCounter", i.TripDays),
 				"PeriodDays": locale.MessageWithCount("DayCounter", i.PeriodDays),
 			}, nil) + "\n"
@@ -101,4 +101,16 @@ func (f *TelegramFormatter) TripExplanation(language language.Tag) string {
 		locale.Message("TripExplanationContinual") + "\n" +
 		locale.Message("TripExplanationLimit") + "\n" +
 		locale.Message("TripExplanationResetInterval")
+}
+
+func wrapCode(str string) string {
+	return "`" + str + "`"
+}
+
+func wrapItalic(str string) string {
+	return "_" + str + "_"
+}
+
+func wrapBold(str string) string {
+	return "*" + str + "*"
 }

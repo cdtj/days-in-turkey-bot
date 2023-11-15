@@ -3,3 +3,9 @@
 
 # binaries
 httpsrvr
+
+# pprof
+*.pprof
+
+# boltdb
+*.bolt

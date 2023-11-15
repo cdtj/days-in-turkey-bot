@@ -52,13 +52,9 @@ func (uc *UserUsecase) GetLanguage(ctx context.Context, user *model.User) langua
 }
 
 func (uc *UserUsecase) UpdateLanguage(ctx context.Context, user *model.User, languageCode string) error {
-	language, err := i18n.LanguageLookup(languageCode)
-	if err != nil {
-		slog.Error("updateLang failed", "userID", user.GetID(), "languageCode", languageCode, "err", err)
-		return err
-	}
-	user.SetLanguage(language)
-	slog.Debug("updateLang ok", "userID", user.GetID(), "language", language)
+	user.SetLanguageCode(languageCode)
+	slog.Debug("updateLang ok", "userID", user.GetID(), "languageCode", languageCode)
+	user.SetLanguage(uc.service.ParseLanguage(ctx, user.GetLanguageCode()))
 	if err := uc.repo.Save(ctx, user.GetID(), user); err != nil {
 		return err
 	}
@@ -82,6 +78,7 @@ func (uc *UserUsecase) сreate(ctx context.Context, userID int64, languageCode s
 			slog.Error("falied to init user with custom lang", "userID", userID, "languageCode", languageCode, "err", err)
 		} else {
 			u.SetLanguage(tag)
+			slog.Debug("user uc", "userID", userID, "languageCode", languageCode, "tag", tag)
 		}
 	}
 	return uc.repo.Save(ctx, userID, u)
@@ -93,6 +90,7 @@ func (uc *UserUsecase) сreate(ctx context.Context, userID int64, languageCode s
 func (uc *UserUsecase) get(ctx context.Context, userID int64) (*model.User, error) {
 	u, err := uc.repo.Load(ctx, userID)
 	if err != nil {
+		slog.Error("user uc", "userID", userID, "err", err)
 		if errors.Is(err, user.ErrRepoUserNotFound) {
 			if err := uc.сreate(ctx, userID, ""); err != nil {
 				return nil, err
@@ -103,18 +101,14 @@ func (uc *UserUsecase) get(ctx context.Context, userID int64) (*model.User, erro
 		return nil, err
 	}
 
-	switch u.Country.Code {
-	case "CUSTOM":
-		break
-	case "":
-		u.SetCountry(*uc.countryUC.DefaultCountry(ctx))
-	default:
-		country, err := uc.countryUC.Get(ctx, u.Country.Code)
-		if err != nil {
-			return nil, err
-		}
+	country, err := uc.countryUC.Get(ctx, u.Country.Code)
+	if err != nil {
+		return nil, err
+	}
+	if country != nil {
 		u.SetCountry(*country)
 	}
+	u.SetLanguage(uc.service.ParseLanguage(ctx, u.GetLanguageCode()))
 
 	return u, nil
 }

@@ -9,21 +9,17 @@ import (
 	"github.com/go-chi/render"
 )
 
-type CountryHttpHandler struct {
+type CountryHttpHandlerChi struct {
 	usecase country.Usecase
 }
 
-func NewCountryHttpHandler(usecase country.Usecase) *CountryHttpHandler {
-	return &CountryHttpHandler{
+func NewCountryHttpHandlerChi(usecase country.Usecase) *CountryHttpHandlerChi {
+	return &CountryHttpHandlerChi{
 		usecase: usecase,
 	}
 }
 
-type GetCountryInput struct {
-	Lang string `json:"lang"`
-}
-
-func (h *CountryHttpHandler) getCountry(w http.ResponseWriter, r *http.Request) {
+func (h *CountryHttpHandlerChi) getCountry(w http.ResponseWriter, r *http.Request) {
 	countryID := chi.URLParam(r, "countryID")
 	input := new(GetCountryInput)
 
@@ -55,12 +51,4 @@ func (h *CountryHttpHandler) getCountry(w http.ResponseWriter, r *http.Request) 
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &CountryResponse{resp})
-}
-
-type ErrorCountryResponse struct {
-	Error string `json:"error"`
-}
-
-type CountryResponse struct {
-	Response string `json:"response"`
 }

@@ -62,17 +62,18 @@ func (t *TelegramBot) Shutdown(ctx context.Context) {
 	go func() {
 		<-shutdownCtx.Done()
 		if shutdownCtx.Err() == context.DeadlineExceeded {
-			slog.Error("unable to gracefully stop telegram bot", "error", shutdownCtx.Err())
+			slog.Error("telegram-bot", "webhook", t.webhook, "msg", "unable to gracefully stop telegram bot", "error", shutdownCtx.Err())
 			return
 		}
 	}()
+	slog.Info("telegram-bot", "wh", t.webhook, "status", "stopping")
 	if t.bot == nil {
 		slog.Error("not yet started", "wh", t.webhook)
 		return
 	}
 	t.bot.StopReceivingUpdates()
 	t.bot = nil
-	slog.Info("bot stopped")
+	slog.Info("telegram-bot", "wh", t.webhook, "status", "stopped")
 }
 
 var (

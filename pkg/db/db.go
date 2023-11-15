@@ -9,4 +9,5 @@ import "errors"
 var (
 	ErrDBEntryNotFound  = errors.New("entry not found")
 	ErrDBBucketNotFound = errors.New("bucket not found")
+	ErrDBUnknownEntity  = errors.New("unknown entity")
 )

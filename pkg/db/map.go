@@ -17,7 +17,7 @@ func NewMapDB() *MapDB {
 	}
 }
 
-func (db *MapDB) Load(ctx context.Context, id interface{}) (interface{}, error) {
+func (db *MapDB) Load(ctx context.Context, id any) (any, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 	if data, ok := db.data[id]; ok {
@@ -26,18 +26,18 @@ func (db *MapDB) Load(ctx context.Context, id interface{}) (interface{}, error) 
 	return nil, ErrDBEntryNotFound
 }
 
-func (db *MapDB) Save(ctx context.Context, id interface{}, intfc interface{}) error {
+func (db *MapDB) Save(ctx context.Context, id any, data any) error {
 	db.mu.Lock()
 	defer db.mu.Unlock()
-	db.data[id] = intfc
+	db.data[id] = data
 	return nil
 }
 
-func (db *MapDB) Keys(ctx context.Context) ([]interface{}, error) {
+func (db *MapDB) Keys(ctx context.Context) ([]any, error) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 
-	keys := make([]interface{}, 0, len(db.data))
+	keys := make([]any, 0, len(db.data))
 	for k := range db.data {
 		keys = append(keys, k)
 	}

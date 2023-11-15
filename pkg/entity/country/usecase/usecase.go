@@ -46,7 +46,14 @@ func (uc *CountryUsecase) constructor() error {
 }
 
 func (uc *CountryUsecase) Get(ctx context.Context, countryID string) (*model.Country, error) {
-	return uc.repo.Get(ctx, countryID)
+	switch countryID {
+	case "CUSTOM":
+		return nil, nil
+	case "":
+		return uc.DefaultCountry(ctx), nil
+	default:
+		return uc.repo.Get(ctx, countryID)
+	}
 }
 
 func (uc *CountryUsecase) Lookup(ctx context.Context, countryID string, daysCont, daysLimit, resetInterval int) (*model.Country, error) {
@@ -117,5 +124,5 @@ func (uc *CountryUsecase) loadFromFiles(ctx context.Context, dir string) error {
 			return err
 		}
 	}
-	return nil
+	return uc.repo.BuildCache(ctx)
 }

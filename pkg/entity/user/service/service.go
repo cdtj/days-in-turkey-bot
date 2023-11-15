@@ -41,5 +41,13 @@ func (s *UserService) CalculateTrip(ctx context.Context, language language.Tag, 
 }
 
 func (s *UserService) DefaultUser(ctx context.Context, userID int64) *model.User {
-	return model.NewUser(userID, s.i18n.DefaultLang(), *s.country.DefaultCountry(ctx))
+	return model.NewUser(userID, s.i18n.DefaultLang().String(), *s.country.DefaultCountry(ctx))
+}
+
+func (s *UserService) ParseLanguage(ctx context.Context, languageCode string) language.Tag {
+	tag, err := i18n.LanguageLookup(languageCode)
+	if err != nil {
+		return s.i18n.DefaultLang()
+	}
+	return tag
 }

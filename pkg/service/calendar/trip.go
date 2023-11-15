@@ -24,7 +24,7 @@ func calcTree(daysLimit, daysCont, resetInterval int, dates []time.Time) *model.
 		tree.Prev = prev
 		prev = tree
 	}
-	if len(dates)%2 == 0 {
+	if tree != nil && len(dates)%2 == 0 {
 		predStart := predictStartDate(isPastToday(tree.EndDate), daysLimit, daysCont, resetInterval, tree)
 		eligibleFullTree := makeTree(predStart, predictEndDate(predStart, daysLimit, daysCont, resetInterval, tree), resetInterval, true, false, tree)
 		eligibleCurrentTree := makeTree(isPastToday(tree.EndDate), predictEndDate(isPastToday(tree.EndDate), daysLimit, daysCont, resetInterval, tree), resetInterval, true, false, tree)

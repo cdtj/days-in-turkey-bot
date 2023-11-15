@@ -34,16 +34,15 @@ func (s *HttpServer) Shutdown(ctx context.Context) {
 	go func() {
 		<-shutdownCtx.Done()
 		if shutdownCtx.Err() == context.DeadlineExceeded {
-			slog.Error("unable to gracefully stop telegram bot", "error", shutdownCtx.Err())
+			slog.Error("server", "Addr", s.server.Addr, "msg", "unable to gracefully stop http server", "error", shutdownCtx.Err())
 			return
 		}
 	}()
 
-	slog.Info("shutting down the server", "Addr", s.server.Addr)
-	err := s.server.Shutdown(shutdownCtx)
-	if err != nil {
-		slog.Error("unable to gracefully stop http server", "error", err)
+	slog.Info("server", "Addr", s.server.Addr, "status", "stopping")
+	if err := s.server.Shutdown(shutdownCtx); err != nil {
+		slog.Error("server", "Addr", s.server.Addr, "msg", "unable to gracefully stop http server", "error", err)
 		return
 	}
-	slog.Info("server is down", "Addr", s.server.Addr)
+	slog.Info("server", "Addr", s.server.Addr, "status", "stopped")
 }

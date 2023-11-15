@@ -5,16 +5,17 @@ import (
 )
 
 type User struct {
-	ID       int64
-	Country  Country
-	Language language.Tag
+	ID           int64
+	Country      Country
+	LanguageCode string
+	language     language.Tag `gob:"-"`
 }
 
-func NewUser(id int64, language language.Tag, country Country) *User {
+func NewUser(id int64, languageCode string, country Country) *User {
 	return &User{
-		ID:       id,
-		Country:  country,
-		Language: language,
+		ID:           id,
+		Country:      country,
+		LanguageCode: languageCode,
 	}
 }
 
@@ -35,11 +36,19 @@ func (u *User) GetDaysLimit() int {
 }
 
 func (u *User) GetLanguage() language.Tag {
-	return u.Language
+	return u.language
 }
 
 func (u *User) SetLanguage(language language.Tag) {
-	u.Language = language
+	u.language = language
+}
+
+func (u *User) GetLanguageCode() string {
+	return u.LanguageCode
+}
+
+func (u *User) SetLanguageCode(languageCode string) {
+	u.LanguageCode = languageCode
 }
 
 func (u *User) SetCountry(country Country) {

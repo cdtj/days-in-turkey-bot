@@ -14,20 +14,22 @@ import (
 )
 
 type BoltDB struct {
+	name   string
 	path   string
-	bucket string
+	bucket []byte
 	db     *bolt.DB
 }
 
 func NewBoltDB(path, bucket string) *BoltDB {
 	return &BoltDB{
 		path:   path,
-		bucket: bucket,
+		name:   bucket,
+		bucket: []byte(bucket),
 	}
 }
 
 func (db *BoltDB) Serve(ctx context.Context) error {
-	bdb, err := bolt.Open(db.path, 0600, nil)
+	bdb, err := bolt.Open(db.path+".bolt", 0600, nil)
 	if err != nil {
 		return err
 	}
@@ -43,30 +45,34 @@ func (db *BoltDB) Shutdown(ctx context.Context) {
 	go func() {
 		<-shutdownCtx.Done()
 		if shutdownCtx.Err() == context.DeadlineExceeded {
-			slog.Error("unable to gracefully stop boltdb", "error", shutdownCtx.Err())
+			slog.Error("boltdb", "path", db.path, "bucket", db.bucket, "msg", "unable to gracefully stop boltdb", "error", shutdownCtx.Err())
 			return
 		}
 	}()
-
-	slog.Info("closing boltdb", "path", db.path, "bucket", db.bucket)
+	slog.Info("boltdb", "path", db.path, "bucket", db.bucket, "status", "stopping")
 	if err := db.db.Close(); err != nil {
-		slog.Error("unable to gracefully stop boltdb", "error", err)
+		slog.Error("boltdb", "path", db.path, "bucket", db.bucket, "msg", "unable to gracefully stop boltdb", "error", err)
+		return
 	}
+	slog.Info("boltdb", "path", db.path, "bucket", db.bucket, "status", "stopped")
 }
 
-func (db *BoltDB) Load(ctx context.Context, id interface{}) (interface{}, error) {
+func (db *BoltDB) Load(ctx context.Context, key any) (any, error) {
 	var result interface{}
-	switch db.bucket {
+	switch db.name {
 	case "users":
 		result = new(model.User)
+		key = keyToByte(key)
+	default:
+		return nil, ErrDBUnknownEntity
 	}
 	err := db.db.View(func(tx *bolt.Tx) error {
 		slog.Info("loading", "bucket", db.bucket, "type", fmt.Sprintf("%T", result))
-		bucket := tx.Bucket([]byte(db.bucket))
+		bucket := tx.Bucket(db.bucket)
 		if bucket == nil {
 			return ErrDBBucketNotFound
 		}
-		data := bucket.Get(keyToByte(id))
+		data := bucket.Get(key.([]byte))
 		if data == nil {
 			return ErrDBEntryNotFound
 		}
@@ -75,14 +81,17 @@ func (db *BoltDB) Load(ctx context.Context, id interface{}) (interface{}, error)
 	return result, err
 }
 
-func (db *BoltDB) Save(ctx context.Context, id interface{}, data interface{}) error {
-	switch db.bucket {
+func (db *BoltDB) Save(ctx context.Context, key any, data any) error {
+	switch db.name {
 	case "users":
 		data = data.(*model.User)
+		key = keyToByte(key)
+	default:
+		return ErrDBUnknownEntity
 	}
 	return db.db.Update(func(tx *bolt.Tx) error {
 		slog.Info("saving", "bucket", db.bucket, "data", data, "type", fmt.Sprintf("%T", data))
-		bucket, err := tx.CreateBucketIfNotExists([]byte(db.bucket))
+		bucket, err := tx.CreateBucketIfNotExists(db.bucket)
 		if err != nil {
 			return err
 		}
@@ -92,7 +101,7 @@ func (db *BoltDB) Save(ctx context.Context, id interface{}, data interface{}) er
 			return err
 		}
 
-		return bucket.Put((keyToByte(id)), buf.Bytes())
+		return bucket.Put(key.([]byte), buf.Bytes())
 	})
 }
 

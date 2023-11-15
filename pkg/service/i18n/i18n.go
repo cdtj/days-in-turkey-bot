@@ -58,6 +58,7 @@ func NewI18n(dir string, defaultLang string) (*I18n, error) {
 			return nil, fmt.Errorf("unable to read %s: %w", f.Name(), err)
 		}
 		i18n.localizers.Store(msg.Tag, i18nlib.NewLocalizer(bundle, msg.Tag.String()))
+		i18n.SetLocale(msg.Tag)
 	}
 	// to avoid nil, we make sure that we have default locale
 	if !i18n.ValidateLang(tag) {
@@ -74,21 +75,21 @@ func (i *I18n) GetLocale(tag language.Tag) Localizer {
 	if locale, ok := i.locales.Load(tag); ok {
 		return locale.(*Locale)
 	}
-	for _, t := range []language.Tag{tag, i.defaultLang} {
-		l := i.localizer(t)
-		slog.Debug("localizer", "tag", t, "l", l)
-		if l != nil {
-			locale := &Locale{
-				Tag:       t,
-				localizer: l,
-			}
-			locale.Name = locale.Message("LanguageName")
-			i.locales.Store(tag, locale)
-			return locale
-		}
-	}
 	slog.Error("empty locale", "tag", tag)
 	return nil
+}
+
+func (i *I18n) SetLocale(tag language.Tag) {
+	l := i.localizer(tag)
+	slog.Debug("localizer", "tag", tag, "l", l)
+	if l != nil {
+		locale := &Locale{
+			Tag:       tag,
+			localizer: l,
+		}
+		locale.Name = locale.Message("LanguageName")
+		i.locales.Store(tag, locale)
+	}
 }
 
 func (i *I18n) GetLocaleByString(lang string) Localizer {

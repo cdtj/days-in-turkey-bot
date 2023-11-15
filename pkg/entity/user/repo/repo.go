@@ -3,15 +3,19 @@ package repo
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"cdtj.io/days-in-turkey-bot/db"
 	"cdtj.io/days-in-turkey-bot/entity/user"
 	"cdtj.io/days-in-turkey-bot/model"
 )
 
+var _ UserDatabase = db.NewBoltDB("", "")
+var _ UserDatabase = db.NewMapDB()
+
 type UserDatabase interface {
-	Load(ctx context.Context, id interface{}) (interface{}, error)
-	Save(ctx context.Context, id interface{}, intfc interface{}) error
+	Load(ctx context.Context, key any) (any, error)
+	Save(ctx context.Context, key any, data any) error
 }
 
 type UserRepo struct {
@@ -29,6 +33,7 @@ func NewUserRepo(db UserDatabase) *UserRepo {
 func (r *UserRepo) Load(ctx context.Context, userID int64) (*model.User, error) {
 	u, err := r.db.Load(ctx, userID)
 	if err != nil {
+		slog.Error("user repo", "userID", userID, "err", err)
 		if errors.Is(err, db.ErrDBEntryNotFound) {
 			return nil, user.ErrRepoUserNotFound
 		}

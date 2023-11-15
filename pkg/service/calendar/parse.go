@@ -50,6 +50,9 @@ func processInput(input string) ([]time.Time, error) {
 		}
 		dates = append(dates, dt)
 	}
+	if len(dates) == 0 {
+		return nil, ErrInvalidDate
+	}
 	slices.SortFunc(dates, func(a, b time.Time) int { return a.Compare(b) })
 
 	return dates, nil

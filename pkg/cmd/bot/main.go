@@ -35,6 +35,9 @@ var (
 )
 
 func main() {
+	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	})))
 	i18n, err := i18n.NewI18n("i18n", defaultLang)
 	if err != nil {
 		panic(err)
@@ -59,8 +62,8 @@ func main() {
 	botSvc := bs.NewBotService(bot, telegramFrmtr, i18n)
 	botUC := buc.NewBotUsecase(botSvc, userUC, countryUC)
 
-	router := httpserver.NewChiRouter()
-	bwh.RegisterWebhookEndpoints(router, botUC)
+	router := httpserver.NewEchoRouter()
+	bwh.RegisterWebhookEndpointsEcho(router, botUC)
 
 	srv := httpserver.NewHttpServer(&http.Server{
 		Addr:    ":8080",

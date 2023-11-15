@@ -10,17 +10,19 @@ import (
 	"github.com/go-chi/render"
 )
 
-type UserHttpHandler struct {
+// UserHttpHandlerChi is deprecated in case of using Echo
+type UserHttpHandlerChi struct {
 	usecase user.Usecase
 }
 
-func NewUserHttpHandler(usecase user.Usecase) *UserHttpHandler {
-	return &UserHttpHandler{
+// NewUserHttpHandlerChi is deprecated in case of using Echo
+func NewUserHttpHandlerChi(usecase user.Usecase) *UserHttpHandlerChi {
+	return &UserHttpHandlerChi{
 		usecase: usecase,
 	}
 }
 
-func (h *UserHttpHandler) info(w http.ResponseWriter, r *http.Request) {
+func (h *UserHttpHandlerChi) info(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
@@ -42,11 +44,7 @@ func (h *UserHttpHandler) info(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &UserResponse{resp})
 }
 
-type CalculateTripInput struct {
-	Dates string `json:"dates"`
-}
-
-func (h *UserHttpHandler) calculateTrip(w http.ResponseWriter, r *http.Request) {
+func (h *UserHttpHandlerChi) calculateTrip(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
@@ -76,11 +74,7 @@ func (h *UserHttpHandler) calculateTrip(w http.ResponseWriter, r *http.Request) 
 	render.JSON(w, r, &UserResponse{resp})
 }
 
-type UpdateLangInput struct {
-	Lang string `json:"lang"`
-}
-
-func (h *UserHttpHandler) updateLang(w http.ResponseWriter, r *http.Request) {
+func (h *UserHttpHandlerChi) updateLang(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
@@ -109,15 +103,7 @@ func (h *UserHttpHandler) updateLang(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, nil)
 }
 
-type UpdateCountryInput struct {
-	Code          string `json:"code"`
-	Flag          string `json:"flag"`
-	DaysContinual int    `json:"daysContinual"`
-	DaysLimit     int    `json:"daysLimit"`
-	ResetInterval int    `json:"resetInterval"`
-}
-
-func (h *UserHttpHandler) updateCountry(w http.ResponseWriter, r *http.Request) {
+func (h *UserHttpHandlerChi) updateCountry(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
@@ -146,12 +132,4 @@ func (h *UserHttpHandler) updateCountry(w http.ResponseWriter, r *http.Request) 
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, nil)
-}
-
-type ErrorUserResponse struct {
-	Error string `json:"error"`
-}
-
-type UserResponse struct {
-	Response string `json:"response"`
 }

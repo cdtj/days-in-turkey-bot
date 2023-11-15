@@ -10,25 +10,17 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-type BotWebhookHandler struct {
+type BotWebhookHandlerChi struct {
 	usecase bot.Usecase
 }
 
-func NewBotWebhookHandler(usecase bot.Usecase) *BotWebhookHandler {
-	return &BotWebhookHandler{
+func NewBotWebhookHandlerChi(usecase bot.Usecase) *BotWebhookHandlerChi {
+	return &BotWebhookHandlerChi{
 		usecase: usecase,
 	}
 }
 
-const (
-	BotWebhookCountry    = "country"
-	BotWebhookLanguage   = "language"
-	BotWebhookContribute = "contribute"
-	BotWebhookTrip       = "trip"
-	BotWebhookStart      = "start"
-)
-
-func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
+func (h *BotWebhookHandlerChi) webhook(w http.ResponseWriter, r *http.Request) {
 	update := new(tgbotapi.Update)
 	err := render.DecodeJSON(r.Body, update)
 	if err != nil {
@@ -111,12 +103,4 @@ func (h *BotWebhookHandler) webhook(w http.ResponseWriter, r *http.Request) {
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, nil)
-}
-
-type ErrorBotResponse struct {
-	Error string `json:"error"`
-}
-
-type BotResponse struct {
-	Response string `json:"response"`
 }

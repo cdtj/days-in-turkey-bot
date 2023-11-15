@@ -48,12 +48,16 @@ func main() {
 	userUC := uuc.NewUserUsecase(userRepo, userSvc, countryUC)
 
 	router := httpserver.NewChiRouter()
-	uep.RegisterHTTPEndpoints(router, userUC)
-	cep.RegisterHTTPEndpoints(router, countryUC)
+	uep.RegisterHTTPEndpointsChi(router, userUC)
+	cep.RegisterHTTPEndpointsChi(router, countryUC)
+
+	echoRouter := httpserver.NewEchoRouter()
+	uep.RegisterHTTPEndpointsEcho(echoRouter, userUC)
+	cep.RegisterHTTPEndpointsEcho(echoRouter, countryUC)
 
 	srv := httpserver.NewHttpServer(&http.Server{
 		Addr:    ":8080",
-		Handler: router,
+		Handler: echoRouter,
 	})
 	Serve(srv)
 }
