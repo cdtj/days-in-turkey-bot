@@ -19,6 +19,10 @@ func NewCountryHttpHandlerChi(usecase country.Usecase) *CountryHttpHandlerChi {
 	}
 }
 
+type GetCountryInput struct {
+	Lang string `json:"lang"`
+}
+
 func (h *CountryHttpHandlerChi) getCountry(w http.ResponseWriter, r *http.Request) {
 	countryID := chi.URLParam(r, "countryID")
 	input := new(GetCountryInput)
@@ -51,4 +55,12 @@ func (h *CountryHttpHandlerChi) getCountry(w http.ResponseWriter, r *http.Reques
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &CountryResponse{resp})
+}
+
+type ErrorCountryResponse struct {
+	Error string `json:"error"`
+}
+
+type CountryResponse struct {
+	Response string `json:"response"`
 }

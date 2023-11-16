@@ -10,7 +10,7 @@ import (
 	"cdtj.io/days-in-turkey-bot/model"
 )
 
-var _ UserDatabase = db.NewBoltDB("", "")
+var _ UserDatabase = NewUserBoltDBAdaptor(db.NewBoltDB("", ""))
 var _ UserDatabase = db.NewMapDB()
 
 type UserDatabase interface {

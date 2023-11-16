@@ -15,12 +15,12 @@ import (
 	"cdtj.io/days-in-turkey-bot/service/formatter"
 	"cdtj.io/days-in-turkey-bot/service/i18n"
 
-	cep "cdtj.io/days-in-turkey-bot/entity/country/endpoint/http"
+	cep "cdtj.io/days-in-turkey-bot/entity/country/endpoint/http/echo"
 	cr "cdtj.io/days-in-turkey-bot/entity/country/repo"
 	cs "cdtj.io/days-in-turkey-bot/entity/country/service"
 	cuc "cdtj.io/days-in-turkey-bot/entity/country/usecase"
 
-	uep "cdtj.io/days-in-turkey-bot/entity/user/endpoint/http"
+	uep "cdtj.io/days-in-turkey-bot/entity/user/endpoint/http/echo"
 	ur "cdtj.io/days-in-turkey-bot/entity/user/repo"
 	us "cdtj.io/days-in-turkey-bot/entity/user/service"
 	uuc "cdtj.io/days-in-turkey-bot/entity/user/usecase"
@@ -46,10 +46,6 @@ func main() {
 	userRepo := ur.NewUserRepo(userDB)
 	userSvc := us.NewUserService(tgFmt, i18n, countrySvc)
 	userUC := uuc.NewUserUsecase(userRepo, userSvc, countryUC)
-
-	router := httpserver.NewChiRouter()
-	uep.RegisterHTTPEndpointsChi(router, userUC)
-	cep.RegisterHTTPEndpointsChi(router, countryUC)
 
 	echoRouter := httpserver.NewEchoRouter()
 	uep.RegisterHTTPEndpointsEcho(echoRouter, userUC)

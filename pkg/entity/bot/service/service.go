@@ -30,6 +30,13 @@ func NewBotService(service BotSender, frmtr formatter.Formatter, i18n i18n.I18ne
 	}
 }
 
+func NewBotServicev2(frmtr formatter.Formatter, i18n i18n.I18ner) *BotService {
+	return &BotService{
+		frmtr: frmtr,
+		i18n:  i18n,
+	}
+}
+
 func (s *BotService) Send(ctx context.Context, chatID int64, text string, replyMarkup []*model.TelegramBotCommandRow) error {
 	return s.sender.Send(ctx, chatID, text, replyMarkup)
 }

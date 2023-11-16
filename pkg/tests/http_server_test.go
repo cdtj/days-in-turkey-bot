@@ -23,12 +23,12 @@ import (
 	"cdtj.io/days-in-turkey-bot/service/i18n"
 	"github.com/go-chi/chi/v5/middleware"
 
-	cep "cdtj.io/days-in-turkey-bot/entity/country/endpoint/http"
+	cep "cdtj.io/days-in-turkey-bot/entity/country/endpoint/http/chi"
 	cr "cdtj.io/days-in-turkey-bot/entity/country/repo"
 	cs "cdtj.io/days-in-turkey-bot/entity/country/service"
 	cuc "cdtj.io/days-in-turkey-bot/entity/country/usecase"
 
-	uep "cdtj.io/days-in-turkey-bot/entity/user/endpoint/http"
+	uep "cdtj.io/days-in-turkey-bot/entity/user/endpoint/http/chi"
 	ur "cdtj.io/days-in-turkey-bot/entity/user/repo"
 	us "cdtj.io/days-in-turkey-bot/entity/user/service"
 	uuc "cdtj.io/days-in-turkey-bot/entity/user/usecase"

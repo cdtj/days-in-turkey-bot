@@ -4,13 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"cdtj.io/days-in-turkey-bot/db"
-	httpserver "cdtj.io/days-in-turkey-bot/http-server"
 	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/formatter"
 	"cdtj.io/days-in-turkey-bot/service/i18n"
@@ -20,13 +18,13 @@ import (
 	cs "cdtj.io/days-in-turkey-bot/entity/country/service"
 	cuc "cdtj.io/days-in-turkey-bot/entity/country/usecase"
 
-	bwh "cdtj.io/days-in-turkey-bot/entity/bot/endpoint/web-hook/echo"
 	ur "cdtj.io/days-in-turkey-bot/entity/user/repo"
 	us "cdtj.io/days-in-turkey-bot/entity/user/service"
 	uuc "cdtj.io/days-in-turkey-bot/entity/user/usecase"
 
+	tghandler "cdtj.io/days-in-turkey-bot/entity/bot/endpoint/tg-handler"
 	bs "cdtj.io/days-in-turkey-bot/entity/bot/service"
-	buc "cdtj.io/days-in-turkey-bot/entity/bot/usecase/v1"
+	buc "cdtj.io/days-in-turkey-bot/entity/bot/usecase/v2"
 )
 
 var (
@@ -58,18 +56,13 @@ func main() {
 	userUC := uuc.NewUserUsecase(userRepo, userSvc, countryUC)
 
 	// telegram bot
-	bot := telegrambot.NewTelegramBot(os.Getenv("BOT_TOKEN"), os.Getenv("BOT_WEBHOOK"))
-	botSvc := bs.NewBotService(bot, telegramFrmtr, i18n)
+	bot := telegrambot.NewTelegramBotv2(os.Getenv("BOT_TOKEN"))
+	botSvc := bs.NewBotServicev2(telegramFrmtr, i18n)
 	botUC := buc.NewBotUsecase(botSvc, userUC, countryUC)
 
-	router := httpserver.NewEchoRouter()
-	bwh.RegisterWebhookEndpointsEcho(router, botUC)
+	tghandler.RegisterBotHandlers(bot, botUC)
 
-	srv := httpserver.NewHttpServer(&http.Server{
-		Addr:    ":8080",
-		Handler: router,
-	})
-	Serve(srv, bot, userDB)
+	Serve(bot, userDB)
 }
 
 type Serveable interface {

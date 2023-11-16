@@ -18,6 +18,10 @@ func NewCountryHttpHandlerEcho(usecase country.Usecase) *CountryHttpHandlerEcho 
 	}
 }
 
+type GetCountryInput struct {
+	Lang string `json:"lang"`
+}
+
 func (h *CountryHttpHandlerEcho) getCountry(c echo.Context) error {
 	countryID := c.Param("countryID")
 	input := new(GetCountryInput)
@@ -41,4 +45,12 @@ func (h *CountryHttpHandlerEcho) getCountry(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, &CountryResponse{resp})
+}
+
+type ErrorCountryResponse struct {
+	Error string `json:"error"`
+}
+
+type CountryResponse struct {
+	Response string `json:"response"`
 }

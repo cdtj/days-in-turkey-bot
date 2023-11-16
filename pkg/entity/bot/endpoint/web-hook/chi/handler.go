@@ -104,3 +104,19 @@ func (h *BotWebhookHandlerChi) webhook(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, nil)
 }
+
+const (
+	BotWebhookCountry    = "country"
+	BotWebhookLanguage   = "language"
+	BotWebhookContribute = "contribute"
+	BotWebhookTrip       = "trip"
+	BotWebhookStart      = "start"
+)
+
+type ErrorBotResponse struct {
+	Error string `json:"error"`
+}
+
+type BotResponse struct {
+	Response string `json:"response"`
+}

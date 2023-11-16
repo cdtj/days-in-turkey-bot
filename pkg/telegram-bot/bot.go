@@ -2,6 +2,8 @@ package telegrambot
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
 	"log/slog"
 	"time"
@@ -12,6 +14,7 @@ import (
 
 type TelegramBot struct {
 	token   string
+	secret  string
 	webhook string
 	debug   bool
 	bot     *tgbotapi.BotAPI
@@ -21,6 +24,7 @@ type TelegramBot struct {
 func NewTelegramBot(token, webhook string) *TelegramBot {
 	return &TelegramBot{
 		token:   token,
+		secret:  genSecret(),
 		webhook: webhook,
 		debug:   false,
 	}
@@ -106,4 +110,14 @@ func replyMarkup(ctx context.Context, rows []*model.TelegramBotCommandRow) tgbot
 	}
 	inlineKeyboard := tgbotapi.NewInlineKeyboardMarkup(ikbs)
 	return inlineKeyboard
+}
+
+func genSecret() string {
+	randomBytes := make([]byte, 64)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		slog.Error("telegram-bot", "error", err)
+		return ""
+	}
+	return base64.RawURLEncoding.EncodeToString(randomBytes)
 }

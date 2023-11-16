@@ -27,6 +27,7 @@ require (
 	github.com/boltdb/bolt v1.3.1
 	github.com/go-chi/render v1.0.3
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
+	github.com/go-telegram/bot v0.8.2
 	github.com/labstack/echo/v4 v4.11.3
 	golang.org/x/sys v0.13.0 // indirect
 )

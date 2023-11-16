@@ -3,13 +3,11 @@ package db
 import (
 	"bytes"
 	"context"
-	"encoding/binary"
 	"encoding/gob"
 	"fmt"
 	"log/slog"
 	"time"
 
-	"cdtj.io/days-in-turkey-bot/model"
 	"github.com/boltdb/bolt"
 )
 
@@ -45,52 +43,36 @@ func (db *BoltDB) Shutdown(ctx context.Context) {
 	go func() {
 		<-shutdownCtx.Done()
 		if shutdownCtx.Err() == context.DeadlineExceeded {
-			slog.Error("boltdb", "path", db.path, "bucket", db.bucket, "msg", "unable to gracefully stop boltdb", "error", shutdownCtx.Err())
+			slog.Error("boltdb", "path", db.path, "bucket", db.name, "msg", "unable to gracefully stop boltdb", "error", shutdownCtx.Err())
 			return
 		}
 	}()
-	slog.Info("boltdb", "path", db.path, "bucket", db.bucket, "status", "stopping")
+	slog.Info("boltdb", "path", db.path, "bucket", db.name, "status", "stopping")
 	if err := db.db.Close(); err != nil {
-		slog.Error("boltdb", "path", db.path, "bucket", db.bucket, "msg", "unable to gracefully stop boltdb", "error", err)
+		slog.Error("boltdb", "path", db.path, "bucket", db.name, "msg", "unable to gracefully stop boltdb", "error", err)
 		return
 	}
-	slog.Info("boltdb", "path", db.path, "bucket", db.bucket, "status", "stopped")
+	slog.Info("boltdb", "path", db.path, "bucket", db.name, "status", "stopped")
 }
 
-func (db *BoltDB) Load(ctx context.Context, key any) (any, error) {
-	var result interface{}
-	switch db.name {
-	case "users":
-		result = new(model.User)
-		key = keyToByte(key)
-	default:
-		return nil, ErrDBUnknownEntity
-	}
-	err := db.db.View(func(tx *bolt.Tx) error {
-		slog.Info("loading", "bucket", db.bucket, "type", fmt.Sprintf("%T", result))
+func (db *BoltDB) Load(ctx context.Context, key []byte, result any) error {
+	return db.db.View(func(tx *bolt.Tx) error {
+		slog.Info("loading", "bucket", db.name, "type", fmt.Sprintf("%T", result))
 		bucket := tx.Bucket(db.bucket)
 		if bucket == nil {
 			return ErrDBBucketNotFound
 		}
-		data := bucket.Get(key.([]byte))
+		data := bucket.Get(key)
 		if data == nil {
 			return ErrDBEntryNotFound
 		}
 		return gob.NewDecoder(bytes.NewBuffer(data)).Decode(result)
 	})
-	return result, err
 }
 
-func (db *BoltDB) Save(ctx context.Context, key any, data any) error {
-	switch db.name {
-	case "users":
-		data = data.(*model.User)
-		key = keyToByte(key)
-	default:
-		return ErrDBUnknownEntity
-	}
+func (db *BoltDB) Save(ctx context.Context, key []byte, data any) error {
 	return db.db.Update(func(tx *bolt.Tx) error {
-		slog.Info("saving", "bucket", db.bucket, "data", data, "type", fmt.Sprintf("%T", data))
+		slog.Info("saving", "bucket", db.name, "data", data, "type", fmt.Sprintf("%T", data))
 		bucket, err := tx.CreateBucketIfNotExists(db.bucket)
 		if err != nil {
 			return err
@@ -101,16 +83,6 @@ func (db *BoltDB) Save(ctx context.Context, key any, data any) error {
 			return err
 		}
 
-		return bucket.Put(key.([]byte), buf.Bytes())
+		return bucket.Put(key, buf.Bytes())
 	})
-}
-
-func keyToByte(id interface{}) []byte {
-	switch v := id.(type) {
-	case int64:
-		b := make([]byte, 8)
-		binary.LittleEndian.PutUint64(b, uint64(v))
-		return b
-	}
-	return nil
 }

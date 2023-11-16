@@ -35,6 +35,10 @@ func (h *UserHttpHandlerEcho) info(c echo.Context) error {
 	return c.JSON(http.StatusOK, &UserResponse{resp})
 }
 
+type CalculateTripInput struct {
+	Dates string `json:"dates"`
+}
+
 func (h *UserHttpHandlerEcho) calculateTrip(c echo.Context) error {
 	userID, err := strconv.ParseInt(c.Param("userID"), 10, 64)
 	if err != nil {
@@ -53,6 +57,10 @@ func (h *UserHttpHandlerEcho) calculateTrip(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, &UserResponse{resp})
+}
+
+type UpdateLangInput struct {
+	Lang string `json:"lang"`
 }
 
 func (h *UserHttpHandlerEcho) updateLang(c echo.Context) error {
@@ -74,6 +82,14 @@ func (h *UserHttpHandlerEcho) updateLang(c echo.Context) error {
 	return c.JSON(http.StatusOK, nil)
 }
 
+type UpdateCountryInput struct {
+	Code          string `json:"code"`
+	Flag          string `json:"flag"`
+	DaysContinual int    `json:"daysContinual"`
+	DaysLimit     int    `json:"daysLimit"`
+	ResetInterval int    `json:"resetInterval"`
+}
+
 func (h *UserHttpHandlerEcho) updateCountry(c echo.Context) error {
 	userID, err := strconv.ParseInt(c.Param("userID"), 10, 64)
 	if err != nil {
@@ -93,4 +109,12 @@ func (h *UserHttpHandlerEcho) updateCountry(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, nil)
+}
+
+type ErrorUserResponse struct {
+	Error string `json:"error"`
+}
+
+type UserResponse struct {
+	Response string `json:"response"`
 }
