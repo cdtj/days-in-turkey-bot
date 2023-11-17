@@ -7,28 +7,34 @@ import (
 	"cdtj.io/days-in-turkey-bot/model"
 )
 
-func calcTree(daysLimit, daysCont, resetInterval int, dates []time.Time) *model.TripTree {
+// calcTree is the main function that returns Trip Tree
+func calcTree(daysLimit, daysCont, resetInterval int, trips []model.Trip) *model.TripTree {
 	var prev, tree *model.TripTree
 
-	for i := 0; i < len(dates); i = i + 2 {
-		var endDate time.Time
-		startDate := dates[i]
+	for _, trip := range trips {
+		slog.Info("iterating trips", "trip", trip)
+		// predicted flag to mark EndDate was predicted
 		predicted := false
-		if i < len(dates)-1 {
-			endDate = dates[i+1]
-		} else {
+		if trip.EndDate == nil {
 			predicted = true
-			endDate = predictEndDate(startDate, daysLimit, daysCont, resetInterval, tree)
+			predictedEnd := predictEndDate(*trip.StartDate, daysLimit, daysCont, resetInterval, tree)
+			trip.EndDate = &predictedEnd
 		}
-		tree = makeTree(startDate, endDate, resetInterval, false, predicted, tree)
+		tree = makeTree(*trip.StartDate, *trip.EndDate, resetInterval, daysCont, false, predicted, tree)
 		tree.Prev = prev
 		prev = tree
 	}
-	if tree != nil && len(dates)%2 == 0 {
+	// if tree isn't null and current trip has ended, we're trying to predict closest possilbe daysCont trip
+	// and the max duration possible with unused days
+	if tree != nil && !tree.EndPredicted {
+		// calculating prediction StartDate with past trip EndDate or Today
 		predStart := predictStartDate(isPastToday(tree.EndDate), daysLimit, daysCont, resetInterval, tree)
-		eligibleFullTree := makeTree(predStart, predictEndDate(predStart, daysLimit, daysCont, resetInterval, tree), resetInterval, true, false, tree)
-		eligibleCurrentTree := makeTree(isPastToday(tree.EndDate), predictEndDate(isPastToday(tree.EndDate), daysLimit, daysCont, resetInterval, tree), resetInterval, true, false, tree)
+		eligibleFullTree := makeTree(predStart, predictEndDate(predStart, daysLimit, daysCont, resetInterval, tree), resetInterval, daysCont, true, false, tree)
+		// using trip EndDate or Today to calculate trip with unused days
+		eligibleCurrentTree := makeTree(isPastToday(tree.EndDate), predictEndDate(isPastToday(tree.EndDate), daysLimit, daysCont, resetInterval, tree), resetInterval, daysCont, true, false, tree)
 
+		// if we don't have any unused days or we can do daysCont trip
+		// just skip the result so don't have a zerotrip/duplicate
 		if eligibleCurrentTree.TripDays > 0 && eligibleCurrentTree.TripDays != eligibleFullTree.TripDays {
 			tree = eligibleCurrentTree
 			tree.Prev = prev
@@ -42,12 +48,18 @@ func calcTree(daysLimit, daysCont, resetInterval int, dates []time.Time) *model.
 	return tree
 }
 
-func makeTree(startDate, endDate time.Time, resetInterval int, startPred, endPred bool, tree *model.TripTree) *model.TripTree {
+func makeTree(startDate, endDate time.Time, resetInterval, daysCont int, startPred, endPred bool, tree *model.TripTree) *model.TripTree {
 	daysPassed := tripDays(startDate, endDate, resetInterval, tree)
+	dBetween := daysBetween(startDate, endDate)
+	dOverstay := 0
+	if dBetween > daysCont {
+		dOverstay = dBetween - daysCont
+	}
 	return &model.TripTree{
 		StartDate:      startDate,
 		EndDate:        endDate,
-		TripDays:       daysBetween(startDate, endDate),
+		TripDays:       dBetween,
+		OverstayDays:   dOverstay,
 		PeriodDays:     daysPassed,
 		StartPredicted: startPred,
 		EndPredicted:   endPred,
@@ -58,6 +70,8 @@ func daysAllowed(daysPassed, daysLimit int) int {
 	return daysLimit - daysPassed
 }
 
+// predictEndDate tries to predict leave date to avoid overstay
+// can be used in predictions on ongoing and future trips
 func predictEndDate(startDate time.Time, daysLimit, daysCont, resetInterval int, tree *model.TripTree) time.Time {
 	checker := daysCont
 	for {
@@ -76,6 +90,8 @@ func predictEndDate(startDate time.Time, daysLimit, daysCont, resetInterval int,
 	}
 }
 
+// predictStartDate tries to predict closes possible start date
+// to fullyfy daysCont trip
 func predictStartDate(startDate time.Time, daysLimit, daysCont, resetInterval int, tree *model.TripTree) time.Time {
 	for {
 		departureDay := maxDepartureDate(startDate, daysCont)
@@ -130,4 +146,22 @@ func daysBetween(from, to time.Time) int {
 // maxDepartureDate returns date appended by daysCont days
 func maxDepartureDate(startDate time.Time, daysCont int) time.Time {
 	return startDate.Add(time.Hour * 24 * time.Duration(daysCont))
+}
+
+func datesToTrips(dates []time.Time) []model.Trip {
+	trips := make([]model.Trip, 0, len(dates)%2)
+	for i := 0; i < len(dates); i = i + 2 {
+		if i+1 < len(dates) {
+			trips = append(trips, model.Trip{
+				StartDate: &dates[i],
+				EndDate:   &dates[i+1],
+			})
+		} else {
+			trips = append(trips, model.Trip{
+				StartDate: &dates[i],
+				EndDate:   nil,
+			})
+		}
+	}
+	return trips
 }

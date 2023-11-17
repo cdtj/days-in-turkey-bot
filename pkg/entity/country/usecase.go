@@ -13,6 +13,7 @@ type Usecase interface {
 	// to modify Country/Countries make relevant changes to assets/country,
 	// and re-init the CountryMapRepo
 	// Set(ctx context.Context, countryID string, country *model.Country) error
+
 	Lookup(ctx context.Context, countryID string, daysCont, daysLimit, resetInterval int) (*model.Country, error)
 
 	// ListFromRepo deprecated

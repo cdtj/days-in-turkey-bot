@@ -16,7 +16,10 @@ var (
 )
 
 var (
-	ErrInvalidDate = errors.New("invalid date")
+	ErrInvalidDate  = errors.New("invalid date")
+	ErrInvalidYear  = errors.New("invalid year")
+	ErrInvalidMonth = errors.New("invalid month")
+	ErrInvalidDay   = errors.New("invalid day")
 )
 
 func init() {
@@ -65,18 +68,18 @@ func parseDate(dt string) (time.Time, error) {
 	if len(dtArr) == 3 {
 		year, err := strconv.Atoi(dtArr[2])
 		if err != nil {
-			return nullTime, fmt.Errorf("invalid year: %w", err)
+			return nullTime, errors.Join(ErrInvalidYear, err)
 		}
 		if year < 2000 {
 			year += 2000
 		}
 		month, err := strconv.Atoi(dtArr[1])
 		if err != nil {
-			return nullTime, fmt.Errorf("invalid month: %w", err)
+			return nullTime, errors.Join(ErrInvalidMonth, err)
 		}
 		day, err := strconv.Atoi(dtArr[0])
 		if err != nil {
-			return nullTime, fmt.Errorf("invalid day: %w", err)
+			return nullTime, errors.Join(ErrInvalidDay, err)
 		}
 		return time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC), nil
 	}

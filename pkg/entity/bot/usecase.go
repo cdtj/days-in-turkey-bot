@@ -6,6 +6,7 @@ import (
 	"cdtj.io/days-in-turkey-bot/model"
 )
 
+// Usecase is deprecated in case of moving to v2
 type Usecase interface {
 	Welcome(ctx context.Context, chatID int64, userID int64, language string) error
 	Prompt(ctx context.Context, chatID int64, userID int64, prompt string) error

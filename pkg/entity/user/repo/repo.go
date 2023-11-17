@@ -34,7 +34,7 @@ func (r *UserRepo) Load(ctx context.Context, userID int64) (*model.User, error) 
 	u, err := r.db.Load(ctx, userID)
 	if err != nil {
 		slog.Error("user repo", "userID", userID, "err", err)
-		if errors.Is(err, db.ErrDBEntryNotFound) {
+		if errors.Is(err, db.ErrDBEntryNotFound) || errors.Is(err, db.ErrDBBucketNotFound) {
 			return nil, user.ErrRepoUserNotFound
 		}
 		return nil, err

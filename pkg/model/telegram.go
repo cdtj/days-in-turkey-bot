@@ -23,11 +23,13 @@ func NewTelegramBotCommand(caption, command string) *TelegramBotCommand {
 }
 
 type TelegramMessage struct {
-	Text string
+	Text   string
+	Markup any
 }
 
-func NewTelegramMessage(text string) *TelegramMessage {
+func NewTelegramMessage(text string, markup any) *TelegramMessage {
 	return &TelegramMessage{
-		Text: text,
+		Text:   text,
+		Markup: markup,
 	}
 }

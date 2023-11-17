@@ -36,7 +36,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	tgFmt := formatter.NewTelegramFormatter(i18n)
+	tgFmt := formatter.NewTelegramFormatter(i18n, false)
 	countryDB := db.NewMapDB()
 	countryRepo := cr.NewCountryRepo(countryDB)
 	countrySvc := cs.NewCountryService(tgFmt, defaultCountry)

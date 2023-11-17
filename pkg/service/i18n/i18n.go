@@ -31,6 +31,8 @@ var (
 	ErrNoFiles      = errors.New("no localization files in i18n folder")
 	ErrUknownLang   = errors.New("unknown language")
 	ErrUknownMsg    = errors.New("unknown message")
+
+	globalDefaultLang = language.English
 )
 
 func NewI18n(dir string, defaultLang string) (*I18n, error) {
@@ -69,6 +71,11 @@ func NewI18n(dir string, defaultLang string) (*I18n, error) {
 
 func (i *I18n) DefaultLang() language.Tag {
 	return i.defaultLang
+}
+
+// DefaultLang helps to stop nesting this pkg everywhere
+func DefaultLang() language.Tag {
+	return globalDefaultLang
 }
 
 func (i *I18n) GetLocale(tag language.Tag) Localizer {

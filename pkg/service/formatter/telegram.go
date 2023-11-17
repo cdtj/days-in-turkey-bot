@@ -1,22 +1,27 @@
 package formatter
 
 import (
+	"strings"
+
 	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/i18n"
+	tgapi "github.com/go-telegram/bot"
 	"golang.org/x/text/language"
 )
 
 type TelegramFormatter struct {
 	i18n i18n.I18ner
+	v2   bool
 }
 
-func NewTelegramFormatter(i18n i18n.I18ner) *TelegramFormatter {
+func NewTelegramFormatter(i18n i18n.I18ner, v2 bool) *TelegramFormatter {
 	return &TelegramFormatter{
 		i18n: i18n,
+		v2:   v2,
 	}
 }
 
-var _ Formatter = NewTelegramFormatter(nil)
+var _ Formatter = NewTelegramFormatter(nil, false)
 
 func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree) string {
 	result := ""
@@ -55,52 +60,56 @@ func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree
 			}, nil) + "\n"
 		}
 	}
-	return result
+	return f.markdownWrapper(result)
 }
 
 func (f *TelegramFormatter) User(language language.Tag, user *model.User) string {
 	locale := f.i18n.GetLocale(language)
-	return locale.MessageWithTemplate("UserInfo", map[string]interface{}{
+	return f.markdownWrapper(locale.MessageWithTemplate("UserInfo", map[string]interface{}{
 		"Language": locale.Message("LanguageName"),
-	}, nil) + "\n" + f.Country(language, &user.Country)
+	}, nil)) +
+		"\n" +
+		f.Country(language, &user.Country)
 }
 
 func (f *TelegramFormatter) Country(language language.Tag, country *model.Country) string {
 	locale := f.i18n.GetLocale(language)
-	return locale.MessageWithTemplate("CountryInfo", map[string]interface{}{
+	return f.markdownWrapper(locale.MessageWithTemplate("CountryInfo", map[string]interface{}{
 		"Flag": country.GetFlag(),
 		"Name": country.GetName(),
-	}, nil) + "\n" + locale.MessageWithTemplate("CountryDays", map[string]interface{}{
-		"Continual":     country.GetDaysCont(),
-		"Limit":         country.GetDaysLimit(),
-		"ResetInterval": country.GetResetInterval(),
-	}, nil)
+	}, nil) +
+		"\n" +
+		locale.MessageWithTemplate("CountryDays", map[string]interface{}{
+			"Continual":     country.GetDaysCont(),
+			"Limit":         country.GetDaysLimit(),
+			"ResetInterval": country.GetResetInterval(),
+		}, nil))
 }
 
 func (f *TelegramFormatter) FormatMessage(language language.Tag, messageID string) string {
 	locale := f.i18n.GetLocale(language)
-	return locale.Message(messageID)
+	return f.markdownWrapper(locale.Message(messageID))
 }
 
 func (f *TelegramFormatter) Welcome(language language.Tag) string {
 	locale := f.i18n.GetLocale(language)
-	return locale.Message("Welcome") + " " +
+	return f.markdownWrapper(locale.Message("Welcome") + " " +
 		locale.Message("Welcome1") + "\n\n" +
+		locale.Message("WelcomePrompt") + "\n" +
+		locale.Message("WelcomePromptPredictEnd") + "\n" +
+		locale.Message("WelcomePromptPredictRemain") + "\n\n" +
 		locale.Message("WelcomeCountry") + "\n" +
 		locale.Message("WelcomeLanguage") + "\n" +
 		locale.Message("WelcomeTrip") + "\n" +
-		locale.Message("WelcomeContribute") + "\n\n" +
-		locale.Message("WelcomePrompt") + "\n\n" +
-		locale.Message("WelcomePromptPredictEnd") + "\n" +
-		locale.Message("WelcomePromptPredictRemain")
+		locale.Message("WelcomeContribute"))
 }
 
 func (f *TelegramFormatter) TripExplanation(language language.Tag) string {
 	locale := f.i18n.GetLocale(language)
-	return locale.Message("TripExplanation") + "\n\n" +
+	return f.markdownWrapper(locale.Message("TripExplanation") + "\n\n" +
 		locale.Message("TripExplanationContinual") + "\n" +
 		locale.Message("TripExplanationLimit") + "\n" +
-		locale.Message("TripExplanationResetInterval")
+		locale.Message("TripExplanationResetInterval"))
 }
 
 func wrapCode(str string) string {
@@ -113,4 +122,25 @@ func wrapItalic(str string) string {
 
 func wrapBold(str string) string {
 	return "*" + str + "*"
+}
+
+func (f *TelegramFormatter) markdownWrapper(str string) string {
+	if !f.v2 {
+		return str
+	}
+	return strings.ReplaceAll(tgapi.EscapeMarkdown(saveMarkdown(str)), "\\\\", "")
+}
+
+var saveableMarkdown = "_*`"
+
+// saveMarkdown escapes allowed markdown before global markdown escape
+func saveMarkdown(s string) string {
+	var result []rune
+	for _, r := range s {
+		if strings.ContainsRune(saveableMarkdown, r) {
+			result = append(result, '\\')
+		}
+		result = append(result, r)
+	}
+	return string(result)
 }

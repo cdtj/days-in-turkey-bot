@@ -9,6 +9,12 @@ type TripTree struct {
 	StartPredicted bool
 	TripDays       int
 	PeriodDays     int
+	OverstayDays   int
 
 	Prev *TripTree
+}
+
+type Trip struct {
+	StartDate *time.Time
+	EndDate   *time.Time
 }

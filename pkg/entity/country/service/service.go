@@ -34,7 +34,8 @@ func (s *CountryService) DefaultCountry(context.Context) *model.Country {
 func (s *CountryService) CustomCountry(ctx context.Context, daysCont, daysLimit, resetInterval int) *model.Country {
 	return &model.Country{
 		Code:          "CUSTOM",
-		Flag:          "❔",
+		Name:          "",
+		Flag:          "📝",
 		DaysContinual: daysCont,
 		DaysLimit:     daysLimit,
 		ResetInterval: resetInterval,

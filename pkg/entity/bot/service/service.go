@@ -7,6 +7,7 @@ import (
 	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/formatter"
 	"cdtj.io/days-in-turkey-bot/service/i18n"
+	tgmodel "github.com/go-telegram/bot/models"
 	"golang.org/x/text/language"
 )
 
@@ -38,6 +39,9 @@ func NewBotServicev2(frmtr formatter.Formatter, i18n i18n.I18ner) *BotService {
 }
 
 func (s *BotService) Send(ctx context.Context, chatID int64, text string, replyMarkup []*model.TelegramBotCommandRow) error {
+	if s.sender == nil {
+		return bot.ErrBotNotImpl
+	}
 	return s.sender.Send(ctx, chatID, text, replyMarkup)
 }
 
@@ -67,4 +71,17 @@ func (s *BotService) FormatMessage(ctx context.Context, language language.Tag, m
 	default:
 		return s.frmtr.FormatMessage(language, messageID)
 	}
+}
+
+func (s *BotService) CommandsToInlineKeboard(ctx context.Context, commands []*model.TelegramBotCommandRow) *tgmodel.InlineKeyboardMarkup {
+	ikbs := make([]tgmodel.InlineKeyboardButton, 0)
+	for _, command := range commands {
+		ikrs := make([]tgmodel.InlineKeyboardButton, 0)
+		for _, command := range command.Commands {
+			ikrs = append(ikrs, tgmodel.InlineKeyboardButton{Text: command.Caption, CallbackData: command.Command})
+		}
+		ikbs = append(ikbs, ikrs...)
+	}
+	inlineKeyboard := &tgmodel.InlineKeyboardMarkup{InlineKeyboard: [][]tgmodel.InlineKeyboardButton{ikbs}}
+	return inlineKeyboard
 }

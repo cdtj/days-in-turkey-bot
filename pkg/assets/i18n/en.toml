@@ -8,9 +8,9 @@ WelcomeCountry = "/country - to change your country"
 WelcomeLanguage = "/language - to change your language"
 WelcomeTrip = "/trip - to get more info how everything works"
 WelcomeContribute = "/contribute - to contribute to open-source world (looking for translations and data providers)"
-WelcomePrompt = "If you're already bored reading everything, just send me dates space, or linebreak separated to calculate your days."
-WelcomePromptPredictEnd = "_sample 1:_ sending an open date like `31/12/2022` will result in a date before that you will need to leave (or will show how much you overstayed already);"
-WelcomePromptPredictRemain = "_sample 2:_ sending a complete trip `31/12/2022 15/01/2023 01/02/2023 15/02/2023` will show you how many days are remaining and when you're able to enter for a full-period stay;"
+WelcomePrompt = "Just send me dates space or linebreak separated to calculate your days:"
+WelcomePromptPredictEnd = "_sample 1:_ `31/12/2022` (an open date) will result in a date before that you will need to leave (or will show how much you overstayed already);"
+WelcomePromptPredictRemain = "_sample 2:_ `31/12/2022 15/01/2023 01/02/2023 15/02/2023` (a complete trip) will show you how many days are remaining and when you're able to enter for a full-period stay;"
 
 Trip = "🛬 {{.StartDate}} > 🛫 {{.EndDate}}, Duration: {{.TripDays}}, with Total: {{.PeriodDays}}"
 TripPredicted = "🛬 {{.StartDate}} > Leave until 🛫 {{.EndDate}}, Duration: {{.TripDays}}, with Total: {{.PeriodDays}}"
@@ -21,17 +21,21 @@ TripExplanationContinual = "*Continual Days* - days that you're allowed to stay 
 TripExplanationLimit = "*Days Limit* - days that you spent in Turkey during some interval;"
 TripExplanationResetInterval = "*Interval Reset* - days you spent above the reset interval are not counted, in case you're not breaking other limits."
 
+Overstay = "Overstayed for: {{.OverstayDays}}"
+
 UserInfo = "Language: {{.Language}}"
 UserLanguagePrompt = "Choose Language"
 UserLanguageChanged = "Language Changed"
 UserCountryPrompt = "Choose Country"
 UserCountryChanged = "Country Changed"
-UserCountryCustom = "If your country isn't presented, you can send me the allowed days and they will be used in metrics. Example: `/country 60 90 180`. Details: /trip"
+UserCountryCustom = "If your country isn't presented, you can send me the command containing allowed days and they will be used in metrics.\n\nExample: `/custom 60 90 180`\n\nDetails: /trip"
 
 CountryInfo = "Country: {{.Flag}} {{.Name}}"
 CountryDays = "Days Allowed - Continual: {{.Continual}} / Limit: {{.Limit}} / Reset Interval: {{.ResetInterval}}"
 
-ErrorInvalidDate = "invalid date, the date should be in format: day/month/year, example: 31/12/2023"
+# only exposable errors here
+ErrorInvalidDate = "invalid date, the date should be in format: `day/month/year`, example: `31/12/2023`"
+ErrorInvalidCustomCountry = "invalid custom duration config,\nmust be in format: `/custom {Days Continual} {Days Limit} {Reset Interval}`,\nexample: `/custom 60 90 180`\n\nDetails: /trip"
 ErrorInternal = "internal service error, try again later"
 
 [DayCounter]

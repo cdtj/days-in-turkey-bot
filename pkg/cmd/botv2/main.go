@@ -34,14 +34,15 @@ var (
 
 func main() {
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
+		AddSource: true,
+		Level:     slog.LevelDebug,
 	})))
 	i18n, err := i18n.NewI18n("i18n", defaultLang)
 	if err != nil {
 		panic(err)
 	}
 
-	telegramFrmtr := formatter.NewTelegramFormatter(i18n)
+	telegramFrmtr := formatter.NewTelegramFormatter(i18n, true)
 
 	// country service
 	countryDB := db.NewMapDB()
@@ -56,11 +57,9 @@ func main() {
 	userUC := uuc.NewUserUsecase(userRepo, userSvc, countryUC)
 
 	// telegram bot
-	bot := telegrambot.NewTelegramBotv2(os.Getenv("BOT_TOKEN"))
 	botSvc := bs.NewBotServicev2(telegramFrmtr, i18n)
 	botUC := buc.NewBotUsecase(botSvc, userUC, countryUC)
-
-	tghandler.RegisterBotHandlers(bot, botUC)
+	bot := telegrambot.NewTelegramBotv2(os.Getenv("BOT_TOKEN"), tghandler.BindBotHandlers(botUC))
 
 	Serve(bot, userDB)
 }

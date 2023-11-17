@@ -4,15 +4,15 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/go-telegram/bot"
+	tgapi "github.com/go-telegram/bot"
 )
 
 type TelegramBotv2 struct {
-	bot *bot.Bot
+	bot *tgapi.Bot
 }
 
-func NewTelegramBotv2(token string) *TelegramBotv2 {
-	b, err := bot.New(token)
+func NewTelegramBotv2(token string, options []tgapi.Option) *TelegramBotv2 {
+	b, err := tgapi.New(token, options...)
 	if err != nil {
 		return nil
 	}
@@ -26,7 +26,7 @@ func (t *TelegramBotv2) Serve(ctx context.Context) error {
 	if t.bot == nil {
 		return ErrBotNotReady
 	}
-	ok, err := t.bot.DeleteWebhook(ctx, &bot.DeleteWebhookParams{DropPendingUpdates: true})
+	ok, err := t.bot.DeleteWebhook(ctx, &tgapi.DeleteWebhookParams{DropPendingUpdates: true})
 	slog.Info("telegram-bot", "msg", "cleanup old hooks", "ok", ok, "err", err)
 	t.bot.Start(ctx)
 	return nil
@@ -38,18 +38,22 @@ func (t *TelegramBotv2) Shutdown(ctx context.Context) {
 	slog.Info("telegram-bot", "status", "stopped")
 }
 
-func (t *TelegramBotv2) RegisterHandlerExactMessage(command string, handler bot.HandlerFunc) {
-	t.bot.RegisterHandler(bot.HandlerTypeMessageText, command, bot.MatchTypeExact, handler)
+func BindHandlerExactMessage(command string, handler tgapi.HandlerFunc) tgapi.Option {
+	return tgapi.WithMessageTextHandler(command, tgapi.MatchTypeExact, handler)
 }
 
-func (t *TelegramBotv2) RegisterHandlerPrefixMessage(command string, handler bot.HandlerFunc) {
-	t.bot.RegisterHandler(bot.HandlerTypeMessageText, command, bot.MatchTypePrefix, handler)
+func BindHandlerPrefixMessage(command string, handler tgapi.HandlerFunc) tgapi.Option {
+	return tgapi.WithMessageTextHandler(command, tgapi.MatchTypePrefix, handler)
 }
 
-func (t *TelegramBotv2) RegisterHandlerExactCb(command string, handler bot.HandlerFunc) {
-	t.bot.RegisterHandler(bot.HandlerTypeCallbackQueryData, command, bot.MatchTypeExact, handler)
+func BindHandlerExactCb(command string, handler tgapi.HandlerFunc) tgapi.Option {
+	return tgapi.WithCallbackQueryDataHandler(command, tgapi.MatchTypeExact, handler)
 }
 
-func (t *TelegramBotv2) RegisterHandlerPrefixCb(command string, handler bot.HandlerFunc) {
-	t.bot.RegisterHandler(bot.HandlerTypeCallbackQueryData, command, bot.MatchTypePrefix, handler)
+func BindHandlerPrefixCb(command string, handler tgapi.HandlerFunc) tgapi.Option {
+	return tgapi.WithCallbackQueryDataHandler(command, tgapi.MatchTypePrefix, handler)
+}
+
+func BindHandlerDefault(handler tgapi.HandlerFunc) tgapi.Option {
+	return tgapi.WithDefaultHandler(handler)
 }

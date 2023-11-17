@@ -43,7 +43,7 @@ func main() {
 		panic(err)
 	}
 
-	telegramFrmtr := formatter.NewTelegramFormatter(i18n)
+	telegramFrmtr := formatter.NewTelegramFormatter(i18n, false)
 
 	// country service
 	countryDB := db.NewMapDB()
