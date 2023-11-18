@@ -4,9 +4,13 @@
 
 # binaries
 httpsrvr
+bot
 
 # pprof
 *.pprof
 
 # boltdb
 *.bolt
+
+# ds
+.DS_Store
