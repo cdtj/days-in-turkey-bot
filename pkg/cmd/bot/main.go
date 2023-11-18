@@ -1,14 +1,11 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 
+	"cdtj.io/days-in-turkey-bot/cmd"
 	"cdtj.io/days-in-turkey-bot/db"
 	httpserver "cdtj.io/days-in-turkey-bot/http-server"
 	"cdtj.io/days-in-turkey-bot/model"
@@ -26,7 +23,7 @@ import (
 	uuc "cdtj.io/days-in-turkey-bot/entity/user/usecase"
 
 	bs "cdtj.io/days-in-turkey-bot/entity/bot/service"
-	buc "cdtj.io/days-in-turkey-bot/entity/bot/usecase/v1"
+	buc "cdtj.io/days-in-turkey-bot/entity/bot/usecase"
 )
 
 var (
@@ -34,9 +31,13 @@ var (
 	defaultCountry = model.NewCountry("RU", "RU", 60, 90, 180)
 )
 
+// bot (v1) is deprecated even before become public but
+// it might be interested to return back to it when the origin library
+// will be updated to the actual API (if it)
 func main() {
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
+		AddSource: true,
+		Level:     slog.LevelDebug,
 	})))
 	i18n, err := i18n.NewI18n("i18n", defaultLang)
 	if err != nil {
@@ -62,48 +63,17 @@ func main() {
 	botSvc := bs.NewBotService(bot, telegramFrmtr, i18n)
 	botUC := buc.NewBotUsecase(botSvc, userUC, countryUC)
 
+	// we are using webserver to deploy telegram webhook,
+	// please note that bot (v1) based on [github.com/go-telegram-bot-api/telegram-bot-api/v5]
+	// library that doesn't implement webhook secret header, so anyone can post data
+	// if they know your host and hanlder
 	router := httpserver.NewEchoRouter()
 	bwh.RegisterWebhookEndpointsEcho(router, botUC)
 
+	// testing on insecure
 	srv := httpserver.NewHttpServer(&http.Server{
 		Addr:    ":8080",
 		Handler: router,
 	})
-	Serve(srv, bot, userDB)
-}
-
-type Serveable interface {
-	Serve(ctx context.Context) error
-	Shutdown(ctx context.Context)
-}
-
-func Serve(serveables ...Serveable) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-
-	errch := make(chan error)
-
-	for k, s := range serveables {
-		slog.Info("starting", "key", k, "s", s)
-		go func(s Serveable) {
-			if err := s.Serve(ctx); err != nil {
-				errch <- fmt.Errorf("%T stopped with error: %w", s, err)
-			}
-		}(s)
-	}
-
-	go func() {
-		rcvd := <-sig
-		slog.Info("stopping serveables", "signal", rcvd)
-		for _, s := range serveables {
-			s.Shutdown(ctx)
-		}
-		cancel()
-	}()
-	go func() {
-		panic(<-errch)
-	}()
-	<-ctx.Done()
+	cmd.Serve(srv, bot, userDB)
 }

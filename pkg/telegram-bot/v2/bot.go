@@ -2,26 +2,31 @@ package telegrambot
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	tgapi "github.com/go-telegram/bot"
 )
 
-type TelegramBotv2 struct {
+type TelegramBot struct {
 	bot *tgapi.Bot
 }
 
-func NewTelegramBotv2(token string, options []tgapi.Option) *TelegramBotv2 {
+func NewTelegramBot(token string, options []tgapi.Option) *TelegramBot {
 	b, err := tgapi.New(token, options...)
 	if err != nil {
 		return nil
 	}
-	return &TelegramBotv2{
+	return &TelegramBot{
 		bot: b,
 	}
 }
 
-func (t *TelegramBotv2) Serve(ctx context.Context) error {
+var (
+	ErrBotNotReady = errors.New("not not started or already stopped")
+)
+
+func (t *TelegramBot) Serve(ctx context.Context) error {
 	slog.Info("telegram-bot", "status", "starting")
 	if t.bot == nil {
 		return ErrBotNotReady
@@ -32,9 +37,11 @@ func (t *TelegramBotv2) Serve(ctx context.Context) error {
 	return nil
 }
 
-func (t *TelegramBotv2) Shutdown(ctx context.Context) {
+func (t *TelegramBot) Shutdown(ctx context.Context) {
 	// there is no designated shutdown
-	t.bot = nil
+
+	// you can restart bot without re-init, so do not delete it on stop
+	// t.bot = nil
 	slog.Info("telegram-bot", "status", "stopped")
 }
 

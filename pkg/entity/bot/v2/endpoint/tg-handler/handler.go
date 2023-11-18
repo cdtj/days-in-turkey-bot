@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"cdtj.io/days-in-turkey-bot/entity/bot"
+	"cdtj.io/days-in-turkey-bot/entity/bot/v2"
 	tgapi "github.com/go-telegram/bot"
 	tgmodel "github.com/go-telegram/bot/models"
 )
@@ -13,10 +13,10 @@ import (
 // all other Handlers must be used for debug-only purposes
 
 type BotHandler struct {
-	usecase bot.Usecasev2
+	usecase bot.Usecase
 }
 
-func NewBotHandler(usecase bot.Usecasev2) *BotHandler {
+func NewBotHandler(usecase bot.Usecase) *BotHandler {
 	return &BotHandler{
 		usecase: usecase,
 	}
@@ -25,7 +25,7 @@ func NewBotHandler(usecase bot.Usecasev2) *BotHandler {
 func (h *BotHandler) welcome(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil || tgmsg.From == nil {
-		slog.Error("Unexpected message with empty message", "method", "trip", "update", update)
+		slog.Error("Unexpected message with empty message", "method", "welcome", "update", update)
 		return
 	}
 	chatID := tgmsg.Chat.ID
@@ -171,7 +171,7 @@ func (h *BotHandler) updateLanguage(ctx context.Context, b *tgapi.Bot, update *t
 func (h *BotHandler) defaultMessage(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
-		slog.Error("Unexpected message with empty message", "method", "trip", "update", update)
+		slog.Error("Unexpected message with empty message", "method", "defaultMessage", "update", update)
 		return
 	}
 	chatID := tgmsg.Chat.ID
@@ -182,6 +182,6 @@ func (h *BotHandler) defaultMessage(ctx context.Context, b *tgapi.Bot, update *t
 		ParseMode:   tgmodel.ParseModeMarkdown,
 		ReplyMarkup: msg.Markup,
 	}); err != nil {
-		slog.Error("SendMessage failed", "method", "trip", "chatID", chatID, "err", err)
+		slog.Error("SendMessage failed", "method", "defaultMessage", "chatID", chatID, "err", err)
 	}
 }

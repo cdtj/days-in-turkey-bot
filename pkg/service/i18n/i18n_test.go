@@ -5,10 +5,11 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 )
 
-func TestHelloMessage(t *testing.T) {
+func TestLocales(t *testing.T) {
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})))
@@ -21,17 +22,15 @@ func TestHelloMessage(t *testing.T) {
 		Lang   string
 		Result string
 	}{
-		{"en", "This bot is an open-source project. You can contribute to Localization, Data Accuracy, and Source Code aswell. Details: https://cdtj.io/l/turkey-bot"},
-		{"ru", "Этот бот является open-source проектом. Вы можете внести свой вклад в локализацию, точность даных, а так же в исходный код проекта. Больше информации: https://cdtj.io/l/turkey-bot"},
-		{"es", "This bot is an open-source project. You can contribute to Localization, Data Accuracy, and Source Code aswell. Details: https://cdtj.io/l/turkey-bot"}, // default language for unlocalized tag
+		{"en", "This bot is an open-source project. You can contribute to Localization, Data Accuracy, and Source Code as well. Details: https://cdtj.io/l/turkey-bot"},
+		{"ru", "Этот бот является open-source проектом. Вы можете внести свой вклад в локализацию, точность данных, а так же в исходный код проекта. Больше информации: https://cdtj.io/l/turkey-bot"},
+		{"es", "This bot is an open-source project. You can contribute to Localization, Data Accuracy, and Source Code as well. Details: https://cdtj.io/l/turkey-bot"}, // default language for unlocalized tag
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.Lang, func(t *testing.T) {
 			msg := i18n.GetLocaleByString(tc.Lang).Message("Contribute")
-			if msg != tc.Result {
-				t.Errorf("Expected %q but got %q for %q\n", tc.Result, msg, tc.Lang)
-			}
+			assert.Equal(t, msg, tc.Result)
 		})
 	}
 }

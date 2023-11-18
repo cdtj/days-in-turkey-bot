@@ -60,6 +60,7 @@ func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree
 			}, nil) + "\n"
 		}
 	}
+	result += "\n\n" + locale.Message("OverstayCaution")
 	return f.markdownWrapper(result)
 }
 

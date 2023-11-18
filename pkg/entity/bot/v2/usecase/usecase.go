@@ -6,14 +6,14 @@ import (
 	"strconv"
 	"strings"
 
-	"cdtj.io/days-in-turkey-bot/entity/bot"
+	"cdtj.io/days-in-turkey-bot/entity/bot/v2"
 	"cdtj.io/days-in-turkey-bot/entity/country"
 	"cdtj.io/days-in-turkey-bot/entity/user"
 	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/i18n"
 )
 
-var _ bot.Usecasev2 = NewBotUsecase(nil, nil, nil)
+var _ bot.Usecase = NewBotUsecase(nil, nil, nil)
 
 type BotUsecase struct {
 	service   bot.Service

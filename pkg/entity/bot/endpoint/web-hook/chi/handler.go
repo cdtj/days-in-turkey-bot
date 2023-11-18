@@ -95,11 +95,6 @@ func (h *BotWebhookHandlerChi) webhook(w http.ResponseWriter, r *http.Request) {
 		if chatID > 0 {
 			h.usecase.Send(r.Context(), chatID, err.Error(), nil)
 		}
-		/*
-			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, nil)
-			return
-		*/
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, nil)

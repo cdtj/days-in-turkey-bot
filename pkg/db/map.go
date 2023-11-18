@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"log/slog"
 	"sync"
 )
 
@@ -18,6 +19,7 @@ func NewMapDB() *MapDB {
 }
 
 func (db *MapDB) Load(ctx context.Context, id any) (any, error) {
+	slog.Debug("loading", "id", id)
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 	if data, ok := db.data[id]; ok {
@@ -27,6 +29,7 @@ func (db *MapDB) Load(ctx context.Context, id any) (any, error) {
 }
 
 func (db *MapDB) Save(ctx context.Context, id any, data any) error {
+	slog.Debug("saving", "id", id)
 	db.mu.Lock()
 	defer db.mu.Unlock()
 	db.data[id] = data

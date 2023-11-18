@@ -3,7 +3,6 @@ package repo
 import (
 	"context"
 	"errors"
-	"log/slog"
 
 	"cdtj.io/days-in-turkey-bot/db"
 	"cdtj.io/days-in-turkey-bot/entity/user"
@@ -33,7 +32,7 @@ func NewUserRepo(db UserDatabase) *UserRepo {
 func (r *UserRepo) Load(ctx context.Context, userID int64) (*model.User, error) {
 	u, err := r.db.Load(ctx, userID)
 	if err != nil {
-		slog.Error("user repo", "userID", userID, "err", err)
+		// slog.Error("user repo", "userID", userID, "err", err)
 		if errors.Is(err, db.ErrDBEntryNotFound) || errors.Is(err, db.ErrDBBucketNotFound) {
 			return nil, user.ErrRepoUserNotFound
 		}

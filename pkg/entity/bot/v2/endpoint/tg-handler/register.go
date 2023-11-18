@@ -1,12 +1,12 @@
 package tghandler
 
 import (
-	"cdtj.io/days-in-turkey-bot/entity/bot"
-	telegrambot "cdtj.io/days-in-turkey-bot/telegram-bot"
+	"cdtj.io/days-in-turkey-bot/entity/bot/v2"
+	telegrambot "cdtj.io/days-in-turkey-bot/telegram-bot/v2"
 	tgapi "github.com/go-telegram/bot"
 )
 
-func BindBotHandlers(uc bot.Usecasev2) []tgapi.Option {
+func BindBotHandlers(uc bot.Usecase) []tgapi.Option {
 	h := NewBotHandler(uc)
 	return []tgapi.Option{
 		telegrambot.BindHandlerExactMessage("/start", h.welcome),

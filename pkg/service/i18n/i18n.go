@@ -79,8 +79,10 @@ func DefaultLang() language.Tag {
 }
 
 func (i *I18n) GetLocale(tag language.Tag) Localizer {
-	if locale, ok := i.locales.Load(tag); ok {
-		return locale.(*Locale)
+	for _, t := range []language.Tag{tag, i.DefaultLang()} {
+		if locale, ok := i.locales.Load(t); ok {
+			return locale.(*Locale)
+		}
 	}
 	slog.Error("empty locale", "tag", tag)
 	return nil

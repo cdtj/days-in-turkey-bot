@@ -12,10 +12,8 @@ import (
 	"testing"
 
 	"context"
-	"fmt"
-	"os/signal"
-	"syscall"
 
+	"cdtj.io/days-in-turkey-bot/cmd"
 	"cdtj.io/days-in-turkey-bot/db"
 	httpserver "cdtj.io/days-in-turkey-bot/http-server"
 	"cdtj.io/days-in-turkey-bot/model"
@@ -49,7 +47,9 @@ func BenchmarkHttpServer(b *testing.B) {
 	incr := atomic.Int64{}
 
 	srv := srvr()
-	go Serve(srv)
+	go func() {
+		cmd.Serve(srv)
+	}()
 
 	cli := cli()
 	for _, err := cli.Get(hostAddr + "/user/info/" + strconv.FormatInt(incr.Add(1), 10)); err != nil; {
@@ -73,7 +73,7 @@ func BenchmarkHttpServerWaitProfile(b *testing.B) {
 	incr := atomic.Int64{}
 
 	srv := srvr()
-	go Serve(srv)
+	go cmd.Serve(srv)
 
 	cli := cli()
 	for _, err := cli.Get(hostAddr + "/user/info/" + strconv.FormatInt(incr.Add(1), 10)); err != nil; {
@@ -148,42 +148,4 @@ func srvr() *httpserver.HttpServer {
 		Handler: router,
 	})
 	return srv
-}
-
-type Serveable interface {
-	Serve(ctx context.Context) error
-	Shutdown(ctx context.Context)
-}
-
-func Serve(serveables ...Serveable) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-
-	errch := make(chan error)
-
-	for k, s := range serveables {
-		slog.Info("starting", "key", k, "s", s)
-		go func(s Serveable) {
-			for {
-				if err := s.Serve(ctx); err != nil {
-					errch <- fmt.Errorf("%T stopped with error: %w", s, err)
-				}
-			}
-		}(s)
-	}
-
-	go func() {
-		rcvd := <-sig
-		slog.Info("stopping serveables", "signal", rcvd)
-		for _, s := range serveables {
-			s.Shutdown(ctx)
-		}
-		cancel()
-	}()
-	go func() {
-		slog.Error("serving error", "error", <-errch)
-	}()
-	<-ctx.Done()
 }

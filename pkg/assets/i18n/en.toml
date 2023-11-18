@@ -22,6 +22,8 @@ TripExplanationLimit = "*Days Limit* - days that you spent in Turkey during some
 TripExplanationResetInterval = "*Interval Reset* - days you spent above the reset interval are not counted, in case you're not breaking other limits."
 
 Overstay = "Overstayed for: {{.OverstayDays}}"
+OverstayCaution = "To avoid inconveniences add a day to your trip duration, eg if you arrive in the morning and leave at the evening your time might be rounded to a whole day."
+OverstayExplanation = "Overstay might cause an entry ban and financial penalty, that should be calculated as `BaseFee + MonthlyFee * MonthsOverstayed` but on practice it's totaly random."
 
 UserInfo = "Language: {{.Language}}"
 UserLanguagePrompt = "Choose Language"

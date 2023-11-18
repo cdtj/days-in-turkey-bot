@@ -57,7 +57,7 @@ func (db *BoltDB) Shutdown(ctx context.Context) {
 
 func (db *BoltDB) Load(ctx context.Context, key []byte, result any) error {
 	return db.db.View(func(tx *bolt.Tx) error {
-		slog.Info("loading", "bucket", db.name, "type", fmt.Sprintf("%T", result))
+		slog.Debug("loading", "bucket", db.name, "type", fmt.Sprintf("%T", result))
 		bucket := tx.Bucket(db.bucket)
 		if bucket == nil {
 			return ErrDBBucketNotFound
@@ -72,7 +72,7 @@ func (db *BoltDB) Load(ctx context.Context, key []byte, result any) error {
 
 func (db *BoltDB) Save(ctx context.Context, key []byte, data any) error {
 	return db.db.Update(func(tx *bolt.Tx) error {
-		slog.Info("saving", "bucket", db.name, "data", data, "type", fmt.Sprintf("%T", data))
+		slog.Debug("saving", "bucket", db.name, "data", data, "type", fmt.Sprintf("%T", data))
 		bucket, err := tx.CreateBucketIfNotExists(db.bucket)
 		if err != nil {
 			return err

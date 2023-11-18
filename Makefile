@@ -7,17 +7,13 @@ export BOT_WEBHOOK=${NGROK_URL}/telegram-webhook
 
 build:
 	cd ./pkg && \
-	go build -o httpsrvr cmd/http-server/main.go
+	go build -o bot cmd/bot/v2/main.go
 
 run:
-	rm -f ./pkg/httpsrvr
+	rm -f ./pkg/bot
 	$(MAKE) build
-	cd ./pkg && ./httpsrvr
+	cd ./pkg && ./bot
 
 debug:
 	cd ./pkg && \
-	go run ./cmd/bot/main.go
-
-debugv2:
-	cd ./pkg && \
-	go run ./cmd/botv2/main.go
+	go run ./cmd/bot/v2/main.go

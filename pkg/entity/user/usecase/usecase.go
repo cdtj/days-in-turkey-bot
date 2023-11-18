@@ -29,10 +29,10 @@ func NewUserUsecase(repo user.Repo, service user.Service, countryUC country.Usec
 }
 
 func (uc *UserUsecase) Create(ctx context.Context, userID int64, lang string) error {
-	if _, err := uc.get(ctx, userID); err == nil {
-		return nil
+	if _, err := uc.get(ctx, userID); err != nil {
+		return err
 	}
-	return uc.сreate(ctx, userID, lang)
+	return nil
 }
 
 func (uc *UserUsecase) Get(ctx context.Context, userID int64) (*model.User, error) {
@@ -90,7 +90,7 @@ func (uc *UserUsecase) сreate(ctx context.Context, userID int64, languageCode s
 func (uc *UserUsecase) get(ctx context.Context, userID int64) (*model.User, error) {
 	u, err := uc.repo.Load(ctx, userID)
 	if err != nil {
-		slog.Error("user uc", "userID", userID, "err", err)
+		// slog.Error("user uc", "userID", userID, "err", err)
 		if errors.Is(err, user.ErrRepoUserNotFound) {
 			if err := uc.сreate(ctx, userID, ""); err != nil {
 				return nil, err

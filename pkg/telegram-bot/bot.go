@@ -24,7 +24,7 @@ type TelegramBot struct {
 func NewTelegramBot(token, webhook string) *TelegramBot {
 	return &TelegramBot{
 		token:   token,
-		secret:  genSecret(),
+		secret:  genSecret(), // webhook secret isn't implemented by lib used, so moving to bot/v2
 		webhook: webhook,
 		debug:   false,
 	}
@@ -43,7 +43,7 @@ func (t *TelegramBot) Serve(ctx context.Context) error {
 	t.bot = bot
 	t.bot.Debug = t.debug
 	t.sender = t.bot.Send
-	slog.Info("authorized", "account", t.bot.Self.UserName)
+	slog.Info("telegram-bot", "status", "authorized", "account", t.bot.Self.UserName)
 
 	wh, err := tgbotapi.NewWebhook(t.webhook)
 	if err != nil {
@@ -53,7 +53,7 @@ func (t *TelegramBot) Serve(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	slog.Info("webhook deployed", "success", resp.Result)
+	slog.Info("telegram-bot", "status", "webhook deployed", "success", resp.Result)
 
 	<-ctx.Done()
 	return nil
@@ -72,7 +72,7 @@ func (t *TelegramBot) Shutdown(ctx context.Context) {
 	}()
 	slog.Info("telegram-bot", "wh", t.webhook, "status", "stopping")
 	if t.bot == nil {
-		slog.Error("not yet started", "wh", t.webhook)
+		slog.Error("telegram-bot", "wh", t.webhook, "status", "not yet started")
 		return
 	}
 	t.bot.StopReceivingUpdates()

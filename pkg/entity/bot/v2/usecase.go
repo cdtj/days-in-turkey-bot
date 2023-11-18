@@ -6,7 +6,7 @@ import (
 	"cdtj.io/days-in-turkey-bot/model"
 )
 
-type Usecasev2 interface {
+type Usecase interface {
 	Welcome(ctx context.Context, userID int64, lang string) *model.TelegramMessage
 	Country(ctx context.Context, userID int64) *model.TelegramMessage
 	Language(ctx context.Context, userID int64) *model.TelegramMessage
