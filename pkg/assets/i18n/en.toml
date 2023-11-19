@@ -4,6 +4,7 @@ Contribute = "This bot is an open-source project. You can contribute to Localiza
 
 Welcome = "Welcome! I'll help you to plan your trip within the allowed period to avoid overstays."
 Welcome1 = "Days eligible to stay without visa or residence permit depending on your citizenship."
+WelcomeMe = "/me - current settings"
 WelcomeCountry = "/country - to change your country"
 WelcomeLanguage = "/language - to change your language"
 WelcomeTrip = "/trip - to get more info how everything works"

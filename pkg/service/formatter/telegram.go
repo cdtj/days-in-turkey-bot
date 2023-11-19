@@ -112,6 +112,7 @@ func (f *TelegramFormatter) Welcome(language language.Tag) string {
 		locale.Message("WelcomePrompt") + "\n" +
 		locale.Message("WelcomePromptPredictEnd") + "\n" +
 		locale.Message("WelcomePromptPredictRemain") + "\n\n" +
+		locale.Message("WelcomeMe") + "\n" +
 		locale.Message("WelcomeCountry") + "\n" +
 		locale.Message("WelcomeLanguage") + "\n" +
 		locale.Message("WelcomeTrip") + "\n" +

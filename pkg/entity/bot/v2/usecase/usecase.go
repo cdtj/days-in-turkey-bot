@@ -80,6 +80,20 @@ func (uc *BotUsecase) Trip(ctx context.Context, userID int64) *model.TelegramMes
 	return model.NewTelegramMessage(uc.service.FormatMessage(ctx, user.GetLanguage(), bot.FmtdMsgTripExplanation), nil)
 }
 
+func (uc *BotUsecase) Me(ctx context.Context, userID int64) *model.TelegramMessage {
+	user, err := uc.userUC.Get(ctx, userID)
+	if err != nil {
+		slog.Error("usecase failed", "err", err)
+		return model.NewTelegramMessage(uc.service.FormatMessage(ctx, i18n.DefaultLang(), "ErrorInternal"), nil)
+	}
+	msg, err := uc.userUC.GetInfo(ctx, user)
+	if err != nil {
+		slog.Error("usecase failed", "err", err)
+		return model.NewTelegramMessage(uc.service.FormatMessage(ctx, i18n.DefaultLang(), "ErrorInternal"), nil)
+	}
+	return model.NewTelegramMessage(msg, nil)
+}
+
 func (uc *BotUsecase) UpdateLanguage(ctx context.Context, userID int64, languageCodeInput string) *model.TelegramMessage {
 	user, err := uc.userUC.Get(ctx, userID)
 	if err != nil {
