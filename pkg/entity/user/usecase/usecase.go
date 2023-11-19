@@ -8,7 +8,6 @@ import (
 	"cdtj.io/days-in-turkey-bot/entity/country"
 	"cdtj.io/days-in-turkey-bot/entity/user"
 	"cdtj.io/days-in-turkey-bot/model"
-	"cdtj.io/days-in-turkey-bot/service/i18n"
 	"golang.org/x/text/language"
 )
 
@@ -29,10 +28,7 @@ func NewUserUsecase(repo user.Repo, service user.Service, countryUC country.Usec
 }
 
 func (uc *UserUsecase) Create(ctx context.Context, userID int64, lang string) error {
-	if _, err := uc.get(ctx, userID); err != nil {
-		return err
-	}
-	return nil
+	return uc.сreate(ctx, userID, lang)
 }
 
 func (uc *UserUsecase) Get(ctx context.Context, userID int64) (*model.User, error) {
@@ -72,19 +68,24 @@ func (uc *UserUsecase) UpdateCountry(ctx context.Context, user *model.User, coun
 
 func (uc *UserUsecase) сreate(ctx context.Context, userID int64, languageCode string) error {
 	u := uc.service.DefaultUser(ctx, userID)
-	if languageCode != "" {
-		tag, err := i18n.LanguageLookup(languageCode)
-		if err != nil {
-			slog.Error("falied to init user with custom lang", "userID", userID, "languageCode", languageCode, "err", err)
-		} else {
-			u.SetLanguage(tag)
-			slog.Debug("user uc", "userID", userID, "languageCode", languageCode, "tag", tag)
+	u.SetLanguageCode(languageCode)
+	// we don't need to perform this check since the default locale will be picked on userRepo load,
+	// so, someday users with previously unsupported locales will see localized messages once they are translated
+	/*
+		if languageCode != "" {
+			tag, err := i18n.LanguageLookup(languageCode)
+			if err != nil {
+				slog.Error("falied to init user with custom lang", "userID", userID, "languageCode", languageCode, "err", err)
+			} else {
+				u.SetLanguageCode(languageCode)
+				slog.Debug("user uc", "userID", userID, "languageCode", languageCode, "tag", tag)
+			}
 		}
-	}
+	*/
 	return uc.repo.Save(ctx, userID, u)
 }
 
-// get is a most expensive method because it contains user constructor performing
+// get is the most expensive method because it contains user constructor performing
 // CountryLookup and LanguageLookup, it might be cheaper just to store them instead of
 // looking up every time
 func (uc *UserUsecase) get(ctx context.Context, userID int64) (*model.User, error) {

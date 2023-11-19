@@ -30,6 +30,10 @@ func NewBotUsecase(service bot.Service, userUC user.Usecase, countryUC country.U
 }
 
 func (uc *BotUsecase) Welcome(ctx context.Context, userID int64, lang string) *model.TelegramMessage {
+	if err := uc.userUC.Create(ctx, userID, lang); err != nil {
+		slog.Error("usecase failed", "err", err)
+		return model.NewTelegramMessage(uc.service.FormatMessage(ctx, i18n.DefaultLang(), "ErrorInternal"), nil)
+	}
 	user, err := uc.userUC.Get(ctx, userID)
 	if err != nil {
 		slog.Error("usecase failed", "err", err)
