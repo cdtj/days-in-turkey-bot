@@ -23,7 +23,7 @@ TripExplanationResetInterval = "*Interval Reset* - days you spent above the rese
 
 Overstay = "Overstayed for: {{.OverstayDays}}"
 OverstayCaution = "To avoid inconveniences add a day to your trip duration, eg if you arrive in the morning and leave at the evening your time might be rounded to a whole day."
-OverstayExplanation = "Overstay might cause an entry ban and financial penalty, that should be calculated as `BaseFee + MonthlyFee * MonthsOverstayed` but on practice it's totaly random."
+OverstayExplanation = "Overstay might cause an entry ban and a fee that must be paid at the departure. The fee formula is `Base Fee + Monthly Fee * Months Overstayed` but in practice, it's mostly random."
 
 UserInfo = "Language: {{.Language}}"
 UserLanguagePrompt = "Choose Language"

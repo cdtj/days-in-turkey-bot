@@ -33,7 +33,7 @@ func (s *UserService) UserInfo(ctx context.Context, language language.Tag, user 
 }
 
 func (s *UserService) CalculateTrip(ctx context.Context, language language.Tag, input string, daysCont, daysLimit, resetInterval int) (string, error) {
-	tree, err := calendar.MakeTree(input, daysLimit, daysCont, resetInterval)
+	tree, err := calendar.MakeTree(input, daysCont, daysLimit, resetInterval)
 	if err != nil {
 		return "", err
 	}

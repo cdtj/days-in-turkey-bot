@@ -1,6 +1,7 @@
 package formatter
 
 import (
+	"log/slog"
 	"strings"
 
 	"cdtj.io/days-in-turkey-bot/model"
@@ -27,10 +28,12 @@ func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree
 	result := ""
 	firstLine := true
 	firstEligible := true
+	overstayed := false
 	locale := f.i18n.GetLocale(language)
 	for i := tree; i != nil; i = i.Prev {
-		if i.StartPredicted {
-			if firstEligible {
+		slog.Info("TripTree", "StartDate", i.StartDate, "EndDate", i.EndDate, "TripDays", i.TripDays, "PeriodDays", i.PeriodDays, "OverstayDays", i.OverstayDays)
+		if i.StartPredicted || i.EndPredicted {
+			if i.StartPredicted && firstEligible {
 				result += locale.Message("TripEligibleHdr") + "\n"
 				firstEligible = false
 			}
@@ -39,14 +42,14 @@ func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree
 				"EndDate":    wrapCode(locale.FormatDate(i.EndDate)),
 				"TripDays":   locale.MessageWithCount("DayCounter", i.TripDays),
 				"PeriodDays": locale.MessageWithCount("DayCounter", i.PeriodDays),
-			}, nil) + "\n"
-		} else if i.EndPredicted {
-			result += locale.MessageWithTemplate("TripPredicted", map[string]interface{}{
-				"StartDate":  wrapCode(locale.FormatDate(i.StartDate)),
-				"EndDate":    wrapCode(locale.FormatDate(i.EndDate)),
-				"TripDays":   locale.MessageWithCount("DayCounter", i.TripDays),
-				"PeriodDays": locale.MessageWithCount("DayCounter", i.PeriodDays),
-			}, nil) + "\n"
+			}, nil)
+			if i.OverstayDays > 0 {
+				overstayed = true
+				result += ", " + locale.MessageWithTemplate("Overstay", map[string]interface{}{
+					"OverstayDays": wrapBold(locale.MessageWithCount("DayCounter", i.OverstayDays)),
+				}, nil) + " ⚠️"
+			}
+			result += "\n"
 		} else {
 			if firstLine {
 				result += "\n" + locale.Message("TripPast") + "\n"
@@ -57,10 +60,20 @@ func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree
 				"EndDate":    wrapCode(locale.FormatDate(i.EndDate)),
 				"TripDays":   locale.MessageWithCount("DayCounter", i.TripDays),
 				"PeriodDays": locale.MessageWithCount("DayCounter", i.PeriodDays),
-			}, nil) + "\n"
+			}, nil)
+			if i.OverstayDays > 0 {
+				overstayed = true
+				result += ", " + locale.MessageWithTemplate("Overstay", map[string]interface{}{
+					"OverstayDays": wrapBold(locale.MessageWithCount("DayCounter", i.OverstayDays)),
+				}, nil) + " ⚠️"
+			}
+			result += "\n"
 		}
 	}
 	result += "\n\n" + locale.Message("OverstayCaution")
+	if overstayed {
+		result += "\n" + locale.Message("OverstayExplanation")
+	}
 	return f.markdownWrapper(result)
 }
 

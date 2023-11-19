@@ -31,7 +31,7 @@ func TestCalendarCalc(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
-			tree, err := MakeTree(tc.Input, 90, 60, 180)
+			tree, err := MakeTree(tc.Input, 60, 90, 180)
 			if err != nil {
 				if tc.Name == "Ugly Date" && errors.Is(err, ErrInvalidDate) {
 					return
@@ -66,7 +66,7 @@ func BenchmarkCalendarCalc(b *testing.B) {
 	for _, tc := range testCases {
 		b.Run(tc.Name, func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
-				tree, err := MakeTree(tc.Input, 90, 60, 180)
+				tree, err := MakeTree(tc.Input, 60, 90, 180)
 				if err != nil {
 					b.Error(err)
 					continue

@@ -38,3 +38,10 @@ func isPastToday(dt time.Time) time.Time {
 	}
 	return dt
 }
+
+func isBeforeToday(dt time.Time) time.Time {
+	if getToday().Before(dt) {
+		return getToday()
+	}
+	return dt
+}
