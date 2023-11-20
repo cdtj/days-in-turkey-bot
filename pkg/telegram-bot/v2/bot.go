@@ -15,6 +15,7 @@ type TelegramBot struct {
 func NewTelegramBot(token string, options []tgapi.Option) *TelegramBot {
 	b, err := tgapi.New(token, options...)
 	if err != nil {
+		slog.Error("telegram-bot", "msg", "unable to create new bot", "err", err)
 		return nil
 	}
 	return &TelegramBot{

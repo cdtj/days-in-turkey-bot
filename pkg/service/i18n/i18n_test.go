@@ -22,14 +22,14 @@ func TestLocales(t *testing.T) {
 		Lang   string
 		Result string
 	}{
-		{"en", "This bot is an open-source project. You can contribute to Localization, Data Accuracy, and Source Code as well. Details: https://cdtj.io/l/turkey-bot"},
-		{"ru", "Этот бот является open-source проектом. Вы можете внести свой вклад в локализацию, точность данных, а так же в исходный код проекта. Больше информации: https://cdtj.io/l/turkey-bot"},
-		{"es", "This bot is an open-source project. You can contribute to Localization, Data Accuracy, and Source Code as well. Details: https://cdtj.io/l/turkey-bot"}, // default language for unlocalized tag
+		{"en", "If you're not addicted to github.com just post your feedback or questions to https://t.me/TurkeyDays telegram chat"},
+		{"ru", "Публичный чат для вопросов и предложений: https://t.me/TurkeyDays"},
+		{"es", "If you're not addicted to github.com just post your feedback or questions to https://t.me/TurkeyDays telegram chat"}, // default language for unlocalized tag
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.Lang, func(t *testing.T) {
-			msg := i18n.GetLocaleByString(tc.Lang).Message("Contribute")
+			msg := i18n.GetLocaleByString(tc.Lang).Message("Feedback")
 			assert.Equal(t, msg, tc.Result)
 		})
 	}
