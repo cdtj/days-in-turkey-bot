@@ -2,10 +2,6 @@
 .token
 .secret
 
-# binaries
-httpsrvr
-bot
-
 # pprof
 *.pprof
 
