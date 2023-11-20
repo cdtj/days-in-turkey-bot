@@ -24,12 +24,12 @@ func NewTelegramBot(token string, options []tgapi.Option) *TelegramBot {
 }
 
 var (
-	ErrBotNotReady = errors.New("not not started or already stopped")
+	ErrBotNotReady = errors.New("not initialized or already stopped")
 )
 
 func (t *TelegramBot) Serve(ctx context.Context) error {
 	slog.Info("telegram-bot", "status", "starting")
-	if t.bot == nil {
+	if t == nil || t.bot == nil {
 		return ErrBotNotReady
 	}
 	ok, err := t.bot.DeleteWebhook(ctx, &tgapi.DeleteWebhookParams{DropPendingUpdates: true})
