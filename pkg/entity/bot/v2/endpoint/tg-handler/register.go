@@ -15,6 +15,7 @@ func BindBotHandlers(uc bot.Usecase) []tgapi.Option {
 		telegrambot.BindHandlerExactMessage("/contribute", h.contribute),
 		telegrambot.BindHandlerExactMessage("/trip", h.trip),
 		telegrambot.BindHandlerExactMessage("/me", h.me),
+		telegrambot.BindHandlerExactMessage("/feedback", h.feedback),
 
 		telegrambot.BindHandlerPrefixCb("country", h.updateCountry),
 		telegrambot.BindHandlerPrefixCb("language", h.updateLanguage),

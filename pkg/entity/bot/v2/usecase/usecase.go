@@ -193,3 +193,13 @@ func (uc *BotUsecase) Hint(ctx context.Context, userID int64, messageCode bot.Fm
 	}
 	return model.NewTelegramMessage(uc.service.FormatMessage(ctx, user.GetLanguage(), messageCode), nil)
 }
+
+func (uc *BotUsecase) Feedback(ctx context.Context, userID int64) *model.TelegramMessage {
+	mth := "Feedback"
+	user, err := uc.userUC.Get(ctx, userID)
+	if err != nil {
+		slog.Error("usecase failed", "method", mth, "userID", userID, "err", err)
+		return model.NewTelegramMessage(uc.service.FormatMessage(ctx, i18n.DefaultLang(), "ErrorInternal"), nil)
+	}
+	return model.NewTelegramMessage(uc.service.FormatMessage(ctx, user.GetLanguage(), "Feedback"), nil)
+}

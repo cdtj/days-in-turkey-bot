@@ -13,6 +13,7 @@ type Usecase interface {
 	Contribute(ctx context.Context, userID int64) *model.TelegramMessage
 	Trip(ctx context.Context, userID int64) *model.TelegramMessage
 	Me(ctx context.Context, userID int64) *model.TelegramMessage
+	Feedback(ctx context.Context, userID int64) *model.TelegramMessage
 	UpdateLanguage(ctx context.Context, userID int64, languageCode string) *model.TelegramMessage
 	UpdateCountry(ctx context.Context, userID int64, countryInput string) *model.TelegramMessage
 	CalculateTrip(ctx context.Context, userID int64, datesInput string) *model.TelegramMessage

@@ -149,6 +149,24 @@ func (h *BotHandler) me(ctx context.Context, b *tgapi.Bot, update *tgmodel.Updat
 	}
 }
 
+func (h *BotHandler) feedback(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
+	tgmsg := update.Message
+	if tgmsg == nil {
+		slog.Error("Unexpected message with empty message", "method", "me", "update", update)
+		return
+	}
+	chatID := tgmsg.Chat.ID
+	msg := h.usecase.Feedback(ctx, chatID)
+	if _, err := b.SendMessage(ctx, &tgapi.SendMessageParams{
+		ChatID:      chatID,
+		Text:        msg.Text,
+		ParseMode:   tgmodel.ParseModeMarkdown,
+		ReplyMarkup: msg.Markup,
+	}); err != nil {
+		slog.Error("SendMessage failed", "method", "me", "chatID", chatID, "text", msg.Text, "err", err)
+	}
+}
+
 func (h *BotHandler) updateCountry(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	cb := update.CallbackQuery
 	tgmsg := update.Message

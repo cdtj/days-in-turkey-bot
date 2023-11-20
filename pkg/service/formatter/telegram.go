@@ -111,7 +111,7 @@ func (f *TelegramFormatter) Welcome(language language.Tag) string {
 		locale.Message("Welcome1") + "\n\n" +
 		locale.Message("WelcomePrompt") + "\n" +
 		locale.MessageWithTemplate("WelcomePromptPredictEnd", map[string]interface{}{
-			"SignleDate": wrapCode("31/12/2022"),
+			"SingleDate": wrapCode("31/12/2022"),
 		}, nil) + "\n" +
 		locale.MessageWithTemplate("WelcomePromptPredictRemain", map[string]interface{}{
 			"MultiDate": wrapCode("31/12/2022 15/01/2023 01/02/2023 15/02/2023"),
@@ -120,7 +120,8 @@ func (f *TelegramFormatter) Welcome(language language.Tag) string {
 		locale.Message("WelcomeCountry") + "\n" +
 		locale.Message("WelcomeLanguage") + "\n" +
 		locale.Message("WelcomeTrip") + "\n" +
-		locale.Message("WelcomeContribute"))
+		locale.Message("WelcomeContribute") + "\n" +
+		locale.Message("WelcomeFeedback"))
 }
 
 func (f *TelegramFormatter) TripExplanation(language language.Tag) string {
