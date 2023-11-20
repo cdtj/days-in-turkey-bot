@@ -64,3 +64,10 @@ func BindHandlerPrefixCb(command string, handler tgapi.HandlerFunc) tgapi.Option
 func BindHandlerDefault(handler tgapi.HandlerFunc) tgapi.Option {
 	return tgapi.WithDefaultHandler(handler)
 }
+
+func BindHandlerDefaultError(handler tgapi.ErrorsHandler) tgapi.Option {
+	return tgapi.WithErrorsHandler(handler)
+}
+func BindHandlerDefaultDebug(handler tgapi.DebugHandler) tgapi.Option {
+	return tgapi.WithDebugHandler(handler)
+}

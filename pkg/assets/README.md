@@ -1,5 +1,5 @@
 # Days in Turkey Telegram Bot Assets
-Here we have assets used in our bot configuration. Currently we countrol Countries and Internationalization. I also planned to have Penalty calculator here but on practice it doesn't work.
+Here we have assets used in our bot configuration. Currently, we control Countries and Internationalization. I also planned to have a Penalty calculator here but in practice, it doesn't work.
 
 ## Country Configs
 Check `assets/country/.template` for a sample.  
@@ -9,7 +9,7 @@ Useful resources:
 
 ## Internationalization
 Check `assets/i18n/en.toml` for a sample.  
-Usefult resources:  
+Useful resources:  
 - Golang i18n I used [nicksnyder/go-i18n](https://github.com/nicksnyder/go-i18n)
 
 ## Licence

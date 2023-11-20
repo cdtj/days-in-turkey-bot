@@ -28,10 +28,7 @@ func (h *UserHttpHandlerEcho) info(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	resp, err := h.usecase.GetInfo(c.Request().Context(), user)
-	if err != nil {
-		return err
-	}
+	resp := h.usecase.GetInfo(c.Request().Context(), user)
 	return c.JSON(http.StatusOK, &UserResponse{resp})
 }
 
@@ -52,7 +49,7 @@ func (h *UserHttpHandlerEcho) calculateTrip(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	resp, err := h.usecase.GetTrip(c.Request().Context(), user, input.Dates)
+	resp, err := h.usecase.CalculateTrip(c.Request().Context(), user, input.Dates)
 	if err != nil {
 		return err
 	}

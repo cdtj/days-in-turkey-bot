@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 
 	"cdtj.io/days-in-turkey-bot/cmd"
 	"cdtj.io/days-in-turkey-bot/db"
@@ -30,9 +32,24 @@ var (
 )
 
 func main() {
+	replace := func(groups []string, a slog.Attr) slog.Attr {
+		// Remove the directory from the source's filename.
+		if a.Key == slog.SourceKey {
+			source := a.Value.Any().(*slog.Source)
+			source.File = filepath.Base(source.File)
+		}
+		if a.Value.Kind().String() == "Time" && a.Key != slog.TimeKey {
+			return slog.Attr{
+				Key:   a.Key,
+				Value: slog.StringValue(a.Value.Time().Format("2006-01-02")),
+			}
+		}
+		return a
+	}
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		AddSource: true,
-		Level:     slog.LevelDebug,
+		AddSource:   true,
+		Level:       slog.LevelDebug,
+		ReplaceAttr: replace,
 	})))
 	i18n, err := i18n.NewI18n("i18n", defaultLang)
 	if err != nil {
@@ -56,9 +73,19 @@ func main() {
 	// telegram bot
 	botSvc := bs.NewBotService(telegramFrmtr, i18n)
 	botUC := buc.NewBotUsecase(botSvc, userUC, countryUC)
-	bot := telegrambot.NewTelegramBot(os.Getenv("BOT_TOKEN"), bh.BindBotHandlers(botUC))
+
+	// registering our handlers and replacing defaults
+	botHandlers := bh.BindBotHandlers(botUC)
+	botHandlers = append(botHandlers, telegrambot.BindHandlerDefaultDebug(func(format string, args ...any) {
+		slog.Debug("bop-api", "msg", fmt.Sprintf(format, args))
+	}))
+	botHandlers = append(botHandlers, telegrambot.BindHandlerDefaultError(func(err error) {
+		slog.Error("bop-api", "err", err)
+	}))
+	bot := telegrambot.NewTelegramBot(os.Getenv("BOT_TOKEN"), botHandlers)
 
 	// using botv2 (based on [github.com/go-telegram/bot]) to read all updates directly without callbacks
-	// so we're not using webserver to process with webhooks
+	// so we're not using webserver to process with webhooks.
+	// mayber we will use http in future for logs
 	cmd.Serve(bot, userDB)
 }

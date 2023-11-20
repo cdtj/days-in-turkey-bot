@@ -1,5 +1,5 @@
 # Days in Turkey Telegram Bot
-I get bored using Sheets to calcualte when I must to leave and when I'm able to enter. So here it is.
+I get bored using Sheets to calculate when I must leave and when I'm able to enter. So here it is.
 
 ## Usage
 Reach the bot: [@TurkeyDaysBot](https://t.me/TurkeyDaysBot)

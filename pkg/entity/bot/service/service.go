@@ -54,13 +54,13 @@ func (s *BotService) LanguageMarkup(ctx context.Context) []*model.TelegramBotCom
 	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands)}
 }
 
-func (s *BotService) FormatMessage(ctx context.Context, language language.Tag, messageID string) string {
+func (s *BotService) FormatMessage(ctx context.Context, language language.Tag, messageID bot.FmtdMsg) string {
 	switch messageID {
 	case bot.FmtdMsgWelcome:
 		return s.frmtr.Welcome(language)
 	case bot.FmtdMsgTripExplanation:
 		return s.frmtr.TripExplanation(language)
 	default:
-		return s.frmtr.FormatMessage(language, messageID)
+		return s.frmtr.FormatMessage(language, string(messageID))
 	}
 }

@@ -34,12 +34,7 @@ func (h *UserHttpHandlerChi) info(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
 		return
 	}
-	resp, err := h.usecase.GetInfo(r.Context(), user)
-	if err != nil {
-		render.Status(r, http.StatusBadRequest)
-		render.JSON(w, r, &ErrorUserResponse{err.Error()})
-		return
-	}
+	resp := h.usecase.GetInfo(r.Context(), user)
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &UserResponse{resp})
 }
@@ -68,7 +63,7 @@ func (h *UserHttpHandlerChi) calculateTrip(w http.ResponseWriter, r *http.Reques
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})
 		return
 	}
-	resp, err := h.usecase.GetTrip(r.Context(), user, input.Dates)
+	resp, err := h.usecase.CalculateTrip(r.Context(), user, input.Dates)
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})

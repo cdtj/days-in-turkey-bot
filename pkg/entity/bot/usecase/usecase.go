@@ -39,10 +39,7 @@ func (uc *BotUsecase) Welcome(ctx context.Context, chatID int64, userID int64, l
 		return err
 	}
 
-	userInfo, err := uc.userUC.GetInfo(ctx, user)
-	if err != nil {
-		return err
-	}
+	userInfo := uc.userUC.GetInfo(ctx, user)
 	if err := uc.Send(ctx, chatID, userInfo, nil); err != nil {
 		return err
 	}
@@ -88,10 +85,7 @@ func (uc *BotUsecase) UpdateLanguage(ctx context.Context, chatID int64, userID i
 	if err := uc.userUC.UpdateLanguage(ctx, user, lang); err != nil {
 		return err
 	}
-	userInfo, err := uc.userUC.GetInfo(ctx, user)
-	if err != nil {
-		return err
-	}
+	userInfo := uc.userUC.GetInfo(ctx, user)
 	return uc.Send(ctx, chatID, userInfo, nil)
 }
 
@@ -108,10 +102,7 @@ func (uc *BotUsecase) UpdateCountry(ctx context.Context, chatID int64, userID in
 	if err := uc.userUC.UpdateCountry(ctx, user, country); err != nil {
 		return err
 	}
-	userInfo, err := uc.userUC.GetInfo(ctx, user)
-	if err != nil {
-		return err
-	}
+	userInfo := uc.userUC.GetInfo(ctx, user)
 	return uc.Send(ctx, chatID, userInfo, nil)
 }
 
@@ -121,7 +112,7 @@ func (uc *BotUsecase) CalculateTrip(ctx context.Context, chatID int64, userID in
 		return err
 	}
 
-	trip, err := uc.userUC.GetTrip(ctx, user, datesInput)
+	trip, err := uc.userUC.CalculateTrip(ctx, user, datesInput)
 	if err != nil {
 		return err
 	}

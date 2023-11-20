@@ -31,7 +31,7 @@ func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree
 	overstayed := false
 	locale := f.i18n.GetLocale(language)
 	for i := tree; i != nil; i = i.Prev {
-		slog.Info("TripTree", "StartDate", i.StartDate, "EndDate", i.EndDate, "TripDays", i.TripDays, "PeriodDays", i.PeriodDays, "OverstayDays", i.OverstayDays)
+		slog.Debug("TripTree", "StartDate", i.StartDate, "EndDate", i.EndDate, "TripDays", i.TripDays, "PeriodDays", i.PeriodDays, "OverstayDays", i.OverstayDays)
 		if i.StartPredicted || i.EndPredicted {
 			if i.StartPredicted && firstEligible {
 				result += locale.Message("TripEligibleHdr") + "\n"

@@ -12,7 +12,6 @@ func calcTree(daysCont, daysLimit, resetInterval int, trips []model.Trip) *model
 	var prev, tree *model.TripTree
 
 	for _, trip := range trips {
-		slog.Info("iterating trips", "trip", trip)
 		// predicted flag to mark EndDate was predicted
 		predicted := false
 		if trip.EndDate == nil {
@@ -82,7 +81,7 @@ func daysOverstayed(startDate, endDate time.Time, daysCont, daysLimit, daysPerio
 	if overstayCont > overstayDays {
 		overstayDays = overstayCont
 	}
-	slog.Info("daysOverstayed", "StartDate", startDate, "EndDate", endDate, "dBetween", dBetween, "overstayPeriod", overstayPeriod, "overstayCont", overstayCont)
+	slog.Debug("daysOverstayed", "StartDate", startDate, "EndDate", endDate, "dBetween", dBetween, "overstayPeriod", overstayPeriod, "overstayCont", overstayCont)
 	return overstayDays
 }
 
