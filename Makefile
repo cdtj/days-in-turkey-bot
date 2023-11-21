@@ -1,10 +1,7 @@
-NGROK_URL=https://2562-188-169-160-237.ngrok.io
+TERMSITE_VER=$(shell cat VERSION)
+BOT_TOKEN=$(shell cat .token)
 
-export VERSION="0.0.1"
-export BOT_TOKEN=$(shell cat .token)
-export BOT_WEBHOOK=${NGROK_URL}/telegram-webhook
-
-.PHONY: build run debug
+.PHONY: build run debug docker
 
 build:
 	cd ./pkg && \
@@ -23,4 +20,6 @@ docker:
 	docker build --platform linux/amd64 \
 		--build-arg BOT_TOKEN="${BOT_TOKEN}" \
 		-t turkeydays:${VERSION} . && \
-	docker run --restart=unless-stopped turkeydays:${VERSION}
+	docker run --restart=unless-stopped \
+		-v /home/docker/shared/days-in-turkey-bot:/db \
+		-d turkeydays:${VERSION}
