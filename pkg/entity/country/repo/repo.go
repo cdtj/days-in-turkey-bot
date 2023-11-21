@@ -38,7 +38,7 @@ func (r *CountryRepo) BuildCache(ctx context.Context) error {
 	}
 	slog.Debug("constructing countries", "keys", keys)
 	sort.Slice(keys, func(i, j int) bool {
-		return keys[i] > keys[j]
+		return keys[i] < keys[j]
 	})
 	for _, key := range keys {
 		country, err := r.Get(ctx, key)
