@@ -1,0 +1,8 @@
+Code = "UA"
+Name = "Україна"
+Global = "Ukraine"
+Flag = "🇺🇦"
+Language = "uk"
+DaysContinual = 60
+DaysLimit = 90
+ResetInterval = 180
