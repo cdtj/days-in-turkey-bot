@@ -22,9 +22,9 @@ func TestLocales(t *testing.T) {
 		Lang   string
 		Result string
 	}{
-		{"en", "If you're not addicted to github.com just post your feedback or questions to https://t.me/TurkeyDays telegram chat"},
+		{"en", "If you're not addicted to github pull-requests just post your feedback or questions to https://t.me/TurkeyDays telegram chat"},
 		{"ru", "Публичный чат для вопросов и предложений: https://t.me/TurkeyDays"},
-		{"es", "If you're not addicted to github.com just post your feedback or questions to https://t.me/TurkeyDays telegram chat"}, // default language for unlocalized tag
+		{"es", "If you're not addicted to github pull-requests just post your feedback or questions to https://t.me/TurkeyDays telegram chat"}, // default language for unlocalized tag
 	}
 
 	for _, tc := range testCases {

@@ -65,7 +65,7 @@ func main() {
 	countryUC := cuc.NewCountryUsecase(countryRepo, countrySvc)
 
 	// user service
-	userDB := db.NewBoltDB("users", "users")
+	userDB := db.NewBoltDB("/db/users", "users")
 	userRepo := ur.NewUserRepo(ur.NewUserBoltDBAdaptor(userDB))
 	userSvc := us.NewUserService(telegramFrmtr, i18n, countrySvc)
 	userUC := uuc.NewUserUsecase(userRepo, userSvc, countryUC)
