@@ -1,0 +1,8 @@
+Code = "RU"
+Name = "Россия"
+Global = "Russia"
+Flag = "🇷🇺"
+Language = "ru"
+DaysContinual = 60
+DaysLimit = 90
+ResetInterval = 180

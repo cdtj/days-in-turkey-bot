@@ -1,0 +1,8 @@
+Code = "BY"
+Name = "Беларусь"
+Global = "Belarus"
+Flag = "🇧🇾"
+Language = "by"
+DaysContinual = 60
+DaysLimit = 90
+ResetInterval = 360

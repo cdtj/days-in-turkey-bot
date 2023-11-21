@@ -1,0 +1,12 @@
+# telegram bot token and secret
+.token
+.secret
+
+# pprof
+*.pprof
+
+# boltdb
+*.bolt
+
+# ds
+.DS_Store

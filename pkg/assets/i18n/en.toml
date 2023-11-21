@@ -1,0 +1,50 @@
+# en.toml
+LanguageName = "🇺🇸 English"
+
+Welcome = "Welcome! I'll help you to plan your trip and to avoid overstay."
+Welcome1 = "Days eligible to stay without a visa or residence permit depend on your citizenship."
+WelcomeMe = "/me - current settings"
+WelcomeCountry = "/country - to change your country"
+WelcomeLanguage = "/language - to change your language"
+WelcomeTrip = "/trip - to get more info how everything works"
+WelcomeContribute = "/contribute - to contribute to open-source world (looking for translations and data providers)"
+WelcomeFeedback = "/feedback - public chat for your questions"
+WelcomePrompt = "Just send me the dates spaces or linebreaks separated to calculate the trip:"
+WelcomePromptPredictEnd = "_sample 1:_ {{.SingleDate}} (an open date) will result in a date before you will need to leave (or will show how much you overstayed already);"
+WelcomePromptPredictRemain = "_sample 2:_ {{.MultiDate}} (a complete trip) will show you how many days are remaining and when you're able to enter for a full-period stay;"
+
+Trip = "🛬 {{.StartDate}} > 🛫 {{.EndDate}}, Duration: {{.TripDays}}, with Total: {{.PeriodDays}}"
+TripPredicted = "🛬 {{.StartDate}} > Leave until 🛫 {{.EndDate}}, Duration: {{.TripDays}}, with Total: {{.PeriodDays}}"
+TripPast = "Previous Trips:"
+TripEligibleHdr = "You're eligible for the following trips:"
+TripExplanation = "Depending on your country you're allowed to stay in Turkey for a while. There are 3 metrics that you need to look at:"
+TripExplanationContinual = "*Continual Days* - days that you're allowed to stay without crossing the Turkey border;"
+TripExplanationLimit = "*Days Limit* - days that you spent in Turkey during some interval;"
+TripExplanationResetInterval = "*Interval Reset* - days you spent above the reset interval are not counted, in case you're not breaking other limits."
+
+Overstay = "Overstayed for: {{.OverstayDays}}"
+OverstayCaution = "To avoid inconveniences add a day to your trip duration, eg if you arrive in the morning and leave at the evening your time might be rounded to a whole day."
+OverstayExplanation = "Overstay might cause an entry ban and a fee that must be paid at the departure. The fee formula is `Base Fee + (Monthly Fee * Months Overstayed)` but in practice, it's mostly random."
+
+UserInfo = "Language: {{.Language}}"
+UserLanguagePrompt = "Choose Language"
+UserLanguageChanged = "Language Changed"
+UserCountryPrompt = "Choose Country"
+UserCountryChanged = "Country Changed"
+UserCountryCustom = "If your country isn't presented, you can send me the `/custom` command followed by the allowed days in the format: `/custom {Days Continual} {Days Limit} {Reset Interval}` and they will be used in the metrics.\n\nExample: `/custom 60 90 180`\n\nDetails: /trip"
+
+CountryInfo = "Country: {{.Flag}} {{.Name}}"
+CountryDays = "Days Allowed - Continual: {{.Continual}} / Limit: {{.Limit}} / Reset Interval: {{.ResetInterval}}"
+
+# only exposable errors here
+ErrorInvalidDate = "invalid date, the date should be in the format: `day/month/year`, example: `31/12/2023`"
+ErrorInvalidCustomCountry = "invalid custom duration config,\nmust be in the format: `/custom {Days Continual} {Days Limit} {Reset Interval}`,\nexample: `/custom 60 90 180`\n\nDetails: /trip"
+ErrorInternal = "internal service error, try again later"
+
+Contribute = "This bot is an open-source project. You can contribute to Localization, Data Accuracy, and Source Code as well. Request a feature or submit a bug-report. Details: https://cdtj.io/l/turkey-bot"
+Feedback = "If you're not addicted to github.com just post your feedback or questions to https://t.me/TurkeyDays telegram chat"
+
+[DayCounter]
+description = "Display day/days on condition"
+one = "{{.Count}} day"
+other = "{{.Count}} days"
