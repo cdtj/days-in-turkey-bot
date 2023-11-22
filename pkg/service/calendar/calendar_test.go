@@ -1,7 +1,7 @@
 package calendar
 
 import (
-	"errors"
+	"fmt"
 	"log/slog"
 	"os"
 	"testing"
@@ -21,21 +21,22 @@ func TestCalendarCalc(t *testing.T) {
 	}
 
 	testCases := []struct {
-		Name  string
-		Input string
+		Name      string
+		ShouldErr bool
+		Input     string
 	}{
-		{"Ugly Date", "asd"},
-		{"Predict End Date", "11/11/2023"},
-		{"Predict Eligible", "11/11/2023 11/12/2023"},
-		{"Bunch Of Inputs", "11/01/2023 11/02/2023 11/03/2023 11/04/2023 11/05/2023 11/06/2023 11/07/2023 11/08/2023 11/09/2023 11/10/2023"},
+		{"Ugly Date", true, "asd"},
+		{"Predict End Date", false, "11/11/2023"},
+		{"Predict Eligible", false, "11/11/2023 11/12/2023"},
+		{"Bunch Of Inputs", false, "11/01/2023 11/02/2023 11/03/2023 11/04/2023 11/05/2023 11/06/2023 11/07/2023 11/08/2023 11/09/2023 11/10/2023"},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			tree, err := MakeTree(tc.Input, 60, 90, 180)
-			if err != nil {
-				if tc.Name == "Ugly Date" && errors.Is(err, ErrInvalidDate) {
-					return
-				}
+			if tc.ShouldErr && err == nil {
+				t.Error(fmt.Errorf("%s wasn't catched", tc.Name))
+				return
+			} else if !tc.ShouldErr && err != nil {
 				t.Error(err)
 				return
 			}
