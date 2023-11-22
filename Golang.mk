@@ -1,5 +1,6 @@
 export VERSION=$(shell cat VERSION)
 export BOT_TOKEN=$(shell cat .token)
+export BOLDTB_PATH=./
 
 .PHONY: build run debug
 

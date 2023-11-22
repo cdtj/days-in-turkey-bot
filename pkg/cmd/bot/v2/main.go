@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"os"
@@ -65,7 +66,11 @@ func main() {
 	countryUC := cuc.NewCountryUsecase(countryRepo, countrySvc)
 
 	// user service
-	userDB := db.NewBoltDB("/db/users", "users")
+	dbPath := os.Getenv("BOLDTB_PATH")
+	if dbPath == "" {
+		dbPath = "/db/"
+	}
+	userDB := db.NewBoltDB(dbPath+"users", "users")
 	userRepo := ur.NewUserRepo(ur.NewUserBoltDBAdaptor(userDB))
 	userSvc := us.NewUserService(telegramFrmtr, i18n, countrySvc)
 	userUC := uuc.NewUserUsecase(userRepo, userSvc, countryUC)
@@ -83,6 +88,12 @@ func main() {
 		slog.Error("bop-api", "err", err)
 	}))
 	bot := telegrambot.NewTelegramBot(os.Getenv("BOT_TOKEN"), botHandlers)
+	if err := botUC.RegisterCommands(context.Background(), bot); err != nil {
+		panic(err)
+	}
+	if err := botUC.RegisterDescription(context.Background(), bot); err != nil {
+		panic(err)
+	}
 
 	// using botv2 (based on [github.com/go-telegram/bot]) to read all updates directly without callbacks
 	// so we're not using webserver to process with webhooks.
