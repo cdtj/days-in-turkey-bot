@@ -37,8 +37,14 @@ CountryInfo = "Страна: {{.Flag}} {{.Name}}"
 CountryDays = "Дней разрешено - Единовременно: {{.Continual}} / Всего: {{.Limit}} / Обнуление: {{.ResetInterval}}"
 
 ErrorInvalidDate = "неправильная дата, дата должна быть в формате: `день/месяц/год`, например: `31/12/2023`"
+ErrorInvalidDatePeriod = "неправильный {{.PeriodName}}: {{.PeriodValue}} [{{.DateInput}}]"
 ErrorInvalidCustomCountry = "неправильные настройки сроков пребывания,\nукажите в формате: `/custom {Непрерывных дней} {Лимит дней} {Обнуление срока}`,\nнапример: `/custom 60 90 180`\n\nПодробнее: /trip"
+ErrorInvalidCustomCountrySeq = "invalid custom duration config,\nmust be in the following sequence: `{Days Continual}` less than `{Days Limit}` less than `{Reset Interval}`,\nexample: `/custom 60 90 180`\n\nDetails: /trip"
 ErrorInternal = "внутренняя ошибка, попробуйте позже"
+
+DatePeriodDay = "день"
+DatePeriodMonth = "месяц"
+DatePeriodYear = "год"
 
 Contribute = "Этот бот является open-source проектом. Вы можете внести свой вклад в локализацию, точность данных, а так же в исходный код проекта. Создать заявку на добавление функционала или баг-репорт. Больше информации: https://cdtj.io/l/turkey-bot"
 Feedback = "Публичный чат для вопросов и предложений: https://t.me/TurkeyDays"

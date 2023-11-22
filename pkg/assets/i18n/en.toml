@@ -37,9 +37,15 @@ CountryInfo = "Country: {{.Flag}} {{.Name}}"
 CountryDays = "Days Allowed - Continual: {{.Continual}} / Limit: {{.Limit}} / Reset Interval: {{.ResetInterval}}"
 
 # only exposable errors here
-ErrorInvalidDate = "invalid date, the date should be in the format: `day/month/year`, example: `31/12/2023`"
+ErrorInvalidDate = "invalid date: {{.DateInput}}, the date should be in the format: `day/month/year`, example: `31/12/2023`"
+ErrorInvalidDatePeriod = "invalid {{.PeriodName}}: {{.PeriodValue}} [{{.DateInput}}]"
 ErrorInvalidCustomCountry = "invalid custom duration config,\nmust be in the format: `/custom {Days Continual} {Days Limit} {Reset Interval}`,\nexample: `/custom 60 90 180`\n\nDetails: /trip"
+ErrorInvalidCustomCountrySeq = "invalid custom duration config,\nmust be in the following sequence: `{Days Continual}` less than `{Days Limit}` less than `{Reset Interval}`,\nexample: `/custom 60 90 180`\n\nDetails: /trip"
 ErrorInternal = "internal service error, try again later"
+
+DatePeriodDay = "day"
+DatePeriodMonth = "month"
+DatePeriodYear = "year"
 
 Contribute = "This bot is an open-source project. You can contribute to Localization, Data Accuracy, and Source Code as well. Request a feature or submit a bug-report. Details: https://cdtj.io/l/turkey-bot"
 Feedback = "If you're not addicted to github pull-requests just post your feedback or questions to https://t.me/TurkeyDays telegram chat"

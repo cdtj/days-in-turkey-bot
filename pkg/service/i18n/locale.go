@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"cdtj.io/days-in-turkey-bot/model"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
 )
@@ -15,7 +16,10 @@ type Localizer interface {
 	Message(messageID string) string
 	MessageWithCount(messageID string, count interface{}) string
 	MessageWithTemplate(messageID string, tpl map[string]interface{}, plural interface{}) string
-	Error(messageID string, err error) string
+
+	Error(err *model.LError) string
+	ErrorWithDefault(err error, defaultMessageID string) string
+
 	FormatDate(dt time.Time) string
 }
 
@@ -59,8 +63,24 @@ func (l *Locale) MessageWithTemplate(messageID string, tpl map[string]interface{
 	return msg
 }
 
-func (l *Locale) Error(messageID string, err error) string {
-	return l.MessageWithTemplate(messageID, map[string]interface{}{"Error": err}, nil)
+func (l *Locale) ErrorWithDefault(err error, defaultMessageID string) string {
+	switch lerr := err.(type) {
+	case *model.LError:
+		return l.Error(lerr)
+	}
+	return l.Message(defaultMessageID)
+}
+
+func (l *Locale) Error(err *model.LError) string {
+	if err.Template != nil {
+		for key := range err.Template {
+			switch val := err.Template[key].(type) {
+			case model.LErrorExpandable:
+				err.Template[key] = l.Message(string(val))
+			}
+		}
+	}
+	return l.MessageWithTemplate(err.Code, err.Template, nil)
 }
 
 const dateLayout = "02/01/2006"

@@ -57,6 +57,8 @@ func BenchmarkCalendarCalc(b *testing.B) {
 		Name  string
 		Input string
 	}{
+		// just benchmarking here, no uglies
+		// {"Ugly Date", "lol"},
 		{"Predict End Date", "11/11/2023"},
 		{"Predict Eligible", "11/11/2023 11/12/2023"},
 		{"Bunch Of Inputs", "11/01/2023 11/02/2023 11/03/2023 11/04/2023 11/05/2023 11/06/2023 11/07/2023 11/08/2023 11/09/2023 11/10/2023"},
@@ -66,12 +68,13 @@ func BenchmarkCalendarCalc(b *testing.B) {
 	for _, tc := range testCases {
 		b.Run(tc.Name, func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
+				fmtr := formatter.NewTelegramFormatter(i18n, false)
 				tree, err := MakeTree(tc.Input, 60, 90, 180)
 				if err != nil {
-					b.Error(err)
+					b.Error(fmtr.FormatError(i18n.DefaultLang(), err))
 					continue
 				}
-				formatter.NewTelegramFormatter(i18n, false).TripTree(i18n.DefaultLang(), tree)
+				fmtr.TripTree(i18n.DefaultLang(), tree)
 			}
 		})
 	}

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"cdtj.io/days-in-turkey-bot/model"
 	"golang.org/x/exp/slices"
 )
 
@@ -54,7 +55,7 @@ func processInput(input string) ([]time.Time, error) {
 		dates = append(dates, dt)
 	}
 	if len(dates) == 0 {
-		return nil, ErrInvalidDate
+		return nil, model.NewLError("ErrorInvalidDate", map[string]any{"DateInput": ""}, ErrInvalidDate)
 	}
 	slices.SortFunc(dates, func(a, b time.Time) int { return a.Compare(b) })
 
@@ -68,22 +69,30 @@ func parseDate(dt string) (time.Time, error) {
 	if len(dtArr) == 3 {
 		year, err := strconv.Atoi(dtArr[2])
 		if err != nil {
-			return nullTime, errors.Join(ErrInvalidYear, err)
+			return nullTime, model.NewLError("ErrorInvalidDatePeriod",
+				map[string]any{"DateInput": dt, "PeriodName": "DatePeriodYear", "PeriodValue": dtArr[2]},
+				errors.Join(ErrInvalidYear, err))
 		}
 		if year < 2000 {
 			year += 2000
 		}
 		month, err := strconv.Atoi(dtArr[1])
 		if err != nil {
-			return nullTime, errors.Join(ErrInvalidMonth, err)
+			return nullTime, model.NewLError("ErrorInvalidDatePeriod",
+				map[string]any{"DateInput": dt, "PeriodName": "DatePeriodMonth", "PeriodValue": dtArr[1]},
+				errors.Join(ErrInvalidMonth, err))
 		}
 		day, err := strconv.Atoi(dtArr[0])
 		if err != nil {
-			return nullTime, errors.Join(ErrInvalidDay, err)
+			return nullTime, model.NewLError("ErrorInvalidDatePeriod",
+				map[string]any{"DateInput": dt, "PeriodName": "DatePeriodDay", "PeriodValue": dtArr[0]},
+				errors.Join(ErrInvalidDay, err))
 		}
 		return time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC), nil
 	}
-	return nullTime, ErrInvalidDate
+	return nullTime, model.NewLError("ErrorInvalidDate",
+		map[string]any{"DateInput": dt},
+		ErrInvalidDate)
 }
 
 func getSeparator(str string) string {

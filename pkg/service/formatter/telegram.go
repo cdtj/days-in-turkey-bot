@@ -105,6 +105,11 @@ func (f *TelegramFormatter) FormatMessage(language language.Tag, messageID strin
 	return f.markdownWrapper(locale.Message(messageID))
 }
 
+func (f *TelegramFormatter) FormatError(language language.Tag, err error) string {
+	locale := f.i18n.GetLocale(language)
+	return f.markdownWrapper(locale.ErrorWithDefault(err, "ErrorInternal"))
+}
+
 func (f *TelegramFormatter) Welcome(language language.Tag) string {
 	locale := f.i18n.GetLocale(language)
 	return f.markdownWrapper(locale.Message("Welcome") + " " +

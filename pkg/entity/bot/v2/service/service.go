@@ -52,6 +52,10 @@ func (s *BotService) FormatMessage(ctx context.Context, language language.Tag, m
 	}
 }
 
+func (s *BotService) FormatError(ctx context.Context, language language.Tag, err error) string {
+	return s.frmtr.FormatError(language, err)
+}
+
 func (s *BotService) CommandsToInlineKeboard(ctx context.Context, commands []*model.TelegramBotCommandRow) *tgmodel.InlineKeyboardMarkup {
 	ikbs := make([]tgmodel.InlineKeyboardButton, 0)
 	for _, command := range commands {
