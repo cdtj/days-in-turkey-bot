@@ -1,0 +1,9 @@
+Code = "TM"
+Name = "Türkmenistan"
+Global = "Turkmenistan"
+Flag = "🇹🇲"
+Language = "tk"
+DaysContinual = 60
+DaysLimit = 90
+ResetInterval = 180
+NonVisa = true

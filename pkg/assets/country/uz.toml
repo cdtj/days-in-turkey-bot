@@ -1,0 +1,9 @@
+Code = "UZ"
+Name = "O‘zbekiston"
+Global = "Uzbekistan"
+Flag = "🇺🇿"
+Language = "uz"
+DaysContinual = 60
+DaysLimit = 90
+ResetInterval = 180
+NonVisa = true

@@ -1,0 +1,9 @@
+Code = "EE"
+Name = "Eesti"
+Global = "Estonia"
+Flag = "🇪🇪"
+Language = "et"
+DaysContinual = 60
+DaysLimit = 90
+ResetInterval = 180
+NonVisa = true
