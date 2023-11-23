@@ -2,14 +2,14 @@
 LanguageName = "🇺🇸 English"
 
 CommandMe = "current settings"
-CommandCountry = "to change your country"
-CommandLanguage = "to change your language"
-CommandTrip = "to get more info how everything works"
-CommandContribute = "to contribute to open-source world (looking for translations and data providers)"
+CommandCountry = "change your country"
+CommandLanguage = "change your language"
+CommandTrip = "how everything works"
+CommandContribute = "contribute to open-source world (looking for translations and data providers)"
 CommandFeedback = "public chat for your questions"
 
-BotDescription = "I'll help you to plan your trip and to avoid overstay."
-BotAbout = "I'll help you to plan your trip and to avoid overstay."
+BotDescription = "I'll help you to plan your trip and to avoid overstay.\n\nDiscuss: @TurkeyDays"
+BotAbout = "I'll help you to plan your trip and to avoid overstay.\n\nDiscuss: @TurkeyDays"
 
 Welcome = "Welcome! I'll help you to plan your trip and to avoid overstay."
 Welcome1 = "Days eligible to stay without a visa or residence permit depend on your citizenship."

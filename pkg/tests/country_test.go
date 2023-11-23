@@ -24,7 +24,7 @@ const (
 
 func BenchmarkCountry(b *testing.B) {
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level: slog.LevelError,
 	})))
 	i18n, err := i18n.NewI18n("i18n", language.English.String())
 	if err != nil {

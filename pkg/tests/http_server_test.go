@@ -42,7 +42,7 @@ const RunMultiplier = 100
 
 func BenchmarkHttpServer(b *testing.B) {
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level: slog.LevelError,
 	})))
 	incr := atomic.Int64{}
 
@@ -68,7 +68,7 @@ func BenchmarkHttpServer(b *testing.B) {
 
 func BenchmarkHttpServerWaitProfile(b *testing.B) {
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level: slog.LevelError,
 	})))
 	incr := atomic.Int64{}
 

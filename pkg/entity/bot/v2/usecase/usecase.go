@@ -11,7 +11,6 @@ import (
 	"cdtj.io/days-in-turkey-bot/entity/user"
 	"cdtj.io/days-in-turkey-bot/model"
 	"cdtj.io/days-in-turkey-bot/service/i18n"
-	telegrambot "cdtj.io/days-in-turkey-bot/telegram-bot/v2"
 )
 
 var _ bot.Usecase = NewBotUsecase(nil, nil, nil)
@@ -58,7 +57,7 @@ func (uc *BotUsecase) Country(ctx context.Context, userID int64) *model.Telegram
 		return model.NewTelegramMessage(uc.service.FormatError(ctx, i18n.DefaultLang(), err), nil)
 	}
 	return model.NewTelegramMessage(uc.service.FormatMessage(ctx, user.GetLanguage(), "UserCountryPrompt"),
-		uc.service.CommandsToInlineKeboard(ctx, uc.service.CountryMarkup(ctx, uc.countryUC.ListFromCache(ctx))))
+		uc.service.CommandsToInlineKeboard(ctx, uc.service.CommandsFromCountry(ctx, uc.countryUC.ListFromCache(ctx))))
 }
 
 func (uc *BotUsecase) Language(ctx context.Context, userID int64) *model.TelegramMessage {
@@ -69,7 +68,7 @@ func (uc *BotUsecase) Language(ctx context.Context, userID int64) *model.Telegra
 		return model.NewTelegramMessage(uc.service.FormatError(ctx, i18n.DefaultLang(), err), nil)
 	}
 	return model.NewTelegramMessage(uc.service.FormatMessage(ctx, user.GetLanguage(), "UserLanguagePrompt"),
-		uc.service.CommandsToInlineKeboard(ctx, uc.service.LanguageMarkup(ctx)))
+		uc.service.CommandsToInlineKeboard(ctx, uc.service.CommandsFromLanguage(ctx)))
 }
 
 func (uc *BotUsecase) Contribute(ctx context.Context, userID int64) *model.TelegramMessage {
@@ -208,28 +207,12 @@ func (uc *BotUsecase) Feedback(ctx context.Context, userID int64) *model.Telegra
 	return model.NewTelegramMessage(uc.service.FormatMessage(ctx, user.GetLanguage(), "Feedback"), nil)
 }
 
-func (uc *BotUsecase) RegisterCommands(ctx context.Context, bot *telegrambot.TelegramBot) error {
-	mth := "RegisterCommands"
-	rows := uc.service.CommandsMarkup(ctx)
-	for _, row := range rows {
-		slog.Info("usecase", "method", mth, "row", row)
-		if err := bot.SetCommands(ctx, row.Commands, row.LanguageCode); err != nil {
-			slog.Error("usecase failed", "method", mth, "err", err)
-			return err
-		}
-	}
-	return nil
+func (uc *BotUsecase) LocalizeCommands(ctx context.Context, commands []*model.TelegramBotCommand) []*model.TelegramBotCommandRow {
+	// mth := "LocalizeCommands"
+	return uc.service.LocalizeCommands(ctx, commands)
 }
 
-func (uc *BotUsecase) RegisterDescription(ctx context.Context, bot *telegrambot.TelegramBot) error {
-	mth := "RegisterDescription"
-	rows := uc.service.DescriptionMarkup(ctx)
-	for _, row := range rows {
-		slog.Info("usecase", "method", mth, "row", row)
-		if err := bot.SetInfo(ctx, row.Description, row.About, row.LanguageCode); err != nil {
-			slog.Error("usecase failed", "method", mth, "err", err)
-			return err
-		}
-	}
-	return nil
+func (uc *BotUsecase) LocalizeDescription(ctx context.Context, description *model.TelegramBotDescription) []*model.TelegramBotDescription {
+	// mth := "LocalizeDescription"
+	return uc.service.LocalizeDescription(ctx, description)
 }

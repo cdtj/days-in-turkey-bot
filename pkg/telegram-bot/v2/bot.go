@@ -63,7 +63,7 @@ func (t *TelegramBot) SetCommands(ctx context.Context, commands []*model.Telegra
 	return err
 }
 
-func (t *TelegramBot) SetInfo(ctx context.Context, description, about, languageCode string) error {
+func (t *TelegramBot) SetDescription(ctx context.Context, description, about, languageCode string) error {
 	if _, err := t.bot.SetMyDescription(ctx, &tgapi.SetMyDescriptionParams{
 		Description:  description,
 		LanguageCode: languageCode,

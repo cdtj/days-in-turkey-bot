@@ -62,9 +62,9 @@ func (uc *BotUsecase) Prompt(ctx context.Context, chatID int64, userID int64, pr
 
 	switch prompt {
 	case BotCommandCountry:
-		return uc.Send(ctx, chatID, uc.service.FormatMessage(ctx, user.GetLanguage(), "UserCountryPrompt"), uc.service.CountryMarkup(ctx, uc.countryUC.ListFromCache(ctx)))
+		return uc.Send(ctx, chatID, uc.service.FormatMessage(ctx, user.GetLanguage(), "UserCountryPrompt"), uc.service.CommandsFromCountry(ctx, uc.countryUC.ListFromCache(ctx)))
 	case BotCommandLanguage:
-		return uc.Send(ctx, chatID, uc.service.FormatMessage(ctx, user.GetLanguage(), "UserLanguagePrompt"), uc.service.LanguageMarkup(ctx))
+		return uc.Send(ctx, chatID, uc.service.FormatMessage(ctx, user.GetLanguage(), "UserLanguagePrompt"), uc.service.CommandsFromLanguage(ctx))
 	case BotCommandContribute:
 		return uc.Send(ctx, chatID, uc.service.FormatMessage(ctx, user.GetLanguage(), "Contribute"), nil)
 	case BotCommandTrip:

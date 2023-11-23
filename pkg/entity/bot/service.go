@@ -10,6 +10,6 @@ import (
 type Service interface {
 	Send(ctx context.Context, chatID int64, text string, replyMarkup []*model.TelegramBotCommandRow) error
 	FormatMessage(ctx context.Context, language language.Tag, messageID FmtdMsg) string
-	CountryMarkup(ctx context.Context, countries []*model.Country) []*model.TelegramBotCommandRow
-	LanguageMarkup(ctx context.Context) []*model.TelegramBotCommandRow
+	CommandsFromCountry(ctx context.Context, countries []*model.Country) []*model.TelegramBotCommandRow
+	CommandsFromLanguage(ctx context.Context) []*model.TelegramBotCommandRow
 }

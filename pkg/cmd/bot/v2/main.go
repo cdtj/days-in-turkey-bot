@@ -88,15 +88,37 @@ func main() {
 		slog.Error("bop-api", "err", err)
 	}))
 	bot := telegrambot.NewTelegramBot(os.Getenv("BOT_TOKEN"), botHandlers)
-	if err := botUC.RegisterCommands(context.Background(), bot); err != nil {
-		panic(err)
+	if commandsRows := botUC.LocalizeCommands(context.Background(), BotCommands()); commandsRows != nil {
+		for _, commandRow := range commandsRows {
+			bot.SetCommands(context.Background(), commandRow.Commands, commandRow.LanguageCode)
+		}
 	}
-	if err := botUC.RegisterDescription(context.Background(), bot); err != nil {
-		panic(err)
+	if descriptionRows := botUC.LocalizeDescription(context.Background(), BotDescription()); descriptionRows != nil {
+		for _, descriptionRow := range descriptionRows {
+			bot.SetDescription(context.Background(), descriptionRow.Description, descriptionRow.About, descriptionRow.LanguageCode)
+		}
 	}
 
 	// using botv2 (based on [github.com/go-telegram/bot]) to read all updates directly without callbacks
 	// so we're not using webserver to process with webhooks.
 	// mayber we will use http in future for logs
 	cmd.Serve(bot, userDB)
+}
+
+// BotCommands returns list of known commands,
+// feels like it needs to be exported as a config
+func BotCommands() []*model.TelegramBotCommand {
+	return []*model.TelegramBotCommand{
+		model.NewTelegramBotCommand("CommandMe", "me"),
+		model.NewTelegramBotCommand("CommandCountry", "country"),
+		model.NewTelegramBotCommand("CommandLanguage", "language"),
+		model.NewTelegramBotCommand("CommandTrip", "trip"),
+		model.NewTelegramBotCommand("CommandContribute", "contribute"),
+		model.NewTelegramBotCommand("CommandFeedback", "feedback"),
+	}
+}
+
+// BotDescription returns placeholders for Bot About and Bot Description used in l10n
+func BotDescription() *model.TelegramBotDescription {
+	return model.NewTelegramBotDescription("BotDescription", "BotAbout", "")
 }

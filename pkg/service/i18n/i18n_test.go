@@ -12,7 +12,7 @@ import (
 
 func TestLocales(t *testing.T) {
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level: slog.LevelError,
 	})))
 	i18n, err := NewI18n("i18n", language.English.String())
 	if err != nil {
@@ -38,7 +38,7 @@ func TestLocales(t *testing.T) {
 
 func TestExpandableError(t *testing.T) {
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level: slog.LevelError,
 	})))
 	i18n, err := NewI18n("i18n", language.English.String())
 	if err != nil {
