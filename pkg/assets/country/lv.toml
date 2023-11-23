@@ -1,0 +1,9 @@
+Code = "LV"
+Name = "Latvija"
+Global = "Latvia"
+Flag = "🇱🇻"
+Language = "lv"
+DaysContinual = 30
+DaysLimit = 90
+ResetInterval = 180
+NonVisa = true

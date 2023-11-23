@@ -1,0 +1,9 @@
+Code = "GE"
+Name = "საქართველო"
+Global = "Georgia"
+Flag = "🇬🇪"
+Language = "ka"
+DaysContinual = 90
+DaysLimit = 90
+ResetInterval = 180
+NonVisa = true

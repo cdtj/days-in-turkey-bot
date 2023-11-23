@@ -1,0 +1,9 @@
+Code = "AZ"
+Name = "Azərbaycan"
+Global = "Azerbaijan"
+Flag = "🇦🇿"
+Language = "az"
+DaysContinual = 90
+DaysLimit = 90
+ResetInterval = 180
+NonVisa = true

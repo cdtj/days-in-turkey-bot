@@ -1,0 +1,9 @@
+Code = "ro-MD"
+Name = "Moldova"
+Global = "Moldova"
+Flag = "🇲🇩"
+Language = "ro"
+DaysContinual = 90
+DaysLimit = 90
+ResetInterval = 180
+NonVisa = true

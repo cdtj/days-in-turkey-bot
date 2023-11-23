@@ -1,0 +1,9 @@
+Code = "TJ"
+Name = "Тоҷикистон"
+Global = "Tajikistan"
+Flag = "🇹🇯"
+Language = "tg"
+DaysContinual = 90
+DaysLimit = 90
+ResetInterval = 180
+NonVisa = true

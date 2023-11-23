@@ -1,0 +1,9 @@
+Code = "KG"
+Name = "Кыргызстан"
+Global = "Kyrgyzstan"
+Flag = "🇰🇬"
+Language = "ky"
+DaysContinual = 90
+DaysLimit = 90
+ResetInterval = 180
+NonVisa = true

@@ -1,0 +1,9 @@
+Code = "KZ"
+Name = "Қазақстан"
+Global = "Kazakhstan"
+Flag = "🇰🇿"
+Language = "kk"
+DaysContinual = 90
+DaysLimit = 90
+ResetInterval = 180
+NonVisa = true
