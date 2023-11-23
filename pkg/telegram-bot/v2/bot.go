@@ -5,7 +5,9 @@ import (
 	"errors"
 	"log/slog"
 
+	"cdtj.io/days-in-turkey-bot/model"
 	tgapi "github.com/go-telegram/bot"
+	"github.com/go-telegram/bot/models"
 )
 
 type TelegramBot struct {
@@ -46,6 +48,37 @@ func (t *TelegramBot) Shutdown(ctx context.Context) {
 	slog.Info("telegram-bot", "status", "stopped")
 }
 
+func (t *TelegramBot) SetCommands(ctx context.Context, commands []*model.TelegramBotCommand, languageCode string) error {
+	tgcmds := make([]models.BotCommand, 0, len(commands))
+	for _, command := range commands {
+		tgcmds = append(tgcmds, models.BotCommand{
+			Command:     command.Command,
+			Description: command.Caption,
+		})
+	}
+	_, err := t.bot.SetMyCommands(ctx, &tgapi.SetMyCommandsParams{
+		Commands:     tgcmds,
+		LanguageCode: languageCode,
+	})
+	return err
+}
+
+func (t *TelegramBot) SetInfo(ctx context.Context, description, about, languageCode string) error {
+	if _, err := t.bot.SetMyDescription(ctx, &tgapi.SetMyDescriptionParams{
+		Description:  description,
+		LanguageCode: languageCode,
+	}); err != nil {
+		return err
+	}
+	if _, err := t.bot.SetMyShortDescription(ctx, &tgapi.SetMyShortDescriptionParams{
+		ShortDescription: about,
+		LanguageCode:     languageCode,
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func BindHandlerExactMessage(command string, handler tgapi.HandlerFunc) tgapi.Option {
 	return tgapi.WithMessageTextHandler(command, tgapi.MatchTypeExact, handler)
 }
@@ -69,6 +102,7 @@ func BindHandlerDefault(handler tgapi.HandlerFunc) tgapi.Option {
 func BindHandlerDefaultError(handler tgapi.ErrorsHandler) tgapi.Option {
 	return tgapi.WithErrorsHandler(handler)
 }
+
 func BindHandlerDefaultDebug(handler tgapi.DebugHandler) tgapi.Option {
 	return tgapi.WithDebugHandler(handler)
 }

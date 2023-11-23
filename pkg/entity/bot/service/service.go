@@ -42,7 +42,7 @@ func (s *BotService) CountryMarkup(ctx context.Context, countries []*model.Count
 	for _, country := range countries {
 		commands = append(commands, model.NewTelegramBotCommand(country.GetFlag()+" "+country.GetName(), "country "+country.GetCode()))
 	}
-	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands)}
+	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands, "")}
 }
 
 func (s *BotService) LanguageMarkup(ctx context.Context) []*model.TelegramBotCommandRow {
@@ -51,7 +51,7 @@ func (s *BotService) LanguageMarkup(ctx context.Context) []*model.TelegramBotCom
 	for _, cmd := range locales {
 		commands = append(commands, model.NewTelegramBotCommand(cmd.Name, "language "+cmd.Tag.String()))
 	}
-	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands)}
+	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands, "")}
 }
 
 func (s *BotService) FormatMessage(ctx context.Context, language language.Tag, messageID bot.FmtdMsg) string {
