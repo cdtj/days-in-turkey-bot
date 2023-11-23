@@ -24,21 +24,39 @@ func NewBotService(frmtr formatter.Formatter, i18n i18n.I18ner) *BotService {
 		i18n:  i18n,
 	}
 }
+
+const (
+	inlineKeyboardCountryMaxLen  = 3
+	inlineKeyboardLanguageMaxLen = 3
+)
+
 func (s *BotService) CommandsFromCountry(ctx context.Context, countries []*model.Country) []*model.TelegramBotCommandRow {
-	commands := make([]*model.TelegramBotCommand, 0, len(countries))
-	for _, country := range countries {
+	commandsRows := make([]*model.TelegramBotCommandRow, 0)
+	commands := make([]*model.TelegramBotCommand, 0)
+	for k, country := range countries {
+		newline := k + 1
 		commands = append(commands, model.NewTelegramBotCommand(country.GetFlag()+" "+country.GetName(), "country "+country.GetCode()))
+		if (newline > 0 && newline%inlineKeyboardCountryMaxLen == 0) || newline == len(countries) {
+			commandsRows = append(commandsRows, model.NewTelegramBotCommandRow(commands, ""))
+			commands = make([]*model.TelegramBotCommand, 0)
+		}
 	}
-	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands, "")}
+	return commandsRows
 }
 
 func (s *BotService) CommandsFromLanguage(ctx context.Context) []*model.TelegramBotCommandRow {
 	locales := s.i18n.Locales()
-	commands := make([]*model.TelegramBotCommand, 0, len(locales))
-	for _, cmd := range locales {
-		commands = append(commands, model.NewTelegramBotCommand(cmd.Name, "language "+cmd.Tag.String()))
+	commandsRows := make([]*model.TelegramBotCommandRow, 0)
+	commands := make([]*model.TelegramBotCommand, 0)
+	for k, locale := range locales {
+		newline := k + 1
+		commands = append(commands, model.NewTelegramBotCommand(locale.Name, "language "+locale.Tag.String()))
+		if (newline > 0 && newline%inlineKeyboardLanguageMaxLen == 0) || newline == len(locales) {
+			commandsRows = append(commandsRows, model.NewTelegramBotCommandRow(commands, ""))
+			commands = make([]*model.TelegramBotCommand, 0)
+		}
 	}
-	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands, "")}
+	return commandsRows
 }
 
 func (s *BotService) FormatMessage(ctx context.Context, language language.Tag, messageID bot.FmtdMsg) string {
@@ -57,15 +75,15 @@ func (s *BotService) FormatError(ctx context.Context, language language.Tag, err
 }
 
 func (s *BotService) CommandsToInlineKeboard(ctx context.Context, commands []*model.TelegramBotCommandRow) *tgmodel.InlineKeyboardMarkup {
-	ikbs := make([]tgmodel.InlineKeyboardButton, 0)
+	ikbs := make([][]tgmodel.InlineKeyboardButton, 0)
 	for _, command := range commands {
 		ikrs := make([]tgmodel.InlineKeyboardButton, 0)
 		for _, command := range command.Commands {
 			ikrs = append(ikrs, tgmodel.InlineKeyboardButton{Text: command.Caption, CallbackData: command.Command})
 		}
-		ikbs = append(ikbs, ikrs...)
+		ikbs = append(ikbs, ikrs)
 	}
-	inlineKeyboard := &tgmodel.InlineKeyboardMarkup{InlineKeyboard: [][]tgmodel.InlineKeyboardButton{ikbs}}
+	inlineKeyboard := &tgmodel.InlineKeyboardMarkup{InlineKeyboard: ikbs}
 	return inlineKeyboard
 }
 
@@ -77,7 +95,7 @@ func (s *BotService) LocalizeCommands(ctx context.Context, commands []*model.Tel
 		for _, command := range commands {
 			lcommands = append(lcommands, model.NewTelegramBotCommand(l.Message(command.Caption), command.Command))
 		}
-		rows = append(rows, model.NewTelegramBotCommandRow(commands, l.Tag.String()))
+		rows = append(rows, model.NewTelegramBotCommandRow(lcommands, l.Tag.String()))
 	}
 	return rows
 }
