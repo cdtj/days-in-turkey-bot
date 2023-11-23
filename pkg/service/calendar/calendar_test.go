@@ -40,7 +40,7 @@ func TestCalendarCalc(t *testing.T) {
 				t.Error(err)
 				return
 			}
-			t.Log(formatter.NewTelegramFormatter(i18n, false).TripTree(i18n.DefaultLang(), tree))
+			formatter.NewTelegramFormatter(i18n, false).TripTree(i18n.DefaultLang(), tree)
 		})
 	}
 }
