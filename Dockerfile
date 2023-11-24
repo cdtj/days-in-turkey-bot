@@ -16,7 +16,7 @@ RUN GOOS=linux GOARCH=amd64 go build -o bot -a -v cmd/bot/v2/main.go
 
 FROM gcr.io/distroless/base-debian12:latest AS build-release
 
-# assets are ebedded, no need to keep them
+# assets are ebedded
 # COPY --from=build-env /app/assets /app/assets
 COPY --from=build-env /app/bot /app/bot
 WORKDIR /app
