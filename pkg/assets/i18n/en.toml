@@ -1,4 +1,5 @@
 # en.toml
+# following file contains Telegram MarkdownV2: https://core.telegram.org/bots/api#markdownv2-style
 LanguageName = "🇺🇸 English"
 
 CommandMe = "current settings"
@@ -35,7 +36,7 @@ UserLanguagePrompt = "Choose Language"
 UserLanguageChanged = "Language Changed"
 UserCountryPrompt = "Choose Country"
 UserCountryChanged = "Country Changed"
-UserCountryCustom = "If your country isn't presented, you can send me the `/custom` command followed by the allowed days in the format: `/custom {Days Continual} {Days Limit} {Reset Interval}` and they will be used in the metrics.\n\nExample: `/custom 60 90 180`\n\nDetails: /trip"
+UserCountryCustom = "If your country isn't presented, you can send me the `/custom` command followed by the allowed days in the format: `/custom {Days Continual} {Days Limit} {Reset Interval}` and they will be used in the metrics.\n\nExample: `/custom 60 90 180`\nDetails: /trip"
 
 CountryInfo = "Country: {{.Flag}} {{.Name}}"
 CountryDays = "Days Allowed - Continual: {{.Continual}} / Limit: {{.Limit}} / Reset Interval: {{.ResetInterval}}"
@@ -43,8 +44,8 @@ CountryDays = "Days Allowed - Continual: {{.Continual}} / Limit: {{.Limit}} / Re
 # only exposable errors here
 ErrorInvalidDate = "invalid date: {{.DateInput}}, the date should be in the format: `day/month/year`, example: `31/12/2023`"
 ErrorInvalidDatePeriod = "invalid {{.PeriodName}}: {{.PeriodValue}} [{{.DateInput}}]"
-ErrorInvalidCustomCountry = "invalid custom duration config,\nmust be in the format: `/custom {Days Continual} {Days Limit} {Reset Interval}`,\nexample: `/custom 60 90 180`\n\nDetails: /trip"
-ErrorInvalidCustomCountrySeq = "invalid custom duration config,\nmust be in the following sequence: `{Days Continual}` less than `{Days Limit}` less than `{Reset Interval}`,\nexample: `/custom 60 90 180`\n\nDetails: /trip"
+ErrorInvalidCustomCountry = "invalid custom duration config,\nmust be in the format: `/custom {Days Continual} {Days Limit} {Reset Interval}`,\nexample: `/custom 60 90 180`\nDetails: /trip"
+ErrorInvalidCustomCountrySeq = "invalid custom duration config,\nmust be in the following sequence: `{Days Continual}` less than `{Days Limit}` less than `{Reset Interval}`,\nexample: `/custom 60 90 180`\nDetails: /trip"
 ErrorInternal = "internal service error, try again later"
 
 DatePeriodDay = "day"

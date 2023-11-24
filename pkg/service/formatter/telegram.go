@@ -121,12 +121,12 @@ func (f *TelegramFormatter) Welcome(language language.Tag) string {
 		locale.MessageWithTemplate("WelcomePromptPredictRemain", map[string]interface{}{
 			"MultiDate": wrapCode("31/12/2022 15/01/2023 01/02/2023 15/02/2023"),
 		}, nil) + "\n\n" +
-		// "/me - " + locale.Message("WelcomeMe") + "\n" +
-		"/country - " + locale.Message("WelcomeCountry") + "\n" +
-		"/language - " + locale.Message("WelcomeLanguage") + "\n" +
-		"/trip - " + locale.Message("WelcomeTrip") + "\n" +
-		// "/contribute - " + locale.Message("WelcomeContribute") + "\n" +
-		// "/feedback - " + locale.Message("WelcomeFeedback") +
+		// "/me - " + locale.Message("CommandMe") + "\n" +
+		"/country - " + locale.Message("CommandCountry") + "\n" +
+		"/language - " + locale.Message("CommandLanguage") + "\n" +
+		"/trip - " + locale.Message("CommandTrip") + "\n" +
+		// "/contribute - " + locale.Message("CommandContribute") + "\n" +
+		// "/feedback - " + locale.Message("CommandFeedback") +
 		"")
 }
 
