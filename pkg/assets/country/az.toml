@@ -6,4 +6,4 @@ Language = "az"
 DaysContinual = 90
 DaysLimit = 90
 ResetInterval = 180
-NonVisa = true
+VisaFree = true

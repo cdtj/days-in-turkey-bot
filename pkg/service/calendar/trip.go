@@ -14,12 +14,12 @@ func calcTree(daysCont, daysLimit, resetInterval int, trips []model.Trip) *model
 	for _, trip := range trips {
 		// predicted flag to mark EndDate was predicted
 		predicted := false
-		if trip.EndDate == nil {
+		if trip.GetEndDate() == nil {
 			predicted = true
-			predictedEnd := predictEndDate(*trip.StartDate, daysCont, daysLimit, resetInterval, tree)
-			trip.EndDate = &predictedEnd
+			predictedEnd := predictEndDate(*trip.GetStartDate(), daysCont, daysLimit, resetInterval, tree)
+			trip.SetEndDate(&predictedEnd)
 		}
-		tree = makeTree(*trip.StartDate, *trip.EndDate, daysCont, daysLimit, resetInterval, false, predicted, tree)
+		tree = makeTree(*trip.GetStartDate(), *trip.GetEndDate(), daysCont, daysLimit, resetInterval, false, predicted, tree)
 		tree.Prev = prev
 		prev = tree
 	}
@@ -167,15 +167,9 @@ func datesToTrips(dates []time.Time) []model.Trip {
 	trips := make([]model.Trip, 0, len(dates)%2)
 	for i := 0; i < len(dates); i = i + 2 {
 		if i+1 < len(dates) {
-			trips = append(trips, model.Trip{
-				StartDate: &dates[i],
-				EndDate:   &dates[i+1],
-			})
+			trips = append(trips, model.NewTrip(&dates[i], &dates[i+1]))
 		} else {
-			trips = append(trips, model.Trip{
-				StartDate: &dates[i],
-				EndDate:   nil,
-			})
+			trips = append(trips, model.NewTrip(&dates[i], nil))
 		}
 	}
 	return trips

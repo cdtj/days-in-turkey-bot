@@ -2,7 +2,7 @@ export VERSION=$(shell cat VERSION)
 export BOT_TOKEN=$(shell cat .token)
 export BOLDTB_PATH=./
 
-.PHONY: build stop start
+.PHONY: build stop start clean
 
 build:
 	docker build --platform linux/amd64 \
@@ -16,3 +16,7 @@ stop:
 start:
 	docker run --restart=unless-stopped \
 		-d turkeydays:${VERSION}
+
+clean:
+	docker rm $(shell docker container ls -a -f label="tag=turkeydays" -f "status=exited" -q)
+	docker image rm $(shell docker images -a -f label="tag=turkeydays" -f "status=exited" -q)

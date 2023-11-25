@@ -39,7 +39,7 @@ func (s *BotService) CommandsFromCountry(ctx context.Context, countries []*model
 		newline := k + 1
 		commands = append(commands, model.NewTelegramBotCommand(country.GetFlag()+" "+country.GetName(), "country "+country.GetCode(), model.TelegramBotCommandCallbackExact))
 		if (newline > 0 && newline%inlineKeyboardCountryMaxLen == 0) || newline == len(countries) {
-			commandsRows = append(commandsRows, model.NewTelegramBotCommandRow(commands, ""))
+			commandsRows = append(commandsRows, model.NewTelegramBotCommandRow(commands))
 			commands = make([]*model.TelegramBotCommand, 0)
 		}
 	}
@@ -56,7 +56,7 @@ func (s *BotService) CommandsFromLanguage(ctx context.Context) []*model.Telegram
 		newline := k + 1
 		commands = append(commands, model.NewTelegramBotCommand(locale.Name, "language "+locale.Tag.String(), model.TelegramBotCommandCallbackExact))
 		if (newline > 0 && newline%inlineKeyboardLanguageMaxLen == 0) || newline == len(locales) {
-			commandsRows = append(commandsRows, model.NewTelegramBotCommandRow(commands, ""))
+			commandsRows = append(commandsRows, model.NewTelegramBotCommandRow(commands))
 			commands = make([]*model.TelegramBotCommand, 0)
 		}
 	}
@@ -86,8 +86,8 @@ func (s *BotService) CommandsToInlineKeboard(ctx context.Context, commands []*mo
 	ikbs := make([][]tgmodel.InlineKeyboardButton, 0)
 	for _, command := range commands {
 		ikrs := make([]tgmodel.InlineKeyboardButton, 0)
-		for _, command := range command.Commands {
-			ikrs = append(ikrs, tgmodel.InlineKeyboardButton{Text: command.Caption, CallbackData: command.Command})
+		for _, command := range command.GetCommands() {
+			ikrs = append(ikrs, tgmodel.InlineKeyboardButton{Text: command.GetCaption(), CallbackData: command.GetCommand()})
 		}
 		ikbs = append(ikbs, ikrs)
 	}

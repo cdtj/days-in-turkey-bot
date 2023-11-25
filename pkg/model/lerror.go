@@ -4,27 +4,37 @@ package model
 // extractable template
 // Check *Locale.Error for details
 type LError struct {
-	Code     string
-	Template map[string]any
+	code     string
+	template map[string]any
 
-	Err error
+	err error
 }
 
 func NewLError(code string, tpl map[string]any, err error) *LError {
 	return &LError{
-		Code:     code,
-		Template: tpl,
-		Err:      err,
+		code:     code,
+		template: tpl,
+		err:      err,
 	}
+}
+
+func (e *LError) GetCode() string {
+	return e.code
+}
+func (e *LError) GetTemplate() map[string]any {
+	return e.template
+}
+func (e *LError) GetError() error {
+	return e.err
 }
 
 // Error returns stringified error,
 // this is backup method that shouldn't happen for Localized Error in most cases
 func (e *LError) Error() string {
-	if e.Err == nil {
+	if e.err == nil {
 		return ""
 	}
-	return e.Err.Error()
+	return e.err.Error()
 }
 
 // LErrorExpandable sub-type that marks that value need to be expanded to Localized Message

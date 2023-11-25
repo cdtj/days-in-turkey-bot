@@ -29,7 +29,7 @@ import (
 
 var (
 	defaultLang    = "en"
-	defaultCountry = model.NewCountry("RU", "RU", 60, 90, 180)
+	defaultCountry = model.NewCountry("CUSTOM", "📝", "", 60, 90, 180, true)
 )
 
 func main() {
@@ -80,7 +80,7 @@ func main() {
 	botUC := buc.NewBotUsecase(botSvc, userUC, countryUC)
 
 	botOptions := telegrambot.NewTelegramBotOptions(bh.BindBotHandlers(botUC),
-		model.NewTelegramBotDescription("BotDescription", "BotAbout", ""),
+		model.NewTelegramBotDescription("BotDescription", "BotAbout"),
 		nil,
 		func(err error) {
 			slog.Error("bop-api", "err", err)
@@ -96,8 +96,8 @@ func main() {
 	for _, locale := range locales {
 		lCommands := LocalizeCommands(locale, botOptions.GetCommands())
 		lDescription := LocalizeDescription(locale, botOptions.GetDescription())
-		bot.SetCommands(context.Background(), lCommands.Commands, lCommands.LanguageCode)
-		bot.SetDescription(context.Background(), lDescription.Description, lDescription.About, lDescription.LanguageCode)
+		bot.SetCommands(context.Background(), lCommands.GetCommands(), locale.GetLanguage())
+		bot.SetDescription(context.Background(), lDescription.GetDescription(), lDescription.GetAbout(), locale.GetLanguage())
 	}
 
 	// using botv2 (based on [github.com/go-telegram/bot]) to read all updates directly without callbacks

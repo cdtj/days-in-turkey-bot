@@ -72,15 +72,14 @@ func (l *Locale) ErrorWithDefault(err error, defaultMessageID string) string {
 }
 
 func (l *Locale) Error(err *model.LError) string {
-	if err.Template != nil {
-		for key := range err.Template {
-			switch val := err.Template[key].(type) {
-			case model.LErrorExpandable:
-				err.Template[key] = l.Message(string(val))
-			}
+	tpl := err.GetTemplate()
+	for key := range tpl {
+		switch val := tpl[key].(type) {
+		case model.LErrorExpandable:
+			tpl[key] = l.Message(string(val))
 		}
 	}
-	return l.MessageWithTemplate(err.Code, err.Template, nil)
+	return l.MessageWithTemplate(err.GetCode(), err.GetTemplate(), nil)
 }
 
 const dateLayout = "02/01/2006"
@@ -94,14 +93,12 @@ func (l *Locale) FormatDate(dt time.Time) string {
 func (l *Locale) LocalizeCommands(commands []*model.TelegramBotCommand) *model.TelegramBotCommandRow {
 	lcommands := make([]*model.TelegramBotCommand, 0)
 	for _, command := range commands {
-		lcommands = append(lcommands, model.NewTelegramBotCommand(l.Message(command.Caption), command.Command, model.TelegramBotCommandMessageExact))
+		lcommands = append(lcommands, model.NewTelegramBotCommand(l.Message(command.GetCaption()), command.GetCommand(), model.TelegramBotCommandMessageExact))
 	}
-	return model.NewTelegramBotCommandRow(lcommands, l.GetLanguage())
+	return model.NewTelegramBotCommandRow(lcommands)
 }
 
 // LocalizeDescription passes description into nested i18n'er adding Language Tag
 func (l *Locale) LocalizeDescription(description *model.TelegramBotDescription) *model.TelegramBotDescription {
-	return model.NewTelegramBotDescription(l.Message(description.Description),
-		l.Message(description.About),
-		l.GetLanguage())
+	return model.NewTelegramBotDescription(l.Message(description.GetDescription()), l.Message(description.GetAbout()))
 }

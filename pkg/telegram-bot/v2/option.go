@@ -43,7 +43,7 @@ func (o *TelegramBotOptions) GetDescription() *model.TelegramBotDescription {
 func (o *TelegramBotOptions) GetCommands() []*model.TelegramBotCommand {
 	cmds := make([]*model.TelegramBotCommand, 0)
 	for _, cmd := range o.BoundCommands {
-		if cmd.Command != nil && cmd.Command.CommandType == model.TelegramBotCommandMessageExact && cmd.Command.Caption != "" {
+		if cmd.Command != nil && cmd.Command.GetCommandType() == model.TelegramBotCommandMessageExact && cmd.Command.GetCaption() != "" {
 			cmds = append(cmds, cmd.Command)
 		}
 	}
@@ -68,15 +68,15 @@ func (o *TelegramBotOptions) apiOptions() []tgapi.Option {
 }
 
 func (b *TelegramBotBind) bindHandler() tgapi.Option {
-	switch b.Command.CommandType {
+	switch b.Command.GetCommandType() {
 	case model.TelegramBotCommandMessageExact:
-		return bindHandlerMessageExact(b.Command.Command, b.Handler)
+		return bindHandlerMessageExact(b.Command.GetCommand(), b.Handler)
 	case model.TelegramBotCommandMessagePrefix:
-		return bindHandlerMessagePrefix(b.Command.Command, b.Handler)
+		return bindHandlerMessagePrefix(b.Command.GetCommand(), b.Handler)
 	case model.TelegramBotCommandCallbackExact:
-		return bindHandlerCbExact(b.Command.Command, b.Handler)
+		return bindHandlerCbExact(b.Command.GetCommand(), b.Handler)
 	case model.TelegramBotCommandCallbackPrefix:
-		return bindHandlerCbPrefix(b.Command.Command, b.Handler)
+		return bindHandlerCbPrefix(b.Command.GetCommand(), b.Handler)
 	case model.TelegramBotCommandDefaultHandler:
 		return bindHandlerDefault(b.Handler)
 	default:

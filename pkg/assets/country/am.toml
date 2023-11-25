@@ -6,5 +6,5 @@ Language = "hy"
 DaysContinual = 30
 DaysLimit = 180
 ResetInterval = 180
-# non-visa days are not applied
-NonVisa = false
+# visa-free days are not applied
+VisaFree = false

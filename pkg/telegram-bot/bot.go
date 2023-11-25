@@ -103,8 +103,8 @@ func replyMarkup(ctx context.Context, rows []*model.TelegramBotCommandRow) tgbot
 	ikbs := make([]tgbotapi.InlineKeyboardButton, 0)
 	for _, row := range rows {
 		ikrs := make([]tgbotapi.InlineKeyboardButton, 0)
-		for _, command := range row.Commands {
-			ikrs = append(ikrs, tgbotapi.NewInlineKeyboardButtonData(command.Caption, command.Command))
+		for _, command := range row.GetCommands() {
+			ikrs = append(ikrs, tgbotapi.NewInlineKeyboardButtonData(command.GetCaption(), command.GetCommand()))
 		}
 		ikbs = append(ikbs, ikrs...)
 	}

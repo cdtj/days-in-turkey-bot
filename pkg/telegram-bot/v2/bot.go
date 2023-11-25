@@ -54,8 +54,8 @@ func (t *TelegramBot) SetCommands(ctx context.Context, commands []*model.Telegra
 	tgcmds := make([]models.BotCommand, 0, len(commands))
 	for _, command := range commands {
 		tgcmds = append(tgcmds, models.BotCommand{
-			Command:     command.Command,
-			Description: command.Caption,
+			Command:     command.GetCommand(),
+			Description: command.GetCaption(),
 		})
 	}
 	_, err := t.bot.SetMyCommands(ctx, &tgapi.SetMyCommandsParams{
