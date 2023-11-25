@@ -6,4 +6,4 @@ Language = "lv"
 DaysContinual = 30
 DaysLimit = 90
 ResetInterval = 180
-NonVisa = true
+VisaFree = true

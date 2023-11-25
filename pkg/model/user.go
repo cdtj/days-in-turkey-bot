@@ -4,6 +4,8 @@ import (
 	"golang.org/x/text/language"
 )
 
+// User is struct to store User settings,
+// fields are exported in case to store them in DB
 type User struct {
 	ID           int64
 	Country      Country

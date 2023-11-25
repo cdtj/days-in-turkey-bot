@@ -40,18 +40,18 @@ func (s *BotService) Send(ctx context.Context, chatID int64, text string, replyM
 func (s *BotService) CommandsFromCountry(ctx context.Context, countries []*model.Country) []*model.TelegramBotCommandRow {
 	commands := make([]*model.TelegramBotCommand, 0, len(countries))
 	for _, country := range countries {
-		commands = append(commands, model.NewTelegramBotCommand(country.GetFlag()+" "+country.GetName(), "country "+country.GetCode()))
+		commands = append(commands, model.NewTelegramBotCommand(country.GetFlag()+" "+country.GetName(), "country "+country.GetCode(), model.TelegramBotCommandCallbackExact))
 	}
-	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands, "")}
+	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands)}
 }
 
 func (s *BotService) CommandsFromLanguage(ctx context.Context) []*model.TelegramBotCommandRow {
 	locales := s.i18n.Locales()
 	commands := make([]*model.TelegramBotCommand, 0, len(locales))
 	for _, cmd := range locales {
-		commands = append(commands, model.NewTelegramBotCommand(cmd.Name, "language "+cmd.Tag.String()))
+		commands = append(commands, model.NewTelegramBotCommand(cmd.Name, "language "+cmd.Tag.String(), model.TelegramBotCommandCallbackExact))
 	}
-	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands, "")}
+	return []*model.TelegramBotCommandRow{model.NewTelegramBotCommandRow(commands)}
 }
 
 func (s *BotService) FormatMessage(ctx context.Context, language language.Tag, messageID bot.FmtdMsg) string {

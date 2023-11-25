@@ -6,7 +6,7 @@ CommandMe = "текущие настройки"
 CommandCountry = "изменить страну"
 CommandLanguage = "изменить язык бота"
 CommandTrip = "получить больше информации о том как всё работает"
-CommandContribute = "внести свой вклад в open-source (ищем переводчиков и информацию по странам)"
+CommandContribute = "внести свой вклад в open-source (переводы и информацию по странам)"
 CommandFeedback = "чат для вопросов и предложений"
 
 BotDescription = "Я помогу спланировать поездку и избежать оверстея.\n\nОбратная связь: @TurkeyDays"

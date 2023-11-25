@@ -107,11 +107,13 @@ func (h *UserHttpHandlerChi) updateLang(w http.ResponseWriter, r *http.Request) 
 }
 
 type UpdateCountryInput struct {
+	Name          string `json:"name"`
 	Code          string `json:"code"`
 	Flag          string `json:"flag"`
 	DaysContinual int    `json:"daysContinual"`
 	DaysLimit     int    `json:"daysLimit"`
 	ResetInterval int    `json:"resetInterval"`
+	VisaFree      bool   `json:"visaFree"`
 }
 
 func (h *UserHttpHandlerChi) updateCountry(w http.ResponseWriter, r *http.Request) {
@@ -135,7 +137,7 @@ func (h *UserHttpHandlerChi) updateCountry(w http.ResponseWriter, r *http.Reques
 	}
 	// this is test handler for internal use so we don't make any data validation
 	// use at your own risk
-	err = h.usecase.UpdateCountry(r.Context(), user, model.NewCountry(input.Code, input.Flag, input.DaysContinual, input.DaysLimit, input.ResetInterval))
+	err = h.usecase.UpdateCountry(r.Context(), user, model.NewCountry(input.Code, input.Flag, input.Name, input.DaysContinual, input.DaysLimit, input.ResetInterval, input.VisaFree))
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, &ErrorUserResponse{err.Error()})

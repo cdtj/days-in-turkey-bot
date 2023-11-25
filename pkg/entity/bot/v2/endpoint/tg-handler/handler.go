@@ -22,6 +22,9 @@ func NewBotHandler(usecase bot.Usecase) *BotHandler {
 	}
 }
 
+// welcome handles user greetings
+//   - input: [update.Message]
+//   - usecase: [usecase.Welcome], [usecase.Me]
 func (h *BotHandler) welcome(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil || tgmsg.From == nil {
@@ -32,23 +35,26 @@ func (h *BotHandler) welcome(ctx context.Context, b *tgapi.Bot, update *tgmodel.
 	msg := h.usecase.Welcome(ctx, chatID, tgmsg.From.LanguageCode)
 	if _, err := b.SendMessage(ctx, &tgapi.SendMessageParams{
 		ChatID:      chatID,
-		Text:        msg.Text,
+		Text:        msg.GetText(),
 		ParseMode:   tgmodel.ParseModeMarkdown,
-		ReplyMarkup: msg.Markup,
+		ReplyMarkup: msg.GetMarkup(),
 	}); err != nil {
-		slog.Error("SendMessage failed", "method", "welcome", "chatID", chatID, "text", msg.Text, "err", err)
+		slog.Error("SendMessage failed", "method", "welcome", "chatID", chatID, "text", msg.GetText(), "err", err)
 	}
 	meMsg := h.usecase.Me(ctx, chatID)
 	if _, err := b.SendMessage(ctx, &tgapi.SendMessageParams{
 		ChatID:      chatID,
-		Text:        meMsg.Text,
+		Text:        meMsg.GetText(),
 		ParseMode:   tgmodel.ParseModeMarkdown,
-		ReplyMarkup: meMsg.Markup,
+		ReplyMarkup: meMsg.GetMarkup(),
 	}); err != nil {
-		slog.Error("SendMessage failed", "method", "me", "chatID", chatID, "text", meMsg.Text, "err", err)
+		slog.Error("SendMessage failed", "method", "me", "chatID", chatID, "text", meMsg.GetText(), "err", err)
 	}
 }
 
+// country handles user country-related info
+//   - input: [update.Message]
+//   - usecase: [usecase.Country], [usecase.Hint]
 func (h *BotHandler) country(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
@@ -59,24 +65,27 @@ func (h *BotHandler) country(ctx context.Context, b *tgapi.Bot, update *tgmodel.
 	msg := h.usecase.Country(ctx, chatID)
 	if _, err := b.SendMessage(ctx, &tgapi.SendMessageParams{
 		ChatID:      chatID,
-		Text:        msg.Text,
+		Text:        msg.GetText(),
 		ParseMode:   tgmodel.ParseModeMarkdown,
-		ReplyMarkup: msg.Markup,
+		ReplyMarkup: msg.GetMarkup(),
 	}); err != nil {
-		slog.Error("SendMessage failed", "method", "country", "chatID", chatID, "text", msg.Text, "err", err)
+		slog.Error("SendMessage failed", "method", "country", "chatID", chatID, "text", msg.GetText(), "err", err)
 	}
 
 	hint := h.usecase.Hint(ctx, chatID, "UserCountryCustom")
 	if _, err := b.SendMessage(ctx, &tgapi.SendMessageParams{
 		ChatID:      chatID,
-		Text:        hint.Text,
+		Text:        hint.GetText(),
 		ParseMode:   tgmodel.ParseModeMarkdown,
-		ReplyMarkup: hint.Markup,
+		ReplyMarkup: hint.GetMarkup(),
 	}); err != nil {
-		slog.Error("SendMessage failed", "method", "country", "chatID", chatID, "text", hint.Text, "err", err)
+		slog.Error("SendMessage failed", "method", "country", "chatID", chatID, "text", hint.GetText(), "err", err)
 	}
 }
 
+// language handles user language-related info
+//   - input: [update.Message]
+//   - usecase: [usecase.Language]
 func (h *BotHandler) language(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
@@ -87,14 +96,17 @@ func (h *BotHandler) language(ctx context.Context, b *tgapi.Bot, update *tgmodel
 	msg := h.usecase.Language(ctx, chatID)
 	if _, err := b.SendMessage(ctx, &tgapi.SendMessageParams{
 		ChatID:      chatID,
-		Text:        msg.Text,
+		Text:        msg.GetText(),
 		ParseMode:   tgmodel.ParseModeMarkdown,
-		ReplyMarkup: msg.Markup,
+		ReplyMarkup: msg.GetMarkup(),
 	}); err != nil {
-		slog.Error("SendMessage failed", "method", "language", "chatID", chatID, "text", msg.Text, "err", err)
+		slog.Error("SendMessage failed", "method", "language", "chatID", chatID, "text", msg.GetText(), "err", err)
 	}
 }
 
+// contribute handles user contribution-related info
+//   - input: [update.Message]
+//   - usecase: [usecase.Contribute]
 func (h *BotHandler) contribute(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
@@ -105,14 +117,17 @@ func (h *BotHandler) contribute(ctx context.Context, b *tgapi.Bot, update *tgmod
 	msg := h.usecase.Contribute(ctx, chatID)
 	if _, err := b.SendMessage(ctx, &tgapi.SendMessageParams{
 		ChatID:      chatID,
-		Text:        msg.Text,
+		Text:        msg.GetText(),
 		ParseMode:   tgmodel.ParseModeMarkdown,
-		ReplyMarkup: msg.Markup,
+		ReplyMarkup: msg.GetMarkup(),
 	}); err != nil {
-		slog.Error("SendMessage failed", "method", "contribute", "chatID", chatID, "text", msg.Text, "err", err)
+		slog.Error("SendMessage failed", "method", "contribute", "chatID", chatID, "text", msg.GetText(), "err", err)
 	}
 }
 
+// trip handles user trip-related info
+//   - input: [update.Message]
+//   - usecase: [usecase.Trip]
 func (h *BotHandler) trip(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
@@ -123,14 +138,17 @@ func (h *BotHandler) trip(ctx context.Context, b *tgapi.Bot, update *tgmodel.Upd
 	msg := h.usecase.Trip(ctx, chatID)
 	if _, err := b.SendMessage(ctx, &tgapi.SendMessageParams{
 		ChatID:      chatID,
-		Text:        msg.Text,
+		Text:        msg.GetText(),
 		ParseMode:   tgmodel.ParseModeMarkdown,
-		ReplyMarkup: msg.Markup,
+		ReplyMarkup: msg.GetMarkup(),
 	}); err != nil {
-		slog.Error("SendMessage failed", "method", "trip", "chatID", chatID, "text", msg.Text, "err", err)
+		slog.Error("SendMessage failed", "method", "trip", "chatID", chatID, "text", msg.GetText(), "err", err)
 	}
 }
 
+// me handles user user-related info
+//   - input: [update.Message]
+//   - usecase: [usecase.Me]
 func (h *BotHandler) me(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
@@ -141,14 +159,17 @@ func (h *BotHandler) me(ctx context.Context, b *tgapi.Bot, update *tgmodel.Updat
 	msg := h.usecase.Me(ctx, chatID)
 	if _, err := b.SendMessage(ctx, &tgapi.SendMessageParams{
 		ChatID:      chatID,
-		Text:        msg.Text,
+		Text:        msg.GetText(),
 		ParseMode:   tgmodel.ParseModeMarkdown,
-		ReplyMarkup: msg.Markup,
+		ReplyMarkup: msg.GetMarkup(),
 	}); err != nil {
-		slog.Error("SendMessage failed", "method", "me", "chatID", chatID, "text", msg.Text, "err", err)
+		slog.Error("SendMessage failed", "method", "me", "chatID", chatID, "text", msg.GetText(), "err", err)
 	}
 }
 
+// feedback handles user feedback-related info
+//   - input: [update.Message]
+//   - usecase: [usecase.Feedback]
 func (h *BotHandler) feedback(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
@@ -159,14 +180,17 @@ func (h *BotHandler) feedback(ctx context.Context, b *tgapi.Bot, update *tgmodel
 	msg := h.usecase.Feedback(ctx, chatID)
 	if _, err := b.SendMessage(ctx, &tgapi.SendMessageParams{
 		ChatID:      chatID,
-		Text:        msg.Text,
+		Text:        msg.GetText(),
 		ParseMode:   tgmodel.ParseModeMarkdown,
-		ReplyMarkup: msg.Markup,
+		ReplyMarkup: msg.GetMarkup(),
 	}); err != nil {
-		slog.Error("SendMessage failed", "method", "me", "chatID", chatID, "text", msg.Text, "err", err)
+		slog.Error("SendMessage failed", "method", "me", "chatID", chatID, "text", msg.GetText(), "err", err)
 	}
 }
 
+// updateCountry handles country changing request
+//   - input: [update.Message], [update.CallbackQuery]
+//   - usecase: [usecase.UpdateCountry]
 func (h *BotHandler) updateCountry(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	cb := update.CallbackQuery
 	tgmsg := update.Message
@@ -187,14 +211,17 @@ func (h *BotHandler) updateCountry(ctx context.Context, b *tgapi.Bot, update *tg
 	msg := h.usecase.UpdateCountry(ctx, chatID, countryInput)
 	if _, err := b.SendMessage(ctx, &tgapi.SendMessageParams{
 		ChatID:      chatID,
-		Text:        msg.Text,
+		Text:        msg.GetText(),
 		ParseMode:   tgmodel.ParseModeMarkdown,
-		ReplyMarkup: msg.Markup,
+		ReplyMarkup: msg.GetMarkup(),
 	}); err != nil {
-		slog.Error("SendMessage failed", "method", "updateCountry", "chatID", chatID, "input", countryInput, "text", msg.Text, "err", err)
+		slog.Error("SendMessage failed", "method", "updateCountry", "chatID", chatID, "input", countryInput, "text", msg.GetText(), "err", err)
 	}
 }
 
+// updateLanguage handles language changing request
+//   - input: [update.CallbackQuery]
+//   - usecase: [usecase.UpdateLanguage]
 func (h *BotHandler) updateLanguage(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	cb := update.CallbackQuery
 	if cb == nil {
@@ -206,14 +233,17 @@ func (h *BotHandler) updateLanguage(ctx context.Context, b *tgapi.Bot, update *t
 	msg := h.usecase.UpdateLanguage(ctx, chatID, languageInput)
 	if _, err := b.SendMessage(ctx, &tgapi.SendMessageParams{
 		ChatID:      chatID,
-		Text:        msg.Text,
+		Text:        msg.GetText(),
 		ParseMode:   tgmodel.ParseModeMarkdown,
-		ReplyMarkup: msg.Markup,
+		ReplyMarkup: msg.GetMarkup(),
 	}); err != nil {
-		slog.Error("SendMessage failed", "method", "updateLanguage", "chatID", chatID, "input", languageInput, "text", msg.Text, "err", err, "msg", msg.Text)
+		slog.Error("SendMessage failed", "method", "updateLanguage", "chatID", chatID, "input", languageInput, "text", msg.GetText(), "err", err, "msg", msg.GetText())
 	}
 }
 
+// defaultMessage handles default request meant to be a trip calculation input
+//   - input: [update.Message]
+//   - usecase: [usecase.CalculateTrip]
 func (h *BotHandler) defaultMessage(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
@@ -225,10 +255,10 @@ func (h *BotHandler) defaultMessage(ctx context.Context, b *tgapi.Bot, update *t
 	msg := h.usecase.CalculateTrip(ctx, chatID, tripInput)
 	if _, err := b.SendMessage(ctx, &tgapi.SendMessageParams{
 		ChatID:      chatID,
-		Text:        msg.Text,
+		Text:        msg.GetText(),
 		ParseMode:   tgmodel.ParseModeMarkdown,
-		ReplyMarkup: msg.Markup,
+		ReplyMarkup: msg.GetMarkup(),
 	}); err != nil {
-		slog.Error("SendMessage failed", "method", "defaultMessage", "chatID", chatID, "input", tripInput, "text", msg.Text, "err", err)
+		slog.Error("SendMessage failed", "method", "defaultMessage", "chatID", chatID, "input", tripInput, "text", msg.GetText(), "err", err)
 	}
 }

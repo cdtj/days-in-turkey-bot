@@ -11,17 +11,19 @@ import (
 )
 
 type TelegramBot struct {
-	bot *tgapi.Bot
+	bot     *tgapi.Bot
+	options *TelegramBotOptions
 }
 
-func NewTelegramBot(token string, options []tgapi.Option) *TelegramBot {
-	b, err := tgapi.New(token, options...)
+func NewTelegramBot(token string, options *TelegramBotOptions) *TelegramBot {
+	b, err := tgapi.New(token, options.apiOptions()...)
 	if err != nil {
 		slog.Error("telegram-bot", "msg", "unable to create new bot", "err", err)
 		return nil
 	}
 	return &TelegramBot{
-		bot: b,
+		bot:     b,
+		options: options,
 	}
 }
 
@@ -52,8 +54,8 @@ func (t *TelegramBot) SetCommands(ctx context.Context, commands []*model.Telegra
 	tgcmds := make([]models.BotCommand, 0, len(commands))
 	for _, command := range commands {
 		tgcmds = append(tgcmds, models.BotCommand{
-			Command:     command.Command,
-			Description: command.Caption,
+			Command:     command.GetCommand(),
+			Description: command.GetCaption(),
 		})
 	}
 	_, err := t.bot.SetMyCommands(ctx, &tgapi.SetMyCommandsParams{
@@ -77,32 +79,4 @@ func (t *TelegramBot) SetDescription(ctx context.Context, description, about, la
 		return err
 	}
 	return nil
-}
-
-func BindHandlerExactMessage(command string, handler tgapi.HandlerFunc) tgapi.Option {
-	return tgapi.WithMessageTextHandler(command, tgapi.MatchTypeExact, handler)
-}
-
-func BindHandlerPrefixMessage(command string, handler tgapi.HandlerFunc) tgapi.Option {
-	return tgapi.WithMessageTextHandler(command, tgapi.MatchTypePrefix, handler)
-}
-
-func BindHandlerExactCb(command string, handler tgapi.HandlerFunc) tgapi.Option {
-	return tgapi.WithCallbackQueryDataHandler(command, tgapi.MatchTypeExact, handler)
-}
-
-func BindHandlerPrefixCb(command string, handler tgapi.HandlerFunc) tgapi.Option {
-	return tgapi.WithCallbackQueryDataHandler(command, tgapi.MatchTypePrefix, handler)
-}
-
-func BindHandlerDefault(handler tgapi.HandlerFunc) tgapi.Option {
-	return tgapi.WithDefaultHandler(handler)
-}
-
-func BindHandlerDefaultError(handler tgapi.ErrorsHandler) tgapi.Option {
-	return tgapi.WithErrorsHandler(handler)
-}
-
-func BindHandlerDefaultDebug(handler tgapi.DebugHandler) tgapi.Option {
-	return tgapi.WithDebugHandler(handler)
 }

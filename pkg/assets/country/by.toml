@@ -6,4 +6,4 @@ Language = "be"
 DaysContinual = 30
 DaysLimit = 90
 ResetInterval = 365
-NonVisa = true
+VisaFree = true

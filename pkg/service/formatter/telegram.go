@@ -70,7 +70,7 @@ func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree
 			result += "\n"
 		}
 	}
-	result += "\n\n" + locale.Message("OverstayCaution")
+	result += "\n" + locale.Message("OverstayCaution")
 	if overstayed {
 		result += "\n" + locale.Message("OverstayExplanation")
 	}

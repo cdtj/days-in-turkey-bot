@@ -29,7 +29,7 @@ import (
 
 var (
 	defaultLang    = "en"
-	defaultCountry = model.NewCountry("RU", "RU", 60, 90, 180)
+	defaultCountry = model.NewCountry("CUSTOM", "📝", "", 60, 90, 180, true)
 )
 
 func main() {
@@ -79,24 +79,25 @@ func main() {
 	botSvc := bs.NewBotService(telegramFrmtr, i18n)
 	botUC := buc.NewBotUsecase(botSvc, userUC, countryUC)
 
-	// registering our handlers and replacing defaults
-	botHandlers := bh.BindBotHandlers(botUC)
-	botHandlers = append(botHandlers, telegrambot.BindHandlerDefaultDebug(func(format string, args ...any) {
-		slog.Debug("bop-api", "msg", fmt.Sprintf(format, args))
-	}))
-	botHandlers = append(botHandlers, telegrambot.BindHandlerDefaultError(func(err error) {
-		slog.Error("bop-api", "err", err)
-	}))
-	bot := telegrambot.NewTelegramBot(os.Getenv("BOT_TOKEN"), botHandlers)
-	if commandsRows := botUC.LocalizeCommands(context.Background(), BotCommands()); commandsRows != nil {
-		for _, commandRow := range commandsRows {
-			bot.SetCommands(context.Background(), commandRow.Commands, commandRow.LanguageCode)
-		}
-	}
-	if descriptionRows := botUC.LocalizeDescription(context.Background(), BotDescription()); descriptionRows != nil {
-		for _, descriptionRow := range descriptionRows {
-			bot.SetDescription(context.Background(), descriptionRow.Description, descriptionRow.About, descriptionRow.LanguageCode)
-		}
+	botOptions := telegrambot.NewTelegramBotOptions(bh.BindBotHandlers(botUC),
+		model.NewTelegramBotDescription("BotDescription", "BotAbout"),
+		nil,
+		func(err error) {
+			slog.Error("bop-api", "err", err)
+		},
+		func(format string, args ...any) {
+			slog.Debug("bop-api", "msg", fmt.Sprintf(format, args))
+		},
+	)
+	bot := telegrambot.NewTelegramBot(os.Getenv("BOT_TOKEN"), botOptions)
+
+	locales := i18n.Locales()
+
+	for _, locale := range locales {
+		lCommands := LocalizeCommands(locale, botOptions.GetCommands())
+		lDescription := LocalizeDescription(locale, botOptions.GetDescription())
+		bot.SetCommands(context.Background(), lCommands.GetCommands(), locale.GetLanguage())
+		bot.SetDescription(context.Background(), lDescription.GetDescription(), lDescription.GetAbout(), locale.GetLanguage())
 	}
 
 	// using botv2 (based on [github.com/go-telegram/bot]) to read all updates directly without callbacks
@@ -105,20 +106,12 @@ func main() {
 	cmd.Serve(bot, userDB)
 }
 
-// BotCommands returns list of known commands,
-// feels like it needs to be exported as a config
-func BotCommands() []*model.TelegramBotCommand {
-	return []*model.TelegramBotCommand{
-		model.NewTelegramBotCommand("CommandMe", "me"),
-		model.NewTelegramBotCommand("CommandCountry", "country"),
-		model.NewTelegramBotCommand("CommandLanguage", "language"),
-		model.NewTelegramBotCommand("CommandTrip", "trip"),
-		model.NewTelegramBotCommand("CommandContribute", "contribute"),
-		model.NewTelegramBotCommand("CommandFeedback", "feedback"),
-	}
+// LocalizeCommands translates commands using i18n'er and adding Language Tag
+func LocalizeCommands(locale *i18n.Locale, commands []*model.TelegramBotCommand) *model.TelegramBotCommandRow {
+	return locale.LocalizeCommands(commands)
 }
 
-// BotDescription returns placeholders for Bot About and Bot Description used in l10n
-func BotDescription() *model.TelegramBotDescription {
-	return model.NewTelegramBotDescription("BotDescription", "BotAbout", "")
+// LocalizeDescription translates description using i18n'er and adding Language Tag
+func LocalizeDescription(locale *i18n.Locale, description *model.TelegramBotDescription) *model.TelegramBotDescription {
+	return locale.LocalizeDescription(description)
 }

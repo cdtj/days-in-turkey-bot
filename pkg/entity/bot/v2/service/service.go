@@ -30,35 +30,41 @@ const (
 	inlineKeyboardLanguageMaxLen = 3
 )
 
+// CommandsFromCountry creates list of Telegram Bot Commands from the slice of Countries,
+// used for inlineKeyboard generation
 func (s *BotService) CommandsFromCountry(ctx context.Context, countries []*model.Country) []*model.TelegramBotCommandRow {
 	commandsRows := make([]*model.TelegramBotCommandRow, 0)
 	commands := make([]*model.TelegramBotCommand, 0)
 	for k, country := range countries {
 		newline := k + 1
-		commands = append(commands, model.NewTelegramBotCommand(country.GetFlag()+" "+country.GetName(), "country "+country.GetCode()))
+		commands = append(commands, model.NewTelegramBotCommand(country.GetFlag()+" "+country.GetName(), "country "+country.GetCode(), model.TelegramBotCommandCallbackExact))
 		if (newline > 0 && newline%inlineKeyboardCountryMaxLen == 0) || newline == len(countries) {
-			commandsRows = append(commandsRows, model.NewTelegramBotCommandRow(commands, ""))
+			commandsRows = append(commandsRows, model.NewTelegramBotCommandRow(commands))
 			commands = make([]*model.TelegramBotCommand, 0)
 		}
 	}
 	return commandsRows
 }
 
+// CommandsFromLanguage creates list of Telegram Bot Commands from the nested i18n pkg,
+// used for inlineKeyboard generation
 func (s *BotService) CommandsFromLanguage(ctx context.Context) []*model.TelegramBotCommandRow {
 	locales := s.i18n.Locales()
 	commandsRows := make([]*model.TelegramBotCommandRow, 0)
 	commands := make([]*model.TelegramBotCommand, 0)
 	for k, locale := range locales {
 		newline := k + 1
-		commands = append(commands, model.NewTelegramBotCommand(locale.Name, "language "+locale.Tag.String()))
+		commands = append(commands, model.NewTelegramBotCommand(locale.Name, "language "+locale.Tag.String(), model.TelegramBotCommandCallbackExact))
 		if (newline > 0 && newline%inlineKeyboardLanguageMaxLen == 0) || newline == len(locales) {
-			commandsRows = append(commandsRows, model.NewTelegramBotCommandRow(commands, ""))
+			commandsRows = append(commandsRows, model.NewTelegramBotCommandRow(commands))
 			commands = make([]*model.TelegramBotCommand, 0)
 		}
 	}
 	return commandsRows
 }
 
+// FormatMessage formats messages to a specific format depending on nested formatter,
+// we have some enums here and default method
 func (s *BotService) FormatMessage(ctx context.Context, language language.Tag, messageID bot.FmtdMsg) string {
 	switch messageID {
 	case bot.FmtdMsgWelcome:
@@ -70,44 +76,21 @@ func (s *BotService) FormatMessage(ctx context.Context, language language.Tag, m
 	}
 }
 
+// FormatError formats error to a specific format depending on nested formatter
 func (s *BotService) FormatError(ctx context.Context, language language.Tag, err error) string {
 	return s.frmtr.FormatError(language, err)
 }
 
+// CommandsToInlineKeboard converts Telegram Bot Commands into Telegram Bot API InlineKeyboardMarkup
 func (s *BotService) CommandsToInlineKeboard(ctx context.Context, commands []*model.TelegramBotCommandRow) *tgmodel.InlineKeyboardMarkup {
 	ikbs := make([][]tgmodel.InlineKeyboardButton, 0)
 	for _, command := range commands {
 		ikrs := make([]tgmodel.InlineKeyboardButton, 0)
-		for _, command := range command.Commands {
-			ikrs = append(ikrs, tgmodel.InlineKeyboardButton{Text: command.Caption, CallbackData: command.Command})
+		for _, command := range command.GetCommands() {
+			ikrs = append(ikrs, tgmodel.InlineKeyboardButton{Text: command.GetCaption(), CallbackData: command.GetCommand()})
 		}
 		ikbs = append(ikbs, ikrs)
 	}
 	inlineKeyboard := &tgmodel.InlineKeyboardMarkup{InlineKeyboard: ikbs}
 	return inlineKeyboard
-}
-
-func (s *BotService) LocalizeCommands(ctx context.Context, commands []*model.TelegramBotCommand) []*model.TelegramBotCommandRow {
-	locales := s.i18n.Locales()
-	rows := make([]*model.TelegramBotCommandRow, 0, len(locales))
-	for _, l := range locales {
-		lcommands := make([]*model.TelegramBotCommand, 0)
-		for _, command := range commands {
-			lcommands = append(lcommands, model.NewTelegramBotCommand(l.Message(command.Caption), command.Command))
-		}
-		rows = append(rows, model.NewTelegramBotCommandRow(lcommands, l.Tag.String()))
-	}
-	return rows
-}
-
-func (s *BotService) LocalizeDescription(ctx context.Context, description *model.TelegramBotDescription) []*model.TelegramBotDescription {
-	locales := s.i18n.Locales()
-	rows := make([]*model.TelegramBotDescription, 0, len(locales))
-	for _, l := range locales {
-		rows = append(rows,
-			model.NewTelegramBotDescription(l.Message(description.Description),
-				l.Message(description.About),
-				l.Tag.String()))
-	}
-	return rows
 }
