@@ -11,7 +11,7 @@ build:
 		-t turkeydays:${VERSION} .
 
 stop:
-	docker stop $(shell docker container ls -a -f label="tag=turkeydays" -q)
+	docker stop $(shell docker container ls -a -f label="tag=turkeydays" -f "status=running" -q)
 
 start:
 	docker run --restart=unless-stopped \

@@ -12,15 +12,28 @@ func NewTelegramBotCommandRow(commands []*TelegramBotCommand, languageCode strin
 	}
 }
 
+type TelegramBotCommandType int
+
+const (
+	TelegramBotCommandMessageExact TelegramBotCommandType = iota
+	TelegramBotCommandMessagePrefix
+	TelegramBotCommandCallbackExact
+	TelegramBotCommandCallbackPrefix
+	TelegramBotCommandDescription
+	TelegramBotCommandDefaultHandler
+)
+
 type TelegramBotCommand struct {
-	Caption string
-	Command string
+	Caption     string
+	Command     string
+	CommandType TelegramBotCommandType
 }
 
-func NewTelegramBotCommand(caption, command string) *TelegramBotCommand {
+func NewTelegramBotCommand(caption, command string, commandType TelegramBotCommandType) *TelegramBotCommand {
 	return &TelegramBotCommand{
-		Caption: caption,
-		Command: command,
+		Caption:     caption,
+		Command:     command,
+		CommandType: commandType,
 	}
 }
 

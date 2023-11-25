@@ -22,6 +22,9 @@ func NewBotHandler(usecase bot.Usecase) *BotHandler {
 	}
 }
 
+// welcome handles user greetings
+//   - input: [update.Message]
+//   - usecase: [usecase.Welcome], [usecase.Me]
 func (h *BotHandler) welcome(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil || tgmsg.From == nil {
@@ -49,6 +52,9 @@ func (h *BotHandler) welcome(ctx context.Context, b *tgapi.Bot, update *tgmodel.
 	}
 }
 
+// country handles user country-related info
+//   - input: [update.Message]
+//   - usecase: [usecase.Country], [usecase.Hint]
 func (h *BotHandler) country(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
@@ -77,6 +83,9 @@ func (h *BotHandler) country(ctx context.Context, b *tgapi.Bot, update *tgmodel.
 	}
 }
 
+// language handles user language-related info
+//   - input: [update.Message]
+//   - usecase: [usecase.Language]
 func (h *BotHandler) language(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
@@ -95,6 +104,9 @@ func (h *BotHandler) language(ctx context.Context, b *tgapi.Bot, update *tgmodel
 	}
 }
 
+// contribute handles user contribution-related info
+//   - input: [update.Message]
+//   - usecase: [usecase.Contribute]
 func (h *BotHandler) contribute(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
@@ -113,6 +125,9 @@ func (h *BotHandler) contribute(ctx context.Context, b *tgapi.Bot, update *tgmod
 	}
 }
 
+// trip handles user trip-related info
+//   - input: [update.Message]
+//   - usecase: [usecase.Trip]
 func (h *BotHandler) trip(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
@@ -131,6 +146,9 @@ func (h *BotHandler) trip(ctx context.Context, b *tgapi.Bot, update *tgmodel.Upd
 	}
 }
 
+// me handles user user-related info
+//   - input: [update.Message]
+//   - usecase: [usecase.Me]
 func (h *BotHandler) me(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
@@ -149,6 +167,9 @@ func (h *BotHandler) me(ctx context.Context, b *tgapi.Bot, update *tgmodel.Updat
 	}
 }
 
+// feedback handles user feedback-related info
+//   - input: [update.Message]
+//   - usecase: [usecase.Feedback]
 func (h *BotHandler) feedback(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {
@@ -167,6 +188,9 @@ func (h *BotHandler) feedback(ctx context.Context, b *tgapi.Bot, update *tgmodel
 	}
 }
 
+// updateCountry handles country changing request
+//   - input: [update.Message], [update.CallbackQuery]
+//   - usecase: [usecase.UpdateCountry]
 func (h *BotHandler) updateCountry(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	cb := update.CallbackQuery
 	tgmsg := update.Message
@@ -195,6 +219,9 @@ func (h *BotHandler) updateCountry(ctx context.Context, b *tgapi.Bot, update *tg
 	}
 }
 
+// updateLanguage handles language changing request
+//   - input: [update.CallbackQuery]
+//   - usecase: [usecase.UpdateLanguage]
 func (h *BotHandler) updateLanguage(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	cb := update.CallbackQuery
 	if cb == nil {
@@ -214,6 +241,9 @@ func (h *BotHandler) updateLanguage(ctx context.Context, b *tgapi.Bot, update *t
 	}
 }
 
+// defaultMessage handles default request meant to be a trip calculation input
+//   - input: [update.Message]
+//   - usecase: [usecase.CalculateTrip]
 func (h *BotHandler) defaultMessage(ctx context.Context, b *tgapi.Bot, update *tgmodel.Update) {
 	tgmsg := update.Message
 	if tgmsg == nil {

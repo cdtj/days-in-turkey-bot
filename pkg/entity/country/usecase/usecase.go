@@ -64,6 +64,9 @@ func (uc *CountryUsecase) Lookup(ctx context.Context, countryID string, daysCont
 		}
 		return country, nil
 	}
+	if daysCont > daysLimit || daysLimit > resetInterval {
+		return nil, model.NewLError("ErrorInvalidCustomCountrySeq", nil, nil)
+	}
 	return uc.service.CustomCountry(ctx, daysCont, daysLimit, resetInterval), nil
 }
 

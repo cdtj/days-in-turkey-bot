@@ -33,10 +33,11 @@ func NewBotUsecase(service bot.Service, userUC user.Usecase, countryUC country.U
 I feel like logs here are overloaded
 */
 
-// Welcome creates a new user with id and language code,
+// Welcome implements Bot's /welcome command, creates a new user with id and language code,
+// and returns formated and localized TelegramMessage
 func (uc *BotUsecase) Welcome(ctx context.Context, userID int64, lang string) *model.TelegramMessage {
 	mth := "Welcome"
-	// since we do not store anything important, recreating a user on /start is correct behavior
+	// since we do not store anything important, recreating a user on /start is a correct behavior
 	if err := uc.userUC.Create(ctx, userID, lang); err != nil {
 		slog.Error("usecase failed", "method", mth, "userID", userID, "lang", lang, "err", err)
 		return model.NewTelegramMessage(uc.service.FormatError(ctx, i18n.DefaultLang(), err), nil)
@@ -49,6 +50,8 @@ func (uc *BotUsecase) Welcome(ctx context.Context, userID int64, lang string) *m
 	return model.NewTelegramMessage(uc.service.FormatMessage(ctx, user.GetLanguage(), bot.FmtdMsgWelcome), nil)
 }
 
+// Country implements Bot's /country command
+// and returns formated and localized TelegramMessage
 func (uc *BotUsecase) Country(ctx context.Context, userID int64) *model.TelegramMessage {
 	mth := "Country"
 	user, err := uc.userUC.Get(ctx, userID)
@@ -60,6 +63,8 @@ func (uc *BotUsecase) Country(ctx context.Context, userID int64) *model.Telegram
 		uc.service.CommandsToInlineKeboard(ctx, uc.service.CommandsFromCountry(ctx, uc.countryUC.ListFromCache(ctx))))
 }
 
+// Language implements Bot's /language command
+// and returns formated and localized TelegramMessage
 func (uc *BotUsecase) Language(ctx context.Context, userID int64) *model.TelegramMessage {
 	mth := "Language"
 	user, err := uc.userUC.Get(ctx, userID)
@@ -71,6 +76,8 @@ func (uc *BotUsecase) Language(ctx context.Context, userID int64) *model.Telegra
 		uc.service.CommandsToInlineKeboard(ctx, uc.service.CommandsFromLanguage(ctx)))
 }
 
+// Contribute implements Bot's /contribute command
+// and returns formated and localized TelegramMessage
 func (uc *BotUsecase) Contribute(ctx context.Context, userID int64) *model.TelegramMessage {
 	mth := "Contribute"
 	user, err := uc.userUC.Get(ctx, userID)
@@ -81,6 +88,8 @@ func (uc *BotUsecase) Contribute(ctx context.Context, userID int64) *model.Teleg
 	return model.NewTelegramMessage(uc.service.FormatMessage(ctx, user.GetLanguage(), "Contribute"), nil)
 }
 
+// Trip implements Bot's /trip command
+// and returns formated and localized TelegramMessage
 func (uc *BotUsecase) Trip(ctx context.Context, userID int64) *model.TelegramMessage {
 	mth := "Trip"
 	user, err := uc.userUC.Get(ctx, userID)
@@ -91,6 +100,8 @@ func (uc *BotUsecase) Trip(ctx context.Context, userID int64) *model.TelegramMes
 	return model.NewTelegramMessage(uc.service.FormatMessage(ctx, user.GetLanguage(), bot.FmtdMsgTripExplanation), nil)
 }
 
+// Me implements Bot's /me command
+// and returns formated and localized TelegramMessage
 func (uc *BotUsecase) Me(ctx context.Context, userID int64) *model.TelegramMessage {
 	mth := "Me"
 	user, err := uc.userUC.Get(ctx, userID)
@@ -102,6 +113,9 @@ func (uc *BotUsecase) Me(ctx context.Context, userID int64) *model.TelegramMessa
 	return model.NewTelegramMessage(userInfo, nil)
 }
 
+// UpdateLanguage implements Bot's /language command callback query and
+// updates user's language depeding on inlineKeyboard clicked,
+// and returns formated and localized TelegramMessage
 func (uc *BotUsecase) UpdateLanguage(ctx context.Context, userID int64, languageCodeInput string) *model.TelegramMessage {
 	mth := "UpdateLanguage"
 	user, err := uc.userUC.Get(ctx, userID)
@@ -123,6 +137,10 @@ func (uc *BotUsecase) UpdateLanguage(ctx context.Context, userID int64, language
 	return model.NewTelegramMessage(msg+"\n"+userInfo, nil)
 }
 
+// UpdateCountry implements Bot's /country command callback query and
+// updates user's country depeding on inlineKeyboard clicked,
+// also handles /custom command,
+// and returns formated and localized TelegramMessage
 func (uc *BotUsecase) UpdateCountry(ctx context.Context, userID int64, countryInput string) *model.TelegramMessage {
 	mth := "UpdateCountry"
 	user, err := uc.userUC.Get(ctx, userID)
@@ -155,9 +173,6 @@ func (uc *BotUsecase) UpdateCountry(ctx context.Context, userID int64, countryIn
 	} else {
 		return model.NewTelegramMessage(uc.service.FormatError(ctx, user.GetLanguage(), model.NewLError("ErrorInvalidCustomCountry", nil, err)), nil)
 	}
-	if daysCont > daysLimit || daysLimit > resetInterval {
-		return model.NewTelegramMessage(uc.service.FormatError(ctx, user.GetLanguage(), model.NewLError("ErrorInvalidCustomCountrySeq", nil, err)), nil)
-	}
 	country, err := uc.countryUC.Lookup(ctx, countryID, daysCont, daysLimit, resetInterval)
 	if err != nil {
 		slog.Error("usecase failed", "method", mth, "userID", userID, "input", countryInput, "err", err)
@@ -172,6 +187,8 @@ func (uc *BotUsecase) UpdateCountry(ctx context.Context, userID int64, countryIn
 	return model.NewTelegramMessage(msg+"\n"+userInfo, nil)
 }
 
+// CalculateTrip implements Bot's default handler meant to be an array of dates passed as a plain string,
+// and returns formated and localized TelegramMessage
 func (uc *BotUsecase) CalculateTrip(ctx context.Context, userID int64, datesInput string) *model.TelegramMessage {
 	mth := "CalculateTrip"
 	user, err := uc.userUC.Get(ctx, userID)
@@ -187,6 +204,7 @@ func (uc *BotUsecase) CalculateTrip(ctx context.Context, userID int64, datesInpu
 	return model.NewTelegramMessage(trip, nil)
 }
 
+// Hint process incoming Message Code and returns formated and localized TelegramMessage
 func (uc *BotUsecase) Hint(ctx context.Context, userID int64, messageCode bot.FmtdMsg) *model.TelegramMessage {
 	mth := "Hint"
 	user, err := uc.userUC.Get(ctx, userID)
@@ -197,6 +215,7 @@ func (uc *BotUsecase) Hint(ctx context.Context, userID int64, messageCode bot.Fm
 	return model.NewTelegramMessage(uc.service.FormatMessage(ctx, user.GetLanguage(), messageCode), nil)
 }
 
+// Feedback implements Bot's /feedback command and returns feedback-related formated and localized TelegramMessage
 func (uc *BotUsecase) Feedback(ctx context.Context, userID int64) *model.TelegramMessage {
 	mth := "Feedback"
 	user, err := uc.userUC.Get(ctx, userID)
@@ -205,14 +224,4 @@ func (uc *BotUsecase) Feedback(ctx context.Context, userID int64) *model.Telegra
 		return model.NewTelegramMessage(uc.service.FormatError(ctx, i18n.DefaultLang(), err), nil)
 	}
 	return model.NewTelegramMessage(uc.service.FormatMessage(ctx, user.GetLanguage(), "Feedback"), nil)
-}
-
-func (uc *BotUsecase) LocalizeCommands(ctx context.Context, commands []*model.TelegramBotCommand) []*model.TelegramBotCommandRow {
-	// mth := "LocalizeCommands"
-	return uc.service.LocalizeCommands(ctx, commands)
-}
-
-func (uc *BotUsecase) LocalizeDescription(ctx context.Context, description *model.TelegramBotDescription) []*model.TelegramBotDescription {
-	// mth := "LocalizeDescription"
-	return uc.service.LocalizeDescription(ctx, description)
 }

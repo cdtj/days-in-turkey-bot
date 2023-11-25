@@ -6,7 +6,7 @@ CommandMe = "current settings"
 CommandCountry = "change your country"
 CommandLanguage = "change your language"
 CommandTrip = "how everything works"
-CommandContribute = "contribute to open-source world (looking for translations and data providers)"
+CommandContribute = "contribute to open-source (translations and country data are welcome)"
 CommandFeedback = "public chat for your questions"
 
 BotDescription = "I'll help you to plan your trip and to avoid overstay.\n\nDiscuss: @TurkeyDays"

@@ -89,3 +89,19 @@ const dateLayout = "02/01/2006"
 func (l *Locale) FormatDate(dt time.Time) string {
 	return dt.Format(dateLayout)
 }
+
+// LocalizeCommands passes commands into nested i18n'er adding Language Tag
+func (l *Locale) LocalizeCommands(commands []*model.TelegramBotCommand) *model.TelegramBotCommandRow {
+	lcommands := make([]*model.TelegramBotCommand, 0)
+	for _, command := range commands {
+		lcommands = append(lcommands, model.NewTelegramBotCommand(l.Message(command.Caption), command.Command, model.TelegramBotCommandMessageExact))
+	}
+	return model.NewTelegramBotCommandRow(lcommands, l.GetLanguage())
+}
+
+// LocalizeDescription passes description into nested i18n'er adding Language Tag
+func (l *Locale) LocalizeDescription(description *model.TelegramBotDescription) *model.TelegramBotDescription {
+	return model.NewTelegramBotDescription(l.Message(description.Description),
+		l.Message(description.About),
+		l.GetLanguage())
+}
