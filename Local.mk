@@ -19,4 +19,4 @@ start:
 
 clean:
 	docker rm $(shell docker container ls -a -f label="tag=turkeydays" -f "status=exited" -q)
-	docker image rm $(shell docker images -a -f label="tag=turkeydays" -f "status=exited" -q)
+	docker image rm $(shell docker images -a -f label="tag=turkeydays" -q)
