@@ -29,7 +29,7 @@ import (
 
 var (
 	defaultLang    = "en"
-	defaultCountry = model.NewCountry("CUSTOM", "📝", "", 60, 90, 180, true)
+	defaultCountry = model.NewCountry("CUSTOM", "📝", "/country", 60, 90, 180, true)
 )
 
 func main() {

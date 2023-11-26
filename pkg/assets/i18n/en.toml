@@ -40,6 +40,7 @@ UserCountryCustom = "If your country isn't presented, you can send me the `/cust
 
 CountryInfo = "Country: {{.Flag}} {{.Name}}"
 CountryDays = "Days Allowed - Continual: {{.Continual}} / Limit: {{.Limit}} / Reset Interval: {{.ResetInterval}}"
+CountryVisaWarning = "*Warning!* You must get a visa to be able to enter the country."
 
 # only exposable errors here
 ErrorInvalidDate = "invalid date: {{.DateInput}}, the date should be in the format: `day/month/year`, example: `31/12/2023`"

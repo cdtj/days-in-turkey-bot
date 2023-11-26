@@ -25,7 +25,7 @@ func NewTelegramFormatter(i18n i18n.I18ner, v2 bool) *TelegramFormatter {
 var _ Formatter = NewTelegramFormatter(nil, false)
 
 func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree) string {
-	result := ""
+	msg := ""
 	firstLine := true
 	firstEligible := true
 	overstayed := false
@@ -34,10 +34,10 @@ func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree
 		slog.Debug("TripTree", "StartDate", i.StartDate, "EndDate", i.EndDate, "TripDays", i.TripDays, "PeriodDays", i.PeriodDays, "OverstayDays", i.OverstayDays)
 		if i.StartPredicted || i.EndPredicted {
 			if i.StartPredicted && firstEligible {
-				result += locale.Message("TripEligibleHdr") + "\n"
+				msg += locale.Message("TripEligibleHdr") + "\n"
 				firstEligible = false
 			}
-			result += locale.MessageWithTemplate("TripPredicted", map[string]interface{}{
+			msg += locale.MessageWithTemplate("TripPredicted", map[string]interface{}{
 				"StartDate":  wrapCode(locale.FormatDate(i.StartDate)),
 				"EndDate":    wrapCode(locale.FormatDate(i.EndDate)),
 				"TripDays":   locale.MessageWithCount("DayCounter", i.TripDays),
@@ -45,17 +45,17 @@ func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree
 			}, nil)
 			if i.OverstayDays > 0 {
 				overstayed = true
-				result += ", " + locale.MessageWithTemplate("Overstay", map[string]interface{}{
+				msg += ", " + locale.MessageWithTemplate("Overstay", map[string]interface{}{
 					"OverstayDays": wrapBold(locale.MessageWithCount("DayCounter", i.OverstayDays)),
 				}, nil) + " ⚠️"
 			}
-			result += "\n"
+			msg += "\n"
 		} else {
 			if firstLine {
-				result += "\n" + locale.Message("TripPast") + "\n"
+				msg += "\n" + locale.Message("TripPast") + "\n"
 				firstLine = false
 			}
-			result += locale.MessageWithTemplate("Trip", map[string]interface{}{
+			msg += locale.MessageWithTemplate("Trip", map[string]interface{}{
 				"StartDate":  wrapCode(locale.FormatDate(i.StartDate)),
 				"EndDate":    wrapCode(locale.FormatDate(i.EndDate)),
 				"TripDays":   locale.MessageWithCount("DayCounter", i.TripDays),
@@ -63,18 +63,18 @@ func (f *TelegramFormatter) TripTree(language language.Tag, tree *model.TripTree
 			}, nil)
 			if i.OverstayDays > 0 {
 				overstayed = true
-				result += ", " + locale.MessageWithTemplate("Overstay", map[string]interface{}{
+				msg += ", " + locale.MessageWithTemplate("Overstay", map[string]interface{}{
 					"OverstayDays": wrapBold(locale.MessageWithCount("DayCounter", i.OverstayDays)),
 				}, nil) + " ⚠️"
 			}
-			result += "\n"
+			msg += "\n"
 		}
 	}
-	result += "\n" + locale.Message("OverstayCaution")
+	msg += "\n" + locale.Message("OverstayCaution")
 	if overstayed {
-		result += "\n" + locale.Message("OverstayExplanation")
+		msg += "\n" + locale.Message("OverstayExplanation")
 	}
-	return f.markdownWrapper(result)
+	return f.markdownWrapper(msg)
 }
 
 func (f *TelegramFormatter) User(language language.Tag, user *model.User) string {
@@ -88,7 +88,7 @@ func (f *TelegramFormatter) User(language language.Tag, user *model.User) string
 
 func (f *TelegramFormatter) Country(language language.Tag, country *model.Country) string {
 	locale := f.i18n.GetLocale(language)
-	return f.markdownWrapper(locale.MessageWithTemplate("CountryInfo", map[string]interface{}{
+	msg := locale.MessageWithTemplate("CountryInfo", map[string]interface{}{
 		"Flag": country.GetFlag(),
 		"Name": country.GetName(),
 	}, nil) +
@@ -97,7 +97,11 @@ func (f *TelegramFormatter) Country(language language.Tag, country *model.Countr
 			"Continual":     country.GetDaysCont(),
 			"Limit":         country.GetDaysLimit(),
 			"ResetInterval": country.GetResetInterval(),
-		}, nil))
+		}, nil)
+	if !country.GetVisaFree() {
+		msg += "\n\n⚠️ " + locale.Message("CountryVisaWarning") + " ⚠️"
+	}
+	return f.markdownWrapper(msg)
 }
 
 func (f *TelegramFormatter) FormatMessage(language language.Tag, messageID string) string {

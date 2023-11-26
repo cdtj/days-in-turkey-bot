@@ -1,6 +1,6 @@
 # telegram bot token and secret
 .token
-.secret
+.token.*
 
 # pprof
 *.pprof
