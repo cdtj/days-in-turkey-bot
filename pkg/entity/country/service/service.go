@@ -39,5 +39,6 @@ func (s *CountryService) CustomCountry(ctx context.Context, daysCont, daysLimit,
 		DaysContinual: daysCont,
 		DaysLimit:     daysLimit,
 		ResetInterval: resetInterval,
+		VisaFree:      true,
 	}
 }

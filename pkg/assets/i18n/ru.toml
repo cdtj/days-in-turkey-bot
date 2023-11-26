@@ -40,6 +40,7 @@ UserCountryCustom = "Если страны нет в списке, но изве
 
 CountryInfo = "Страна: {{.Flag}} {{.Name}}"
 CountryDays = "Дней разрешено - Единовременно: {{.Continual}} / Всего: {{.Limit}} / Обнуление: {{.ResetInterval}}"
+CountryVisaWarning = "*Внимание!* Вам необходимо получить визу для въезда в страну."
 
 ErrorInvalidDate = "неправильная дата, дата должна быть в формате: `день/месяц/год`, например: `31/12/2023`"
 ErrorInvalidDatePeriod = "неправильный {{.PeriodName}}: {{.PeriodValue}} [{{.DateInput}}]"

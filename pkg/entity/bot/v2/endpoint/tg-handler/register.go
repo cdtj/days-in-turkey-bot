@@ -26,7 +26,7 @@ func BindBotHandlers(uc bot.Usecase) []*telegrambot.TelegramBotBind {
 		telegrambot.NewTelegramBotBind(model.NewTelegramBotCommand("CommandFeedback", "feedback", model.TelegramBotCommandMessageExact),
 			h.feedback),
 
-		telegrambot.NewTelegramBotBind(model.NewTelegramBotCommand("", "/custom", model.TelegramBotCommandMessagePrefix),
+		telegrambot.NewTelegramBotBind(model.NewTelegramBotCommand("", "custom", model.TelegramBotCommandMessagePrefix),
 			h.updateCountry),
 
 		telegrambot.NewTelegramBotBind(model.NewTelegramBotCommand("", "country", model.TelegramBotCommandCallbackPrefix),

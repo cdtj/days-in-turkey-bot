@@ -1,4 +1,8 @@
 # Days in Turkey Telegram Bot
+<div width="100%" align="center">
+  <img src="https://github.com/cdtj/days-in-turkey-bot/blob/main/resources/img/chat_background.jpeg" width="35%">
+  <p>Automating visa-free days calculation</p>
+</div>
 I get bored using Sheets to calculate when I must leave and when I'm able to enter. So here it is.
 
 ## Usage
