@@ -155,7 +155,7 @@ func getResetDay(dt time.Time, resetInterval int) time.Time {
 
 // daysBetween returns int number of days between to dates
 func daysBetween(from, to time.Time) int {
-	return int(to.Sub(from) / (time.Hour * 24))
+	return int(to.Sub(from)/(time.Hour*24)) + 1
 }
 
 // maxDepartureDate returns date appended by daysCont days

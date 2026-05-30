@@ -1,5 +1,5 @@
 # golang stuff
-FROM golang:latest as build-env
+FROM golang:latest AS build-env
 
 RUN mkdir /app
 WORKDIR /app
